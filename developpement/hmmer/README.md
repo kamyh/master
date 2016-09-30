@@ -1,3 +1,7 @@
+# Pre-requis
+
+- Be in this current directory
+
 # Build
 
 $ docker build -t tm/hmmer .
@@ -6,12 +10,12 @@ $ docker build -t tm/hmmer .
 
 ## From container
 
-$ docker run -v ~/hmmer/data:/data -it tm/hmmer
+$ docker run -v $PWD/data:/data -it tm/hmmer
 $ hmmsearch --tblout /data/hits.txt /data/Pfam-A.hmm /data/test_data.fasta
 
 ## From Host
 
-$ docker run --rm --privileged -v ~/hmmer/data:/data tm/hmmer hmmsearch --tblout /data/hits.txt /data/Pfam-A.hmm /data/test_data.fasta
+$ docker run --rm --privileged -v $PWD/data:/data tm/hmmer hmmsearch --tblout /data/hits.txt /data/Pfam-A.hmm /data/test_data.fasta
 
 ## Run with benchmark timer
 

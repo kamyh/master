@@ -10,7 +10,6 @@ RUN yum -y install epel-release
 RUN yum -y install gcc gcc-c++ make wget tar gzip
 
 # Get source code from http://hmmer.org/download.html
-#TODO get it or copy it ??
 RUN wget http://eddylab.org/software/hmmer3/3.1b2/hmmer-3.1b2.tar.gz
 RUN tar -xzvf hmmer-3.1b2.tar.gz
 
