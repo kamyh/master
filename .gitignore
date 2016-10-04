@@ -16,7 +16,7 @@
 .idea*
 
 #too big pfam files
-*/hmmer/data/Pfam*
+developpement/dockers/hmmer/data/Pfam*
 
 # Sensitive or high-churn files:
 .idea/dataSources.ids
