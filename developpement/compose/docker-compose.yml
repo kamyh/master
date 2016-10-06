@@ -1,0 +1,20 @@
+version: '2'
+services:
+  core:
+    image: centos
+    #command: sh -c "ping core"
+    hostname: core
+    networks:
+      - mynet
+
+  hmmer:
+    image: tm/hmmer
+    links:
+    - core
+    command: ping core
+    networks:
+      - mynet
+
+networks:
+  mynet:
+    driver: bridge
