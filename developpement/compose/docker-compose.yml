@@ -6,6 +6,9 @@ services:
     hostname: core
     networks:
       - mynet
+    tty: true
+    links:
+    - ../dockers/hmmer/data:/data
 
   hmmer:
     image: tm/hmmer
