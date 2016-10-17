@@ -34,8 +34,6 @@ class HmmerScan:
 
         os.chdir(pwd)
 
-        self.ls()
-
         p = Popen([
             "docker",
             "run",

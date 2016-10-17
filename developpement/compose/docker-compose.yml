@@ -18,6 +18,14 @@ services:
     networks:
       - mynet
 
+  :
+    build: ../dockers/database
+    links:
+    - core
+    command: ping core
+    networks:
+      - mynet
+
 networks:
   mynet:
     driver: bridge
