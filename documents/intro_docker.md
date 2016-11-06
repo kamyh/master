@@ -1,4 +1,7 @@
 # Introduction
+## Utilisations
+## Compatibilité inter-OS
+## Miracle or illusion
 
 # Pré-requis
 ## Connaissance

@@ -18,7 +18,7 @@ services:
     networks:
       - mynet
 
-  :
+  database:
     build: ../dockers/database
     links:
     - core
