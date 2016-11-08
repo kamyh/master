@@ -1,15 +1,18 @@
 version: '2'
 services:
   core:
-    image: centos
-    command: python inphinity/tests.py
+    build: ../dockers/core
+    command: sh run.sh
     hostname: core
     networks:
       - mynet
     tty: true
     volumes:
-      - ../inphinity/data:/data
-      - ../inphinity:/inphinity
+      - ../inphinity/data:/data:Z
+      - ../inphinity:/tmp/inphinity:Z
+    privileged: true
+
+  #docker run -v ../inphinity:/tmp/inphinity --privileged core "sh run.sh"
 
   hmmer:
     build: ../dockers/hmmer

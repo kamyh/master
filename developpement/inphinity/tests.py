@@ -9,6 +9,7 @@
 
 from hmmerScan import HmmerScan
 from config import Config
+from database_utilities import DBUtilties
 
 
 ##                      ##
@@ -34,9 +35,15 @@ def test_03112016_config_basic():
     c.load_config()
     #c.load_config_test()
 
+def test_08112016_db():
+    db = DBUtilties()
+    db.load_db()
+
 
 if __name__ == '__main__':
     # test_10102016()
     # test_13102016()
 
-    test_03112016_config_basic()
+    #test_03112016_config_basic()
+
+    test_08112016_db()
