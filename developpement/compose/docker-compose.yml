@@ -2,19 +2,21 @@ version: '2'
 services:
   core:
     image: centos
-    #command: sh -c "ping core"
+    command: python inphinity/tests.py
     hostname: core
     networks:
       - mynet
     tty: true
-    links:
-    - ../dockers/hmmer/data:/data
+    volumes:
+      - ../inphinity/data:/data
+      - ../inphinity:/inphinity
 
   hmmer:
-    image: tm/hmmer
+    build: ../dockers/hmmer
+    hostname: hmmer
     links:
     - core
-    command: ping core
+    tty: true
     networks:
       - mynet
 
@@ -22,7 +24,9 @@ services:
     build: ../dockers/database
     links:
     - core
-    command: ping core
+    tty: true
+    environment:
+    - MYSQL_ROOT_PASSWORD=SecretPasswordInphinity
     networks:
       - mynet
 

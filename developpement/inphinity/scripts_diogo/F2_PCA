@@ -1,0 +1,164 @@
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Oct 10 17:04:02 2016
+
+@author: diogo
+"""
+
+
+#####Données accès BD
+dbHost = "127.0.0.1"
+dbUser = "root"
+dbPasswd = "17061990"
+
+dbnamePb = "phage_bacts"
+dbnameDom = "domine"
+#####Fin Données accès BD
+
+#####Variables avec fichiers temporaires
+
+#Fichier pour parser les seqs
+tempFilePSeqs = "/home/diogo/Bureau/PCAExe.txt"
+
+#####Fin Variables avec fichiers temporaires
+
+
+import MySQLdb
+from sklearn.decomposition import PCA
+import csv
+####Fonctions DB
+def connectionOpen(numDb):
+    if numDb == 1:
+        dbConnection = MySQLdb.connect(host=dbHost, user=dbUser, passwd=dbPasswd, db=dbnamePb)
+    else:
+        dbConnection = MySQLdb.connect(host=dbHost, user=dbUser, passwd=dbPasswd, db=dbnameDom)
+    return dbConnection
+
+def connectionClose(dbConnection):
+    dbConnection.close();  
+
+def executeSelect(commandeExecuter, numDb):
+    connection = connectionOpen(numDb)
+    cursor = connection.cursor()
+    cursor.execute(commandeExecuter)
+    connectionClose(connection)
+    return cursor
+
+
+
+####Fonctions non DB
+
+
+
+####Fonctions non DB
+
+#Retournes les interactions positives
+def getInteractionsPositives():
+    rslt = executeSelect("SELECT * from Interactions", 1)
+    resultats = []
+    resultats = rslt.fetchall()
+    return resultats
+    
+#Retournes les interactions engatives
+def getInteractionsNegatives():
+    rslt = executeSelect("SELECT * from Negative_Interactions", 1)
+    resultats = []
+    resultats = rslt.fetchall()
+    return resultats
+    
+#Obtient tous les pourcentages d un organisme
+# 1 - bacteria 0 - phage
+def getAACHWByCell(cellId, boolBact):
+    query = "SELECT * FROM AciAmin_C_WEIGHT WHERE idCell = " + str(cellId) + " AND bool_Bacteria = " + str(boolBact)
+    rslt = executeSelect(query, 1)
+    resultats = []
+    resultats = rslt.fetchall()
+    return resultats
+
+#Retourne toutes les interactions
+def getAllIntractions():
+    listInteractionP = []
+    listInteractionN = []
+    listInteractions = []
+    listInteractionP = getInteractionsPositives()
+    listInteractionN = getInteractionsNegatives()
+    listInteractions = listInteractionP + listInteractionN
+    return listInteractions
+
+
+#Applique la PCA a tous les IPP d une interaction   
+def createData(interactionId, idBacteria, idPhage, classId, componantesNumber):
+    auxBact = getAACHWByCell(idBacteria, 1)
+    auxPhage = getAACHWByCell(idPhage, 0)
+    vecPCAValues = []
+    for percentbact in auxBact:
+        for percentPhage in auxPhage:
+            vecPCAValues.append(percentbact[4:31] + percentPhage[4:31])
+    
+    
+    pca = PCA(n_components=componantesNumber)
+    vecPCAValuesTranspose = zip(*vecPCAValues)
+    
+    PCA(copy=True, n_components=2, whiten=False)    
+    
+    vecPCAValuesResults = pca.fit_transform(vecPCAValuesTranspose)
+
+
+    print pca.explained_variance_ratio_
+    variancePCA = pca.explained_variance_ratio_
+    return vecPCAValuesResults, variancePCA
+
+#Organiser les resultats des PC pour la creation du dataset    
+def saveResults(previewResults):
+    results = [[]for _ in range(NumberPC)]
+    for pcVarInteract in previewResults:
+        aux = 0
+        while aux < NumberPC:
+
+            results[aux].append(pcVarInteract[aux])
+            aux = aux + 1
+    auxResults = []
+    for PC in results:
+        for PCvalue in PC:
+            auxResults.append(PCvalue)  
+    return auxResults
+
+#Ecrire resultats de PCA    
+def writeCSVFile(matrizContent):
+    csv_out = open(tempFilePSeqs, 'w')
+    mywriter = csv.writer(csv_out, delimiter=';')
+    mywriter.writerows(matrizContent)
+    csv_out.close()
+####Fin fonctions non DB
+
+
+####MAIN
+listInteract = getAllIntractions()
+#nombre de PC
+NumberPC = 2
+
+#Nombre resultats de la PCA
+variancePCA = []
+vecResultsPcAWrite = []
+
+
+for interaction in listInteract: 
+    idInteraction = interaction[0]
+    idbacteria = interaction[1]
+    idPhage = interaction[2]
+    PosNegInteraction = interaction[3]
+    print "Interaction Number: " + str(idInteraction)
+    print "Top of Class: " + str(PosNegInteraction)
+    
+    resultsPCS, varPCA = createData(idInteraction, idbacteria, idPhage, PosNegInteraction, NumberPC)
+    variancePCA.append(varPCA)
+    print idInteraction
+    print PosNegInteraction
+    resultsWrite = saveResults(resultsPCS)
+    resultsWrite.insert(0, idInteraction)
+    resultsWrite.append(PosNegInteraction)
+    vecResultsPcAWrite.append(resultsWrite)
+    
+#Creer le dataSet
+writeCSVFile(vecResultsPcAWrite)

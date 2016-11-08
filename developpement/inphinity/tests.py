@@ -30,8 +30,9 @@ def test_13102016():
 ##                      ##
 
 def test_03112016_config_basic():
-    c = Config()
-    c.load_config_test()
+    c = Config('inphinity/default.ini')
+    c.load_config()
+    #c.load_config_test()
 
 
 if __name__ == '__main__':

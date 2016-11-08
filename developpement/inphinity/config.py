@@ -7,10 +7,9 @@
 import ConfigParser
 
 class Config:
-    def __init__(self):
-        self.Config = ConfigParser.ConfigParser()
-        self.Config.read("./default.ini")
-        print self.Config.sections()
+    def __init__(self, filename):
+        self.config = ConfigParser.ConfigParser()
+        self.config.read(filename)
 
     def check_config(self):
         pass
@@ -19,9 +18,12 @@ class Config:
         pass
 
     def load_config(self):
-        pass
+        for section in self.config.sections():
+            print section
+
 
     #Doesn't Working
     def load_config_test(self):
-        test = ConfigSectionMap("test")['val1']
+        self.config.sections()
+        test = self.config.get('TEST','val1')
         print test

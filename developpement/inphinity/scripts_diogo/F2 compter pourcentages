@@ -1,0 +1,404 @@
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Oct 10 14:51:58 2016
+
+@author: diogo
+"""
+
+#####Données accès BD
+dbHost = "127.0.0.1"
+dbUser = "root"
+dbPasswd = "17061990"
+
+dbnamePb = "phage_bacts"
+dbnameDom = "domine"
+#####Fin Données accès BD
+
+#####Variables avec fichiers temporaires
+
+#Fichier pour parser les seqs
+tempFilePSeqs = "/home/diogo/Bureau/tmpMF.txt"
+
+#####Fin Variables avec fichiers temporaires
+
+import MySQLdb
+from Bio import SeqIO
+import numpy as np
+
+
+
+
+####Fonctions DB
+
+
+#Ouvre la connexion a la DB
+#1 = Phage_bacts
+#2 = domine
+def connectionOpen(numDb):
+    if numDb == 1:
+        dbConnection = MySQLdb.connect(host=dbHost, user=dbUser, passwd=dbPasswd, db=dbnamePb)
+    else:
+        dbConnection = MySQLdb.connect(host=dbHost, user=dbUser, passwd=dbPasswd, db=dbnameDom)
+    return dbConnection
+
+#Fermer connexion
+def connectionClose(dbConnection):
+    dbConnection.close();  
+    
+ # Executer une simples commande SQL   
+def executeSelect(commandeExecuter, numDb):
+    connection = connectionOpen(numDb)
+    cursor = connection.cursor()
+    cursor.execute(commandeExecuter)
+    connectionClose(connection)
+    return cursor
+    
+#Executer Insert
+def executeInsert(commandeExecuter,params, numDb):
+    connection = connectionOpen(numDb)
+    cursor = connection.cursor()
+    try:
+        cursor.execute(commandeExecuter, params)
+        connection.commit()
+        #print "Insert OK"
+    except:
+        connection.rollback()
+        print "Inert error"
+    connectionClose(connection)
+    return cursor
+    
+
+
+####Fin Fonctions DB
+
+
+
+####Fonctions non DB
+
+
+#Retourne la seq proteique des proteines
+#(1 = Bacteria; 2 = Phage)
+def getSequenceProteines(idCellule, tipeCellule):
+    if tipeCellule == 1:
+        query = 'SELECT Bacterium_id, GI, Nb_proteins, prot_seq FROM Bacteria WHERE Bacterium_id = ' + str(idCellule)
+    else:
+        query = 'SELECT Phage_id, GI, Nb_proteins, prot_seq FROM Phages WHERE Phage_id = '+ str(idCellule)
+    rslt = executeSelect(query, 1)
+    resultats = []
+    resultats = rslt.fetchall()
+    return resultats
+
+
+    
+#retourne tous les id des bacteries
+def getIdAllBacteries():
+    query = "select Bacterium_id from Bacteria"
+    rslt = executeSelect(query, 1)
+    idBacts = rslt.fetchall()
+    bactsIdRet = []
+    for resultat in idBacts:
+        bactsIdRet.append(resultat[0])
+    return bactsIdRet
+
+#retourne tous les id des Phages
+def getIdAllPhages():
+    query = "select Phage_id from Phages"
+    rslt = executeSelect(query, 1)
+    idPhage = rslt.fetchall()
+    PhageIdRet = []
+    for resultat in idPhage:
+        PhageIdRet.append(resultat[0])
+    return PhageIdRet
+    
+#insere les pourcentages dans le tableau AciAmin_C_Weight
+def setExecuteInserAAChPercentWeightProt(idCell, boolBacteria, idProtein, PercCaractProt, PercChimicalProt, weightProt):
+    aux = [idCell, boolBacteria, idProtein]
+    for value in PercCaractProt:
+        aux.append(value)
+    for value in PercChimicalProt:
+        aux.append(value)
+        
+    aux.append(weightProt)
+    
+    executeInsert("INSERT INTO AciAmin_C_WEIGHT (idCell, bool_Bacteria, idProtein, Perc_A, Perc_C, Perc_D, Perc_E ,Perc_F ,Perc_G ,Perc_H, Perc_I, Perc_K, Perc_L, Perc_M, Perc_N, Perc_P, Perc_Q, Perc_R, Perc_S, Perc_T, Perc_V, Perc_W, Perc_Y, Perc_X, Perc_C_C, Perc_C_H, Perc_C_O, Perc_C_N, Perc_C_S, Perc_Weight) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", aux, 1)
+    
+
+#Fait le parce d un fichier multifasta  
+def parseSequencesProt(sequence):
+    pid = []
+    pseq = []
+    
+    text_file = open(tempFilePSeqs, "w")
+    text_file.write(sequence)
+    text_file.close()
+
+
+
+    fasta_sequences = SeqIO.parse(open(tempFilePSeqs),'fasta')
+    for fasta in fasta_sequences:
+        pid.append(fasta.id)
+        pseq.append(fasta.seq.tostring())
+    return pid, pseq
+    
+#calcule le pourcentage de AA compo chimique et le poids    
+def calculatePercenteAAChWeight(sequence):
+    isCaract = False;
+    Weight = 0
+    PercCaract = np.zeros(21)
+    #0 = C
+    #1 = H
+    #2 = O
+    #3 = N
+    #4 = S
+    PercChimical = np.zeros(5)
+    for caracter in sequence:
+        caracter = caracter.upper()
+        isCaract = False;
+        if caracter == 'A':
+            PercCaract[0] = PercCaract[0] + 1
+            PercChimical[0] = PercChimical[0] + 3
+            PercChimical[1] = PercChimical[1] + 7
+            PercChimical[2] = PercChimical[2] + 2
+            PercChimical[3] = PercChimical[3] + 1
+            PercChimical[4] = PercChimical[4] + 0
+            Weight = Weight + 89
+            isCaract = True
+        if caracter == 'C':
+            PercCaract[1] = PercCaract[1] + 1
+            PercChimical[0] = PercChimical[0] + 3
+            PercChimical[1] = PercChimical[1] + 7
+            PercChimical[2] = PercChimical[2] + 2
+            PercChimical[3] = PercChimical[3] + 1
+            PercChimical[4] = PercChimical[4] + 1
+            Weight = Weight + 133
+            isCaract = True
+        if caracter == 'D':
+            PercCaract[2] = PercCaract[2] + 1
+            PercChimical[0] = PercChimical[0] + 4
+            PercChimical[1] = PercChimical[1] + 6
+            PercChimical[2] = PercChimical[2] + 4
+            PercChimical[3] = PercChimical[3] + 1
+            PercChimical[4] = PercChimical[4] + 0
+            Weight = Weight + 133
+            isCaract = True
+        if caracter == 'E':
+            PercCaract[3] = PercCaract[3] + 1
+            PercChimical[0] = PercChimical[0] + 5
+            PercChimical[1] = PercChimical[1] + 8
+            PercChimical[2] = PercChimical[2] + 4
+            PercChimical[3] = PercChimical[3] + 1
+            PercChimical[4] = PercChimical[4] + 0
+            Weight = Weight + 147
+            isCaract = True
+        if caracter == 'F':
+            PercCaract[4] = PercCaract[4] + 1
+            PercChimical[0] = PercChimical[0] + 3
+            PercChimical[1] = PercChimical[1] + 6
+            PercChimical[2] = PercChimical[2] + 2
+            PercChimical[3] = PercChimical[3] + 1
+            PercChimical[4] = PercChimical[4] + 0
+            Weight = Weight + 165
+            isCaract = True
+        if caracter == 'G':
+            PercCaract[5] = PercCaract[5] + 1
+            PercChimical[0] = PercChimical[0] + 2
+            PercChimical[1] = PercChimical[1] + 5
+            PercChimical[2] = PercChimical[2] + 2
+            PercChimical[3] = PercChimical[3] + 1
+            PercChimical[4] = PercChimical[4] + 0
+            Weight = Weight + 75
+            isCaract = True
+        if caracter == 'H':
+            PercCaract[6] = PercCaract[6] + 1
+            PercChimical[0] = PercChimical[0] + 6
+            PercChimical[1] = PercChimical[1] + 9
+            PercChimical[2] = PercChimical[2] + 2
+            PercChimical[3] = PercChimical[3] + 3
+            PercChimical[4] = PercChimical[4] + 0
+            Weight = Weight + 155
+            isCaract = True
+        if caracter == 'I':
+            PercCaract[7] = PercCaract[7] + 1
+            PercChimical[0] = PercChimical[0] + 6
+            PercChimical[1] = PercChimical[1] + 13
+            PercChimical[2] = PercChimical[2] + 2
+            PercChimical[3] = PercChimical[3] + 1
+            PercChimical[4] = PercChimical[4] + 0
+            Weight = Weight + 131
+            isCaract = True
+        if caracter == 'K':
+            PercCaract[8] = PercCaract[8] + 1
+            PercChimical[0] = PercChimical[0] + 6
+            PercChimical[1] = PercChimical[1] + 15
+            PercChimical[2] = PercChimical[2] + 2
+            PercChimical[3] = PercChimical[3] + 2
+            PercChimical[4] = PercChimical[4] + 0
+            Weight = Weight + 146
+            isCaract = True
+        if caracter == 'L':
+            PercCaract[9] = PercCaract[9] + 1
+            PercChimical[0] = PercChimical[0] + 6
+            PercChimical[1] = PercChimical[1] + 13
+            PercChimical[2] = PercChimical[2] + 2
+            PercChimical[3] = PercChimical[3] + 1
+            PercChimical[4] = PercChimical[4] + 0
+            Weight = Weight + 131
+            isCaract = True
+        if caracter == 'M':
+            PercCaract[10] = PercCaract[10] + 1
+            PercChimical[0] = PercChimical[0] + 5
+            PercChimical[1] = PercChimical[1] + 11
+            PercChimical[2] = PercChimical[2] + 2
+            PercChimical[3] = PercChimical[3] + 1
+            PercChimical[4] = PercChimical[4] + 1
+            Weight = Weight + 149
+            isCaract = True
+        if caracter == 'N':
+            PercCaract[11] = PercCaract[11] + 1
+            PercChimical[0] = PercChimical[0] + 4
+            PercChimical[1] = PercChimical[1] + 8
+            PercChimical[2] = PercChimical[2] + 3
+            PercChimical[3] = PercChimical[3] + 2
+            PercChimical[4] = PercChimical[4] + 0
+            Weight = Weight + 132
+            isCaract = True
+        if caracter == 'P':
+            PercCaract[12] = PercCaract[12] + 1
+            PercChimical[0] = PercChimical[0] + 5
+            PercChimical[1] = PercChimical[1] + 9
+            PercChimical[2] = PercChimical[2] + 2
+            PercChimical[3] = PercChimical[3] + 1
+            PercChimical[4] = PercChimical[4] + 0
+            Weight = Weight + 115
+            isCaract = True
+        if caracter == 'Q':
+            PercCaract[13] = PercCaract[13] + 1
+            PercChimical[0] = PercChimical[0] + 5
+            PercChimical[1] = PercChimical[1] + 10
+            PercChimical[2] = PercChimical[2] + 3
+            PercChimical[3] = PercChimical[3] + 2
+            PercChimical[4] = PercChimical[4] + 0
+            Weight = Weight + 146
+            isCaract = True
+        if caracter == 'R':
+            PercCaract[14] = PercCaract[14] + 1
+            PercChimical[0] = PercChimical[0] + 6
+            PercChimical[1] = PercChimical[1] + 15
+            PercChimical[2] = PercChimical[2] + 2
+            PercChimical[3] = PercChimical[3] + 4
+            PercChimical[4] = PercChimical[4] + 0
+            Weight = Weight + 174
+            isCaract = True
+        if caracter == 'S':
+            PercCaract[15] = PercCaract[15] + 1
+            PercChimical[0] = PercChimical[0] + 3
+            PercChimical[1] = PercChimical[1] + 7
+            PercChimical[2] = PercChimical[2] + 3
+            PercChimical[3] = PercChimical[3] + 1
+            PercChimical[4] = PercChimical[4] + 0
+            Weight = Weight + 105
+            isCaract = True
+        if caracter == 'T':
+            PercCaract[16] = PercCaract[16] + 1
+            PercChimical[0] = PercChimical[0] + 4
+            PercChimical[1] = PercChimical[1] + 9
+            PercChimical[2] = PercChimical[2] + 3
+            PercChimical[3] = PercChimical[3] + 1
+            PercChimical[4] = PercChimical[4] + 0
+            Weight = Weight + 119
+            isCaract = True
+        if caracter == 'V':
+            PercCaract[17] = PercCaract[17] + 1
+            PercChimical[0] = PercChimical[0] + 5
+            PercChimical[1] = PercChimical[1] + 11
+            PercChimical[2] = PercChimical[2] + 2
+            PercChimical[3] = PercChimical[3] + 1
+            PercChimical[4] = PercChimical[4] + 0
+            Weight = Weight + 117
+            isCaract = True
+        if caracter == 'W':
+            PercCaract[18] = PercCaract[18] + 1
+            PercChimical[0] = PercChimical[0] + 5
+            PercChimical[1] = PercChimical[1] + 8
+            PercChimical[2] = PercChimical[2] + 2
+            PercChimical[3] = PercChimical[3] + 2
+            PercChimical[4] = PercChimical[4] + 0
+            Weight = Weight + 204
+            isCaract = True
+        if caracter == 'Y':
+            PercCaract[19] = PercCaract[19] + 1
+            PercChimical[0] = PercChimical[0] + 3
+            PercChimical[1] = PercChimical[1] + 7
+            PercChimical[2] = PercChimical[2] + 2
+            PercChimical[3] = PercChimical[3] + 1
+            PercChimical[4] = PercChimical[4] + 0
+            Weight = Weight + 181
+            isCaract = True
+        if isCaract == False:
+            print "Yessss"
+            PercCaract[20] = PercCaract[20] + 1
+        isCaract = False
+    return Weight, PercCaract, PercChimical
+    
+#appelle la fonction pour calculer les divers pourcentages et add dans le tableau AciAmin_C_Weight
+def calculatePercentAAChWeightAndInsert(idCell, boolBacteria, idProtein, qtdCaractProt, qtdChimicalProt, weightProt):
+    totalCaractProt = np.sum(qtdCaractProt)
+    totalChimicalProt = np.sum(qtdChimicalProt)
+    
+    PercCaractProt = np.zeros(21)
+    PercChimicalProt = np.zeros(5)
+    
+    aux = 0    
+    for caractProt in qtdCaractProt:
+        finalValue = caractProt / float(totalCaractProt)
+        PercCaractProt[aux] = round(finalValue, 9)
+        aux = aux + 1
+    
+    aux = 0
+    for chimicalProt in qtdChimicalProt:
+        finalValue = chimicalProt / float(totalChimicalProt)
+        PercChimicalProt[aux] = round(finalValue, 9)
+        aux = aux + 1
+    
+    setExecuteInserAAChPercentWeightProt(idCell, boolBacteria, idProtein, PercCaractProt, PercChimicalProt, weightProt)
+  
+####Fin Fonctions non DB
+
+
+
+####MAIN
+
+#pour les bacteries il faut de-commenter cette partie...
+#########################Partie Bacteries
+listCellsBact = getIdAllBacteries()
+#listCellsBactAux = listCellsBact[1:2]
+for cell in listCellsBact:
+    ProtSequenceCell = getSequenceProteines(cell,1)
+    print "Bacteria N: " + str(cell)
+    #phages
+    #ProtSequenceCell = getSequenceProteines(cell,2)   
+    pidssProtsCell, pseqssProtsCell = parseSequencesProt(ProtSequenceCell[0][3])
+    
+    for idProt, seqProt in zip(pidssProtsCell,pseqssProtsCell):
+        WeightProt, QtdCaractProt, QtdChimicalProt = calculatePercenteAAChWeight(seqProt)
+        calculatePercentAAChWeightAndInsert(cell, 1, idProt, QtdCaractProt, QtdChimicalProt, WeightProt)
+
+
+#########################Partie bacteriophages
+listCellsPhages = getIdAllPhages()
+
+
+for cell in listCellsPhages:
+    ProtSequenceCell = getSequenceProteines(cell,2)
+    print "Phage N: " + str(cell)
+    #phages
+    #ProtSequenceCell = getSequenceProteines(cell,2)   
+    pidssProtsCell, pseqssProtsCell = parseSequencesProt(ProtSequenceCell[0][3])
+    
+    for idProt, seqProt in zip(pidssProtsCell,pseqssProtsCell):
+        WeightProt, QtdCaractProt, QtdChimicalProt = calculatePercenteAAChWeight(seqProt)
+        calculatePercentAAChWeightAndInsert(cell, 0, idProt, QtdCaractProt, QtdChimicalProt, WeightProt)
+        #Phage
+        #calculatePercentAAChWeightAndInsert(cell, 2, idProt, QtdCaractProt, QtdChimicalProt, WeightProt)
+  
