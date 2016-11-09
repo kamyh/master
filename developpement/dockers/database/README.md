@@ -8,4 +8,5 @@ $ docker run -d -e MYSQL_ROOT_PASSWORD=passwordInphinity -p 3306:3306 tm/databas
 
 # Connect to mysql
 
+$ docker exec -d tm/database /bin/bash
 $ mysql -u root -ppasswordInphinity

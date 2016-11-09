@@ -9,7 +9,7 @@ services:
     tty: true
     volumes:
       - ../inphinity/data:/data:Z
-      - ../inphinity:/tmp/inphinity:Z
+      - ../inphinity:/inphinity:Z
     privileged: true
 
   #docker run -v ../inphinity:/tmp/inphinity --privileged core "sh run.sh"
@@ -18,7 +18,7 @@ services:
     build: ../dockers/hmmer
     hostname: hmmer
     links:
-    - core
+      - core
     tty: true
     networks:
       - mynet
@@ -26,10 +26,13 @@ services:
   database:
     build: ../dockers/database
     links:
-    - core
+      - core
     tty: true
     environment:
-    - MYSQL_ROOT_PASSWORD=SecretPasswordInphinity
+      - MYSQL_ROOT_PASSWORD=SecretPasswordInphinity
+      - MYSQL_DATABASE=test
+    ports:
+      - 3306:3306
     networks:
       - mynet
 
