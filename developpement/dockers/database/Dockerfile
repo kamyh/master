@@ -45,6 +45,10 @@ COPY startup.sh /tmp
 RUN chmod +x /tmp/startup.sh
 
 ADD data/ /tmp/db
+ADD protdom_create.sql /tmp
+
+RUN sed -ire 's/max_allowed_packet.*=.*/max_allowed_packet = 200M/g' /etc/mysql/my.cnf
+RUN sed -ire 's/key_buffer_size.*=.*/key_buffer_size = 128M/g' /etc/mysql/my.cnf
 
 #ENTRYPOINT ["tini", "--"]
 CMD ["/tmp/startup.sh"]

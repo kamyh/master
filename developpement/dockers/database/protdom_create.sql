@@ -1,0 +1,10 @@
+DROP TABLE IF EXISTS PROTDOM;
+CREATE TABLE PROTDOM (
+ProtDomId int NOT NULL AUTO_INCREMENT,
+ProtId varchar(256) DEFAULT NULL,
+DomainAcc char(16) DEFAULT NULL,
+Cell_id int(11) DEFAULT NULL,
+Bacteria_Cell tinyint(1) DEFAULT NULL,
+ProtSeq mediumtext,
+PRIMARY KEY (`ProtDomId`)
+);
