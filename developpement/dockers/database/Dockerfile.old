@@ -31,8 +31,6 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     php5 libapache2-mod-php5 php5-mcrypt \
     fasttree
 
-RUN apt-get install -y python-mysqldb
-
 RUN mkdir /var/run/sshd
 
 RUN mysqld &
@@ -45,9 +43,6 @@ EXPOSE 3306
 
 COPY startup.sh /tmp
 RUN chmod +x /tmp/startup.sh
-
-COPY test_co_db.py /tmp
-RUN chmod +x /tmp/test_co_db.py
 
 ADD data/ /tmp/db
 ADD protdom_create.sql /tmp
@@ -62,7 +57,5 @@ RUN wget --quiet https://github.com/krallin/tini/releases/download/v0.9.0/tini &
     chmod +x /usr/local/bin/tini
 
 ENTRYPOINT ["tini", "--"]
-RUN /tmp/startup.sh
-
-CMD [ "/usr/bin/mysqld_safe" ]
+CMD ["/tmp/startup.sh"]
 

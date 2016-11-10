@@ -1,5 +1,20 @@
 version: '2'
 services:
+  database:
+    build: ../dockers/database
+    tty: true
+    environment:
+      - MYSQL_ROOT_PASSWORD=SecretPasswordInphinity
+      - MYSQL_USER=inphinity
+      - MYSQL_PASSWORD=SecretPasswordInphinity
+      - MYSQL_DATABASE=phage_bact
+    ports:
+      - 3306:3306
+    networks:
+      - mynet
+    container_name: database
+    #entrypoint: ['bash']
+
   core:
     build: ../dockers/core
     command: sh run.sh
@@ -11,6 +26,11 @@ services:
       - ../inphinity/data:/data:Z
       - ../inphinity:/inphinity:Z
     privileged: true
+    links:
+      - database:database
+    depends_on:
+      - database
+    container_name: core
 
   #docker run -v ../inphinity:/tmp/inphinity --privileged core "sh run.sh"
 
@@ -23,18 +43,7 @@ services:
     networks:
       - mynet
 
-  database:
-    build: ../dockers/database
-    links:
-      - core
-    tty: true
-    environment:
-      - MYSQL_ROOT_PASSWORD=SecretPasswordInphinity
-      - MYSQL_DATABASE=test
-    ports:
-      - 3306:3306
-    networks:
-      - mynet
+
 
 networks:
   mynet:

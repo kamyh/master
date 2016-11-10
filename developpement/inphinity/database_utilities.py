@@ -4,11 +4,13 @@
 #   05.11.2016
 ##
 
-import _mysql
+import MySQLdb
 
 class DBUtilties:
     def __init__(self):
-        self.db=_mysql.connect(host="database",port=3306,passwd="SecretPasswordInphinity",db="test")
+        import time
+        time.sleep(5)
+        self.db=MySQLdb.connect(port=3306, host='database', user='root', db='phage_bact')
 
     def load_db(self):
         self.write()

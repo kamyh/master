@@ -15,3 +15,5 @@
     mysql -u root phage_bact < /tmp/db/neg_interactionsVD.sql && \
     echo "Protdom table creation" && \
     mysql -u root phage_bact < /tmp/protdom_create.sql
+
+#while true; do sleep 2; done
