@@ -4,23 +4,27 @@ services:
     build: ../dockers/database
     tty: true
     environment:
-      - MYSQL_ROOT_PASSWORD=SecretPasswordInphinity
-      - MYSQL_USER=inphinity
-      - MYSQL_PASSWORD=SecretPasswordInphinity
-      - MYSQL_DATABASE=phage_bact
+      #TODO: remove ???
+      MYSQL_ROOT_PASSWORD: SecretPasswordInphinity
+      MYSQL_USER: inphinity
+      MYSQL_PASSWORD: SecretPasswordInphinity
+      MYSQL_DATABASE: phage_bact
     ports:
-      - 3306:3306
+      - 3309:3306
     networks:
-      - mynet
-    container_name: database
-    #entrypoint: ['bash']
+      mynet:
+        ipv4_address: 172.25.0.102
+    container_name: inphinity-database
+    volumes:
+      - /inphinity-data/mysql:/var/lib/mysql
 
   core:
     build: ../dockers/core
-    command: sh run.sh
+    #command: sudo sh run.sh
     hostname: core
     networks:
-      - mynet
+      mynet:
+        ipv4_address: 172.25.0.101
     tty: true
     volumes:
       - ../inphinity/data:/data:Z
@@ -30,9 +34,7 @@ services:
       - database:database
     depends_on:
       - database
-    container_name: core
-
-  #docker run -v ../inphinity:/tmp/inphinity --privileged core "sh run.sh"
+    container_name: inphinity-core
 
   hmmer:
     build: ../dockers/hmmer
@@ -48,3 +50,6 @@ services:
 networks:
   mynet:
     driver: bridge
+    ipam:
+      config:
+      - subnet: 172.25.0.0/24

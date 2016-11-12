@@ -27,9 +27,9 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     libxrender1 \
     nano \
     openssh-server \
-    mysql-server mysql-client libmysqlclient-dev \
-    php5 libapache2-mod-php5 php5-mcrypt \
-    fasttree
+    mysql-server mysql-client libmysqlclient-dev
+
+RUN sed -i -e"s/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/" /etc/mysql/my.cnf
 
 RUN apt-get install -y python-mysqldb
 
@@ -62,7 +62,10 @@ RUN wget --quiet https://github.com/krallin/tini/releases/download/v0.9.0/tini &
     chmod +x /usr/local/bin/tini
 
 ENTRYPOINT ["tini", "--"]
-RUN /tmp/startup.sh
 
-CMD [ "/usr/bin/mysqld_safe" ]
+ADD ./startup.sh /opt/startup.sh
+
+EXPOSE 3309
+
+CMD ["/bin/bash", "/opt/startup.sh"]
 

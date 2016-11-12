@@ -1,5 +1,8 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-python /inphinity/tests.py;
+#ping database
+
+mysqld &
+sudo python /tmp/test_co_db.py;
 
 
