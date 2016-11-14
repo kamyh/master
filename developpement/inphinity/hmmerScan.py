@@ -5,11 +5,16 @@
 ##
 
 from subprocess import Popen, PIPE
-import os;
+import os
+from io import IO
+import uuid
+from config import Config
+
 
 class HmmerScan:
     def __init__(self):
         print("HmmerScan wrapper tool initialization")
+        self.io = IO()
 
     ##
     #   Display the output of 'docker ps' command
@@ -27,12 +32,19 @@ class HmmerScan:
     ##
     #   Display the output of the scan hmmer command
     #   docker run --rm --privileged -v $PWD/data:/data tm/hmmer hmmsearch --tblout /data/hits.txt /data/Pfam-A.hmm /data/test_data.fasta
+    #   docker run --rm --privileged -v /data-hmm:/data-hmm inphinity-hmmer hmmsearch --tblout /data-hmm/results/hits.txt /data-hmm/Pfam-A.hmm /data-hmm/fasta/test_data.fasta
     ##
-    def compute_domaine_from_host(self):
-        pwd = '../dockers/hmmer'
-        cwd = os.getcwd()
 
-        os.chdir(pwd)
+
+    #TODO: test
+    def get_results_domaine(self, filename):
+        self.results = self.io.read_results(filename)
+        print self.results
+
+    def compute_domaine_from_host(self, fasta_filename, results_filename):
+        c = Config('inphinity/default.ini')
+        #To solve conext dependent issue qith docker.sock linking
+        path_to_core = c.config.get('ENV','path_to_core')
 
         p = Popen([
             "docker",
@@ -40,13 +52,36 @@ class HmmerScan:
             "--rm",
             "--privileged",
             "-v",
-            cwd + "/data:/data",
-            "tm/hmmer",
+            path_to_core + "/data-hmm:/data-hmm",
+            "inphinity-hmmer",
             "hmmsearch",
             "--tblout",
-            "/data/results/hits.txt",
-            "/data/Pfam-A.hmm",
-            "/data/fasta/test_data.fasta" #TODO issue with file directory - Cannot be called from hmmer dir
+            results_filename,
+            "/data-hmm/Pfam-A.hmm",
+            fasta_filename
         ])
         output = p.communicate()[0]
         print(output)
+
+    def detecter_PFAM(self, info_prot, seq_prot):
+        fasta = '>' + info_prot + '\n' + seq_prot + '\n'
+        fasta_filename = '/data-hmm/tmp/' + str(uuid.uuid4()) + '.fasta'
+        results_filename = '/data-hmm/tmp/' + str(uuid.uuid4()) + '.txt'
+
+        self.io.write(fasta_filename, fasta)
+        self.compute_domaine_from_host(fasta_filename, results_filename)
+
+        print '##### RESULTS #####\n'
+        self.get_results_domaine(results_filename)
+
+        p = Popen([
+            "rm",
+            results_filename
+        ])
+
+        p = Popen([
+            "rm",
+            fasta_filename
+        ])
+
+        #TODO: parse results

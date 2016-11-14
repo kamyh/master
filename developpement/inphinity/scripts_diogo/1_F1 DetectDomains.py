@@ -238,6 +238,7 @@ listIdOrganismes = getIdAllBacteries()
 listIdOrganismes = [0]
 #parcourire tous les ids
 for value in listIdOrganismes:
+    #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     idOrganisme = value
     #print idPhage
     resultatsOrganismes = getSequenceProteines(idOrganisme,1)

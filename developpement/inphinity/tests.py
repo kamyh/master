@@ -10,6 +10,7 @@
 from hmmerScan import HmmerScan
 from config import Config
 from database_utilities import DBUtilties
+from core import DetectDomaines
 
 
 ##                      ##
@@ -26,8 +27,27 @@ def test_13102016():
     h.compute_domaine_from_host()
 
 
+def test_14112016_use_of_hmmer_from_core_with_seq_raw():
+    h = HmmerScan()
+
+    info_prot = '2abl_A mol:protein length:163  ABL TYROSINE KINASE'
+    seq_prot = 'MGPSENDPNLFVALYDFVASGDNTLSITKGEKLRVLGYNHNGEWCEAQTKNGQGWVPSNYITPVNSLEKHSWYHGPVSRNAAEYLLSSGINGSFLVRESESSPGQRSISLRYEGRVYHYRINTASDGKLYVSSESRFNTLAELVHHHSTVADGLITTLHYPAP'
+
+    h.detecter_PFAM(info_prot, seq_prot)
+
+def test_14112016_get_all_id_bacts():
+    db = DBUtilties()
+    print db.get_id_all_bacts()
+
+def test_14112016_run_detect_domaine():
+    dd = DetectDomaines()
+    dd.run()
+
+
+
 ##                      ##
 #   Units tests          #
+#   To format            #
 ##                      ##
 
 def test_03112016_config_basic():
@@ -37,7 +57,9 @@ def test_03112016_config_basic():
 
 def test_08112016_db():
     db = DBUtilties()
-    db.load_db()
+    db.show_tables_of_phage_bact()
+
+
 
 
 if __name__ == '__main__':
@@ -46,4 +68,10 @@ if __name__ == '__main__':
 
     #test_03112016_config_basic()
 
-    test_08112016_db()
+    #test_08112016_db()
+
+    #test_14112016_use_of_hmmer_from_core_with_seq_raw()
+
+    #test_14112016_get_all_id_bacts()
+
+    test_14112016_run_detect_domaine()

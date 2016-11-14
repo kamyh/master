@@ -25,6 +25,11 @@ if [ ! -f /var/lib/mysql/ibdata1 ]; then
 
 	echo "GRANT ALL ON *.* TO admin@'%' IDENTIFIED BY 'root' WITH GRANT OPTION; FLUSH PRIVILEGES" | mysql
 	echo "CREATE DATABASE phage_bact" | mysql
+	mysql phage_bact < /tmp/db/phagesVD.sql
+	mysql phage_bact < /tmp/db/bacteriaVD.sql
+	mysql phage_bact < /tmp/db/interactionsVD.sql
+	mysql phage_bact < /tmp/db/neg_interactionsVD.sql
+	mysql phage_bact < /tmp/db/protdom_create.sql
 
 	killall mysqld
 	sleep 10s

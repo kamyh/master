@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
+sudo rm -R /inphinity-data/mysql
+
 docker-compose down
 
 docker-compose build
-docker-compose up
+
+#Doesn't need to run hmmer image for now
+docker-compose up database core

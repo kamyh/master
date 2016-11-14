@@ -15,7 +15,7 @@ services:
       mynet:
         ipv4_address: 172.25.0.102
     container_name: inphinity-database
-    volumes:
+    volumes: #needed to acces db from python! Why ?
       - /inphinity-data/mysql:/var/lib/mysql
 
   core:
@@ -27,8 +27,9 @@ services:
         ipv4_address: 172.25.0.101
     tty: true
     volumes:
-      - ../inphinity/data:/data:Z
       - ../inphinity:/inphinity:Z
+      - ../dockers/core/data-hmm:/data-hmm:Z
+      - /var/run/docker.sock:/var/run/docker.sock
     privileged: true
     links:
       - database:database
@@ -38,12 +39,15 @@ services:
 
   hmmer:
     build: ../dockers/hmmer
+    image: inphinity-hmmer
     hostname: hmmer
     links:
       - core
     tty: true
     networks:
       - mynet
+    container_name: inphinity-hmmer
+
 
 
 

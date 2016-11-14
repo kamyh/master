@@ -41,10 +41,8 @@ RUN apt-get install -y python-mysqldb
 RUN apt-get install -y python-pip
 RUN pip install mysql-connector
 
-ADD run.sh run.sh
-
 RUN mkdir /tmp/inphinity
 RUN chmod 0777 /tmp/inphinity
 
-COPY test_co_db.py /tmp
-RUN chmod +x /tmp/test_co_db.py
+RUN apt-get install -y curl
+RUN curl -fsSL https://get.docker.com/ | sh

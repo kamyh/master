@@ -19,5 +19,7 @@ RUN ./configure
 RUN make
 RUN make install
 
+EXPOSE 22
+
 # Starting point
 WORKDIR /usr/local/bin

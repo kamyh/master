@@ -6,10 +6,16 @@
 
 from hmmerScan import HmmerScan
 from config import Config
+from database_utilities import DBUtilties
 
 class DetectDomaines():
     def __init__(self):
-        pass
+        self.db = DBUtilties()
+        self.listIdOrganismes = self.db.get_id_all_bacts()
+
+    def run(self):
+        for id in self.listIdOrganismes:
+            print id
 
 class Core:
     def __init__(self):
