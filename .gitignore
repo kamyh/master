@@ -153,3 +153,6 @@ ENV/
 /developpement/inphinity/data/Pfam-A.hmm
 /developpement/dockers/database/data/bacteriaVD.sql
 *bacteriaVD.sql*
+/developpement/dockers/core/data-hmm/Pfam-A.hmm
+
+*Pfam-A.hmm*
