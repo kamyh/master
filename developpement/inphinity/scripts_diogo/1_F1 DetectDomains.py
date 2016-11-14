@@ -199,6 +199,7 @@ def executeInsertDomains(idProtein, domaines, id_Cell, bool_Bacteria, seqProt):
    
 #Recherche des domaines pour chaque Prot
 def chercherDomaines(vecId, vecSeq, idCell, boolBacteria):
+    #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     for idProt, seqProt in zip(vecId, vecSeq):
         try:
             vecDomaines = []
@@ -238,7 +239,7 @@ listIdOrganismes = getIdAllBacteries()
 listIdOrganismes = [0]
 #parcourire tous les ids
 for value in listIdOrganismes:
-    #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
     idOrganisme = value
     #print idPhage
     resultatsOrganismes = getSequenceProteines(idOrganisme,1)

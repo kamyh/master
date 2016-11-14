@@ -44,7 +44,7 @@ class HmmerScan:
     def compute_domaine_from_host(self, fasta_filename, results_filename):
         c = Config('inphinity/default.ini')
         #To solve conext dependent issue qith docker.sock linking
-        path_to_core = c.config.get('ENV','path_to_core')
+        path_to_core = c.get_path_to_core()
 
         p = Popen([
             "docker",

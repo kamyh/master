@@ -22,8 +22,13 @@ class Config:
             print section
 
 
-    #Doesn't Working
     def load_config_test(self):
         self.config.sections()
         test = self.config.get('TEST','val1')
         print test
+
+    def get_path_to_core(self):
+        return self.config.get('ENV','path_to_core')
+
+    def get_path_to_core(self):
+        return self.config.get('ENV','temp_file_pseqs')
