@@ -4,7 +4,10 @@
 #   13.11.2016
 ##
 
-class IO:
+class ToolsIO:
+    def __init__(self):
+        pass
+
     def write(self, filename, txt):
         file = open(filename, "w+")
         file.write(txt)

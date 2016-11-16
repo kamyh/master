@@ -39,7 +39,7 @@ urllib2.install_opener(opener);
 
 
 def detecterPFAM(infoProt, seqProt):
-
+    #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     parameters = {
                   'hmmdb':'pfam',
                   'seq':'>' + infoProt + '\n' + seqProt + '\n'
@@ -58,7 +58,7 @@ def detecterPFAM(infoProt, seqProt):
                   'range':'1,10'
                   }
                   
-                  # add the parameters to your request for the results
+    # add the parameters to your request for the results
     enc_res_params = urllib.urlencode(res_params)
     modified_res_url = results_url + '?' + enc_res_params
 
@@ -178,7 +178,7 @@ def parseSequencesProt(sequence):
         #write_fasta(out_file)    
 
     return pid, pseq
- 
+
 
 #Verifier si la seq a deja ete recherchee
 def getProteineInProtDom(idProtein):
@@ -199,7 +199,7 @@ def executeInsertDomains(idProtein, domaines, id_Cell, bool_Bacteria, seqProt):
    
 #Recherche des domaines pour chaque Prot
 def chercherDomaines(vecId, vecSeq, idCell, boolBacteria):
-    #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
     for idProt, seqProt in zip(vecId, vecSeq):
         try:
             vecDomaines = []

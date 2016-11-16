@@ -5,16 +5,17 @@
 ##
 
 from subprocess import Popen, PIPE
-import os
-from io import IO
+import sys
+from toolsIo import ToolsIO
 import uuid
 from config import Config
 
 
 class HmmerScan:
-    def __init__(self):
+    def __init__(self, verbose=False):
+        self.verdose = verbose
         print("HmmerScan wrapper tool initialization")
-        self.io = IO()
+        self.io = ToolsIO()
 
     ##
     #   Display the output of 'docker ps' command
@@ -39,13 +40,14 @@ class HmmerScan:
     #TODO: test
     def get_results_domaine(self, filename):
         self.results = self.io.read_results(filename)
-        print self.results
+        if(self.verdose):
+            print(self.results)
 
     def compute_domaine_from_host(self, fasta_filename, results_filename):
         c = Config('inphinity/default.ini')
         #To solve conext dependent issue qith docker.sock linking
         path_to_core = c.get_path_to_core()
-
+        print("Starting HmmerScan container for: %s" % fasta_filename)
         p = Popen([
             "docker",
             "run",
@@ -61,7 +63,26 @@ class HmmerScan:
             fasta_filename
         ])
         output = p.communicate()[0]
-        print(output)
+        p.wait()
+
+        print("Ending HmmerScan container for: %s" % fasta_filename)
+
+        import sys
+        sys.exit()
+
+
+
+    def speparer_domaines(domaines_pass):
+        p_f_dom = []
+        domaines_vec = domaines_pass.split(' ')
+        domaines_vec = domaines_vec[:-1]
+        if len(domaines_vec) != 0:
+            for dom in domaines_vec:
+                #print "DOM: " + dom
+                p_f_dom.append(dom.split('.')[0])
+        else:
+            p_f_dom = ["--NA--"]
+        return p_f_dom
 
     def detecter_PFAM(self, info_prot, seq_prot):
         fasta = '>' + info_prot + '\n' + seq_prot + '\n'
@@ -71,7 +92,8 @@ class HmmerScan:
         self.io.write(fasta_filename, fasta)
         self.compute_domaine_from_host(fasta_filename, results_filename)
 
-        print '##### RESULTS #####\n'
+
+        print('##### RESULTS: %s #####\n' % info_prot)
         self.get_results_domaine(results_filename)
 
         p = Popen([
@@ -84,4 +106,34 @@ class HmmerScan:
             fasta_filename
         ])
 
+        #print(self.results)
+
         #TODO: parse results
+            #TODO: select range of hits
+            #TODO: return PF<XXXX>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

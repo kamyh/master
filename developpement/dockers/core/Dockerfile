@@ -30,7 +30,15 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     libxrender1 \
     nano \
     openssh-server \
-    mysql-server mysql-client libmysqlclient-dev
+    mysql-server mysql-client libmysqlclient-dev \
+    python-pip
+
+RUN apt-get install -y python3-pip r-base
+
+RUN pip3 install numpy --upgrade
+RUN pip3 install biopython
+RUN pip3 install mysqlclient
+RUN pip3 install docker-py
 
 RUN mysqld &
 RUN service mysql start
@@ -46,3 +54,5 @@ RUN chmod 0777 /tmp/inphinity
 
 RUN apt-get install -y curl
 RUN curl -fsSL https://get.docker.com/ | sh
+
+WORKDIR /

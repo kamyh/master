@@ -4,11 +4,11 @@
 #   13.10.2016
 ##
 
-import ConfigParser
+import configparser
 
 class Config:
     def __init__(self, filename):
-        self.config = ConfigParser.ConfigParser()
+        self.config = configparser.ConfigParser()
         self.config.read(filename)
 
     def check_config(self):
@@ -19,16 +19,17 @@ class Config:
 
     def load_config(self):
         for section in self.config.sections():
-            print section
+            print(section)
 
 
     def load_config_test(self):
         self.config.sections()
         test = self.config.get('TEST','val1')
-        print test
+        print(test)
 
     def get_path_to_core(self):
         return self.config.get('ENV','path_to_core')
 
-    def get_path_to_core(self):
+    def get_temp_file_p_seqs(self):
         return self.config.get('ENV','temp_file_pseqs')
+
