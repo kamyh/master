@@ -31,6 +31,11 @@ if [ ! -f /var/lib/mysql/ibdata1 ]; then
 	mysql phage_bact < /tmp/db/neg_interactionsVD.sql
 	mysql phage_bact < /tmp/db/protdom_create.sql
 
+	if [true]; then
+	    #TODO: reduce sample in db for testing
+	    echo "DELETE FROM Bacteria FROM (SELECT TOP 42 Bacterium_id FROM Bacteria) tbl WHERE Bacteria.Bacterium_id = tbl.Bacterium_id" | mysql
+	fi
+
 	killall mysqld
 	sleep 10s
 fi

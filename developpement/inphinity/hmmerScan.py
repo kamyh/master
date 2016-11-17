@@ -9,7 +9,9 @@ import sys
 from toolsIo import ToolsIO
 import uuid
 from config import Config
+from Logger import Logger
 
+LOGGER = Logger()
 
 class HmmerScan:
     def __init__(self, verbose=False):
@@ -48,6 +50,8 @@ class HmmerScan:
         #To solve conext dependent issue qith docker.sock linking
         path_to_core = c.get_path_to_core()
         print("Starting HmmerScan container for: %s" % fasta_filename)
+        LOGGER.log_debug('HmmerScan: %s ' % fasta_filename)
+
         p = Popen([
             "docker",
             "run",
@@ -63,14 +67,19 @@ class HmmerScan:
             fasta_filename
         ])
         output = p.communicate()[0]
-        p.wait()
+        self.wait()
 
         print("Ending HmmerScan container for: %s" % fasta_filename)
 
-        import sys
-        sys.exit()
-
-
+    def wait(self):
+        from docker import Client
+        cli = Client(base_url='unix://var/run/docker.sock')
+        wait = True
+        while wait:
+            wait = False
+            for c in cli.containers():
+                if(c['Image'] == 'inphinity-hmmer'):
+                    wait = True
 
     def speparer_domaines(domaines_pass):
         p_f_dom = []
@@ -92,8 +101,12 @@ class HmmerScan:
         self.io.write(fasta_filename, fasta)
         self.compute_domaine_from_host(fasta_filename, results_filename)
 
+        #TODO: cut code here ??
+            #1. Generate all hmmscan hits
+            #2. rest of the execution
 
         print('##### RESULTS: %s #####\n' % info_prot)
+        LOGGER.log_debug('RESULTS: %s ' % info_prot)
         self.get_results_domaine(results_filename)
 
         p = Popen([

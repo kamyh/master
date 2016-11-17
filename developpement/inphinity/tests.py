@@ -63,17 +63,20 @@ def test_15112016_docker_py():
     from docker import Client
     cli = Client(base_url='unix://var/run/docker.sock')
     container = cli.create_container(image='inphinity-hmmer', command='/bin/sleep 10')
-    print(container)
     response = cli.start(container=container.get('Id'))
-    print(response)
 
     id = container.get('Id')
-    print(cli.containers(filters={"running"}))
 
-    cli.wait(container.get('Id'))
+    wait = True
+    while wait:
+        wait = False
+        for c in cli.containers():
+            if(c['Image'] == 'inphinity-hmmer'):
+                wait = True
+
+    #cli.wait(container.get('Id'))
     print("END")
 
-    print(cli.inspect_container(id))
 
 
 if __name__ == '__main__':
@@ -88,5 +91,5 @@ if __name__ == '__main__':
 
     #test_14112016_get_all_id_bacts()
 
-    test_15112016_docker_py()
-    #test_14112016_run_detect_domaine()
+    #test_15112016_docker_py()
+    test_14112016_run_detect_domaine()

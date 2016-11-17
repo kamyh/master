@@ -60,7 +60,8 @@ class DBUtilties:
         bactsIdRet = []
         for resultat in data:
             bactsIdRet.append(resultat[0])
-        return [bactsIdRet[0]] #FOR TESTING RUN PURPOSE (TODO: REMOVE)
+
+        return bactsIdRet[12:18] #FOR TESTING RUN PURPOSE (TODO: REMOVE)
         return bactsIdRet
 
     ########################

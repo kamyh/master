@@ -1,0 +1,28 @@
+#                                                               --- full sequence ---- --- best 1 domain ---- --- domain number estimation ----
+# target name        accession  query name           accession    E-value  score  bias   E-value  score  bias   exp reg clu  ov env dom rep inc description of target
+#------------------- ---------- -------------------- ---------- --------- ------ ----- --------- ------ -----   --- --- --- --- --- --- --- --- ---------------------
+lcl|NC_003911.12_prot_WP_011045773.1_1 -          3HCDH_N              PF02737.16   1.4e-05   11.2   1.0   2.9e-05   10.2   1.0   1.5   1   0   0   1   1   1   1 -
+lcl|NC_003911.12_prot_WP_011045773.1_1 -          AlaDh_PNT_C          PF01262.19   2.3e-07   16.4   0.7   7.5e-07   14.8   0.7   1.8   1   0   0   1   1   1   1 -
+lcl|NC_003911.12_prot_WP_011045773.1_1 -          DAO                  PF01266.22   3.1e-09   22.9   4.6   1.4e-06   14.2   0.1   2.3   1   1   1   2   2   2   2 -
+lcl|NC_003911.12_prot_WP_011045773.1_1 -          FAD_binding_2        PF00890.22   9.9e-11   27.3   3.0   5.5e-09   21.6   1.5   2.4   2   0   0   2   2   2   2 -
+lcl|NC_003911.12_prot_WP_011045773.1_1 -          FAD_oxidored         PF12831.5    5.7e-12   31.7   2.7   8.8e-12   31.1   2.7   1.2   1   0   0   1   1   1   1 -
+lcl|NC_003911.12_prot_WP_011045773.1_1 -          GIDA                 PF01134.20  4.4e-162  525.6   0.0  7.5e-162  524.9   0.0   1.4   2   0   0   2   2   2   1 -
+lcl|NC_003911.12_prot_WP_011045773.1_1 -          GIDA_assoc           PF13932.4    2.5e-66  209.4   0.0   3.6e-66  208.9   0.0   1.2   1   0   0   1   1   1   1 -
+lcl|NC_003911.12_prot_WP_011045773.1_1 -          HI0933_like          PF03486.12   3.1e-06   12.2   2.0   1.2e-05   10.2   0.7   2.4   3   0   0   3   3   3   1 -
+lcl|NC_003911.12_prot_WP_011045773.1_1 -          Lycopene_cycl        PF05834.10   2.5e-06   12.8   1.5     3e-05    9.2   0.6   2.3   2   0   0   2   2   2   2 -
+lcl|NC_003911.12_prot_WP_011045773.1_1 -          NAD_binding_9        PF13454.4    2.2e-07   17.2   0.7   5.7e-07   15.8   0.0   1.9   2   0   0   2   2   2   1 -
+lcl|NC_003911.12_prot_WP_011045773.1_1 -          Pyr_redox            PF00070.25   2.4e-07   17.6   0.6   1.2e-06   15.4   0.4   2.2   2   0   0   2   2   2   1 -
+lcl|NC_003911.12_prot_WP_011045773.1_1 -          Pyr_redox_2          PF07992.12   8.4e-11   27.7   3.4   3.7e-09   22.3   1.0   2.5   2   1   0   3   3   3   2 -
+lcl|NC_003911.12_prot_WP_011045773.1_1 -          SIS_2                PF13580.4    9.6e-06   11.9   0.8   5.1e-05    9.5   0.2   2.4   2   0   0   2   2   2   1 -
+lcl|NC_003911.12_prot_WP_011045773.1_1 -          Thi4                 PF01946.15   6.9e-06   11.6   0.3   1.6e-05   10.3   0.1   1.7   2   0   0   2   2   2   1 -
+lcl|NC_003911.12_prot_WP_011045773.1_1 -          Trp_halogenase       PF04820.12   9.9e-08   17.2   0.5   1.6e-05    9.9   0.0   2.1   2   0   0   2   2   2   2 -
+#
+# Program:         hmmsearch
+# Version:         3.1b2 (February 2015)
+# Pipeline mode:   SEARCH
+# Query file:      /data-hmm/Pfam-A.hmm
+# Target file:     /data-hmm/tmp/1679fed9-bccc-450e-a420-c5be7e54a7c6.fasta
+# Option settings: hmmsearch --tblout /data-hmm/tmp/03d54f66-f532-4c8d-9d29-638cd31fd52c.txt /data-hmm/Pfam-A.hmm /data-hmm/tmp/1679fed9-bccc-450e-a420-c5be7e54a7c6.fasta 
+# Current dir:     /usr/local/bin
+# Date:            Thu Nov 17 23:29:38 2016
+# [ok]

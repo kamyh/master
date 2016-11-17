@@ -10,7 +10,9 @@ from database_utilities import DBUtilties
 import sys
 from Bio import *
 from Bio import SeqIO
+from Logger import Logger
 
+LOGGER = Logger()
 
 class DetectDomaines():
     def __init__(self, verdose=False):
@@ -62,7 +64,13 @@ class DetectDomaines():
                 vec_domaines = ['--PN--']
                 #executeInsertDomains(id_prot, vec_domaines, id_cell, bool_bacteria, seq_prot)
 
+            #TODO: why if breack code goes to end ????
+            if(True):
+                break
+
     def run(self):
+        LOGGER.log_debug('New Run')
+        ##GENERATE Fasta
         for id in self.list_id_organismes:
             print('Organism ID: ' + str(id))
             pidss_bact = []
@@ -77,7 +85,10 @@ class DetectDomaines():
                 print(pseqss_bact)
             self.seek_domaines(pidss_bact, pseqss_bact, id, 0)
 
+
         self.db.show_tables_of_phage_bact()
+
+
 
 
 class Core:
