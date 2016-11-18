@@ -10,7 +10,7 @@
 from hmmerScan import HmmerScan
 from config import Config
 from database_utilities import DBUtilties
-from core import DetectDomaines
+from core import Core
 
 
 ##                      ##
@@ -40,8 +40,8 @@ def test_14112016_get_all_id_bacts():
     print(db.get_id_all_bacts())
 
 def test_14112016_run_detect_domaine():
-    dd = DetectDomaines()
-    dd.run()
+    core=Core()
+    core.phase_1()
 
 
 

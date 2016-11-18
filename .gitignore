@@ -156,3 +156,4 @@ ENV/
 /developpement/dockers/core/data-hmm/Pfam-A.hmm
 
 *Pfam-A.hmm*
+/developpement/dockers/core/data-hmm/tmp/*

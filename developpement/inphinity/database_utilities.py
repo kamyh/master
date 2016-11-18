@@ -6,6 +6,10 @@
 
 import MySQLdb
 
+from Logger import Logger
+
+LOGGER = Logger()
+
 class DBUtilties:
     def __init__(self, verbose=False):
         self.verdose = verbose
@@ -37,12 +41,14 @@ class DBUtilties:
 
     #Inserer domaines d interactions d'une proteines
     def execute_insert_domains(self, id_protein, domaines, id_Cell, bool_Bacteria, seq_prot):
+
         domaines_no_rep = list(set(domaines))
         for dom in domaines_no_rep:
-            print("Insert Domain: %s" % dom)
             if len(dom) >= 5:
+                LOGGER.log_debug('INSERT: %s || %s' % (id_protein,dom))
                 cursor = self.db.cursor()
                 cursor.execute("INSERT INTO PROTDOM (ProtId, DomainAcc, Cell_id, Bacteria_Cell, ProtSeq) VALUES (%s, %s, %s, %s, %s)" % (id_protein, dom, int(id_Cell), bool_Bacteria, seq_prot))
+                self.db.commit()
 
         #Verifier si la seq a deja ete recherchee
     def get_proteine_in_prot_dom(self, id_protein):

@@ -41,17 +41,12 @@ def detecterPFAM(infoProt, seqProt):
     try:
         auxDoms = j['results']['hits']
 
-        print(auxDoms)
-
         for dom in auxDoms:
             domaines = dom['acc'] + " " + domaines
 
-            print('--> ' + domaines + '\n')
-
         domainesReturn = speparerDomaines(domaines)
 
-        for dom in domainesReturn:
-            print('\n====> ' + dom)
+        print(domainesReturn)
 
     except IndexError:
         domainesReturn = ["--NA--"]

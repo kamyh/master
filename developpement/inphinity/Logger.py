@@ -4,12 +4,13 @@
 #   17.11.2016
 ##
 
-from toolsIo import ToolsIO
+#from toolsIo import ToolsIO
 import datetime
 
 
 class Logger():
-    def __init__(self, verdose=False):
+    def __init__(self, verbose=False):
+        self.verbose=verbose
         self.filename = '/tmp/logs_inphinity.txt'
         self.write(self.filename, '\n')
 
@@ -18,17 +19,27 @@ class Logger():
         file.write(txt)
         file.close()
 
+    def log_detailed(self, msg, loge_detailed=False):
+        if(loge_detailed):
+            msg = '\nDETAILS %s| %s' % (datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'), msg)
+            if(self.verbose):
+                print(msg)
+            self.write(self.filename, msg)
+
     def log_error(self, msg):
         msg = '\nERROR %s| %s' % (datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'), msg)
-        print(msg)
+        if(self.verbose):
+            print(msg)
         self.write(self.filename, msg)
 
     def log_warnnings(self, msg):
         msg = '\nWARNNINGS %s| %s' % (datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'), msg)
-        print(msg)
+        if(self.verbose):
+            print(msg)
         self.write(self.filename, msg)
 
     def log_debug(self, msg):
         msg = '\nDEBUG %s| %s' % (datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'), msg)
-        print(msg)
+        if(self.verbose):
+            print(msg)
         self.write(self.filename, msg)

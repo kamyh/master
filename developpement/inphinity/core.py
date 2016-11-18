@@ -15,11 +15,11 @@ from Logger import Logger
 LOGGER = Logger()
 
 class DetectDomaines():
-    def __init__(self, verdose=False):
+    def __init__(self,configuration, verdose=False):
+        self.configuration=configuration
         self.verdose = verdose
         self.db = DBUtilties(self.verdose)
-        self.hmmer_scan = HmmerScan(self.verdose)
-        self.configuration = Config('inphinity/default.ini')
+        self.hmmer_scan = HmmerScan(self.configuration, self.verdose)
         self.list_id_organismes = self.db.get_id_all_bacts()
 
 
@@ -47,6 +47,7 @@ class DetectDomaines():
     def seek_domaines(self, vec_id, vec_seq, id_cell, bool_bacteria):
         #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
+
         for id_prot, seq_prot in zip(vec_id, vec_seq):
             try:
                 vec_domaines = []
@@ -64,7 +65,7 @@ class DetectDomaines():
                 vec_domaines = ['--PN--']
                 #executeInsertDomains(id_prot, vec_domaines, id_cell, bool_bacteria, seq_prot)
 
-            #TODO: why if breack code goes to end ????
+            #TODO: why if break code goes to end ????
             if(True):
                 break
 
@@ -90,10 +91,29 @@ class DetectDomaines():
 
 
 
-
 class Core:
     def __init__(self):
-        self.configuration = Config()
+        self.configuration = Config('inphinity/default.ini')
 
     def phase_1(self):
-        self.detect_domaines = DetectDomaines()
+        self.detect_domaines = DetectDomaines(self.configuration)
+        self.detect_domaines.run()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

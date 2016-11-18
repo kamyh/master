@@ -8,13 +8,13 @@ from subprocess import Popen, PIPE
 import sys
 from toolsIo import ToolsIO
 import uuid
-from config import Config
 from Logger import Logger
 
 LOGGER = Logger()
 
 class HmmerScan:
-    def __init__(self, verbose=False):
+    def __init__(self,configuration, verbose=False):
+        self.configuration=configuration
         self.verdose = verbose
         print("HmmerScan wrapper tool initialization")
         self.io = ToolsIO()
@@ -39,16 +39,9 @@ class HmmerScan:
     ##
 
 
-    #TODO: test
-    def get_results_domaine(self, filename):
-        self.results = self.io.read_results(filename)
-        if(self.verdose):
-            print(self.results)
-
     def compute_domaine_from_host(self, fasta_filename, results_filename):
-        c = Config('inphinity/default.ini')
         #To solve conext dependent issue qith docker.sock linking
-        path_to_core = c.get_path_to_core()
+        path_to_core = self.configuration.get_path_to_core()
         print("Starting HmmerScan container for: %s" % fasta_filename)
         LOGGER.log_debug('HmmerScan: %s ' % fasta_filename)
 
@@ -102,12 +95,36 @@ class HmmerScan:
         self.compute_domaine_from_host(fasta_filename, results_filename)
 
         #TODO: cut code here ??
-            #1. Generate all hmmscan hits
-            #2. rest of the execution
+        #1. Generate all hmmscan hits
+        #2. rest of the execution
 
         print('##### RESULTS: %s #####\n' % info_prot)
         LOGGER.log_debug('RESULTS: %s ' % info_prot)
-        self.get_results_domaine(results_filename)
+
+        results = self.io.read_results(results_filename, self.configuration.get_detailed_logs())
+
+        if(self.verdose):
+            print(results)
+
+        returned_domains=[]
+
+        for result in results:
+            result_tab = result.split(' ')
+            result_tab = list(filter(None, result_tab))
+
+            best_1_domain=result_tab[2]
+            num_domain=result_tab[3].split('.')[0]
+            e_value=result_tab[4]
+            score=result_tab[5]
+            biais=result_tab[6]
+
+            returned_domains.append(num_domain)
+
+            #TODO: not take all ???
+
+            #LOGGER.log_detailed('RESULTS PARSED: %s - %s - %s - %s - %s' % (best_1_domain,num_domain,e_value,score,biais), self.configuration.get_detailed_logs())
+
+        LOGGER.log_debug('Domains: %s' % returned_domains)
 
         p = Popen([
             "rm",
@@ -119,11 +136,8 @@ class HmmerScan:
             fasta_filename
         ])
 
-        #print(self.results)
+        return returned_domains
 
-        #TODO: parse results
-            #TODO: select range of hits
-            #TODO: return PF<XXXX>
 
 
 

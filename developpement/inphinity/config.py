@@ -33,3 +33,6 @@ class Config:
     def get_temp_file_p_seqs(self):
         return self.config.get('ENV','temp_file_pseqs')
 
+    def get_detailed_logs(self):
+        return self.config.get('ENV','detailed_logs')
+
