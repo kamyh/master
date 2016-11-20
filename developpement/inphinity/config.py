@@ -36,3 +36,6 @@ class Config:
     def get_detailed_logs(self):
         return self.config.get('ENV','detailed_logs')
 
+    def is_testing(self):
+        return self.config.get('ENV','testing')
+

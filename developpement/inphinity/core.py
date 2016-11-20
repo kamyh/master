@@ -63,10 +63,10 @@ class DetectDomaines():
                     print("exists")
             except:
                 vec_domaines = ['--PN--']
-                #executeInsertDomains(id_prot, vec_domaines, id_cell, bool_bacteria, seq_prot)
+                self.db.execute_insert_domains(id_prot, vec_domaines, id_cell, bool_bacteria, seq_prot)
 
             #TODO: why if break code goes to end ????
-            if(True):
+            if self.configuration.is_testing():
                 break
 
     def run(self):
@@ -86,9 +86,7 @@ class DetectDomaines():
                 print(pseqss_bact)
             self.seek_domaines(pidss_bact, pseqss_bact, id, 0)
 
-
         self.db.show_tables_of_phage_bact()
-
 
 
 class Core:

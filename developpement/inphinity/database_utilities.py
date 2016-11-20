@@ -45,9 +45,8 @@ class DBUtilties:
         domaines_no_rep = list(set(domaines))
         for dom in domaines_no_rep:
             if len(dom) >= 5:
-                LOGGER.log_debug('INSERT: %s || %s' % (id_protein,dom))
                 cursor = self.db.cursor()
-                cursor.execute("INSERT INTO PROTDOM (ProtId, DomainAcc, Cell_id, Bacteria_Cell, ProtSeq) VALUES (%s, %s, %s, %s, %s)" % (id_protein, dom, int(id_Cell), bool_Bacteria, seq_prot))
+                cursor.execute("INSERT INTO PROTDOM (ProtId, DomainAcc, Cell_id, Bacteria_Cell, ProtSeq) VALUES ('%s', '%s', %s, %s, '%s')" % (id_protein, dom, int(id_Cell), bool_Bacteria, seq_prot))
                 self.db.commit()
 
         #Verifier si la seq a deja ete recherchee
