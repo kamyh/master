@@ -11,6 +11,7 @@ import sys
 from Bio import *
 from Bio import SeqIO
 from Logger import Logger
+from multiprocessing import Pool
 
 LOGGER = Logger()
 
@@ -73,32 +74,46 @@ class DetectDomaines():
         LOGGER.log_debug('New Run')
         ##GENERATE Fasta
         for id in self.list_id_organismes:
-            print('Organism ID: ' + str(id))
-            pidss_bact = []
-            pseqss_bact = []
-
-            resultats_organismes = self.db.get_sequence_proteines_bacteria(id)
-
-            pidss_bact, pseqss_bact = self.parse_sequences_prot(resultats_organismes[0][3])
-
-            if(self.verdose):
-                print(pidss_bact)
-                print(pseqss_bact)
-            self.seek_domaines(pidss_bact, pseqss_bact, id, 0)
+            self.analyze_organisme(id)
 
         self.db.show_tables_of_phage_bact()
+
+    def analyze_organisme(self, id):
+        print('Organism ID: ' + str(id))
+        pidss_bact = []
+        pseqss_bact = []
+        resultats_organismes = self.db.get_sequence_proteines_bacteria(id)
+        pidss_bact, pseqss_bact = self.parse_sequences_prot(resultats_organismes[0][3])
+        if (self.verdose):
+            print(pidss_bact)
+            print(pseqss_bact)
+        self.seek_domaines(pidss_bact, pseqss_bact, id, 0)
 
 
 class Core:
     def __init__(self):
         self.configuration = Config('inphinity/default.ini')
+        self.db = DBUtilties(False)
+        self.detect_domaines = DetectDomaines(self.configuration)
+
+    def parallel_function(self, id):
+        self.detect_domaines.analyze_organisme(id)
+
+    def phase_1_parallel(self):
+        self.list_id_organismes = self.db.get_id_all_bacts()
+
+        print(self.list_id_organismes)
+
+        with Pool(1) as p:
+            print(p.map(f, self.list_id_organismes))
 
     def phase_1(self):
-        self.detect_domaines = DetectDomaines(self.configuration)
         self.detect_domaines.run()
 
 
-
+def f(id):
+    core=Core()
+    core.detect_domaines.analyze_organisme(id)
 
 
 

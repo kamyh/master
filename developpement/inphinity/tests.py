@@ -43,7 +43,10 @@ def test_14112016_run_detect_domaine():
     core=Core()
     core.phase_1()
 
-
+#python3 -c 'from tests import *; print(test_20112016_parallel())'
+def test_20112016_parallel():
+    core=Core()
+    core.phase_1_parallel()
 
 ##                      ##
 #   Units tests          #
@@ -92,4 +95,6 @@ if __name__ == '__main__':
     #test_14112016_get_all_id_bacts()
 
     #test_15112016_docker_py()
-    test_14112016_run_detect_domaine()
+    #test_14112016_run_detect_domaine()
+
+    test_20112016_parallel()

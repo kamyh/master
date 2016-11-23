@@ -37,8 +37,6 @@ class HmmerScan:
     #   docker run --rm --privileged -v $PWD/data:/data tm/hmmer hmmsearch --tblout /data/hits.txt /data/Pfam-A.hmm /data/test_data.fasta
     #   docker run --rm --privileged -v /data-hmm:/data-hmm inphinity-hmmer hmmsearch --tblout /data-hmm/results/hits.txt /data-hmm/Pfam-A.hmm /data-hmm/fasta/test_data.fasta
     ##
-
-
     def compute_domaine_from_host(self, fasta_filename, results_filename):
         #To solve conext dependent issue qith docker.sock linking
         path_to_core = self.configuration.get_path_to_core()

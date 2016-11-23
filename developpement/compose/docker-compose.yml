@@ -37,6 +37,25 @@ services:
       - database
     container_name: inphinity-core
 
+  controller:
+    build: ../dockers/core
+    #command: sudo sh run.sh
+    hostname: controller
+    networks:
+      mynet:
+        ipv4_address: 172.25.0.103
+    tty: true
+    volumes:
+      - ../inphinity:/inphinity:Z
+      - ../dockers/core/data-hmm:/data-hmm:Z
+      - /var/run/docker.sock:/var/run/docker.sock
+    privileged: true
+    links:
+      - database:database
+    depends_on:
+      - database
+    container_name: inphinity-controller
+
   hmmer:
     build: ../dockers/hmmer
     image: inphinity-hmmer
