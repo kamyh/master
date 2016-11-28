@@ -46,9 +46,6 @@ class DetectDomaines():
 
     #Recherche des domaines pour chaque Prot
     def seek_domaines(self, vec_id, vec_seq, id_cell, bool_bacteria):
-        #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-
-
         for id_prot, seq_prot in zip(vec_id, vec_seq):
             try:
                 vec_domaines = []
@@ -66,9 +63,16 @@ class DetectDomaines():
                 vec_domaines = ['--PN--']
                 self.db.execute_insert_domains(id_prot, vec_domaines, id_cell, bool_bacteria, seq_prot)
 
-            #TODO: why if break code goes to end ????
             if self.configuration.is_testing():
                 break
+
+    def seek_domaines_parallel(self, vec_id, vec_seq, id_cell, bool_bacteria):
+        print(zip(vec_id, vec_seq))
+
+        p = Pool(5)
+        #domaines_returned = p.map(cmd, zip(vec_id, vec_seq))
+
+
 
     def run(self):
         LOGGER.log_debug('New Run')
@@ -96,24 +100,28 @@ class Core:
         self.db = DBUtilties(False)
         self.detect_domaines = DetectDomaines(self.configuration)
 
-    def parallel_function(self, id):
-        self.detect_domaines.analyze_organisme(id)
-
     def phase_1_parallel(self):
         self.list_id_organismes = self.db.get_id_all_bacts()
 
         print(self.list_id_organismes)
 
-        with Pool(1) as p:
-            print(p.map(f, self.list_id_organismes))
+        p = Pool(5)
+        print(p.map(cmd, self.list_id_organismes))
 
     def phase_1(self):
         self.detect_domaines.run()
 
 
-def f(id):
+def cmd(id):
+    from time import gmtime, strftime
+    start_time = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+
     core=Core()
     core.detect_domaines.analyze_organisme(id)
+
+    end_time = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+
+    return [start_time, end_time]
 
 
 

@@ -11,6 +11,7 @@ from hmmerScan import HmmerScan
 from config import Config
 from database_utilities import DBUtilties
 from core import Core
+from Bio import *
 
 
 ##                      ##
@@ -97,4 +98,6 @@ if __name__ == '__main__':
     #test_15112016_docker_py()
     #test_14112016_run_detect_domaine()
 
-    test_20112016_parallel()
+    #test_20112016_parallel()
+
+    test_20112016_parallel_2()

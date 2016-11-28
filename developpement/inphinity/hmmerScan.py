@@ -4,7 +4,7 @@
 #   03.10.2016
 ##
 
-from subprocess import Popen, PIPE
+import subprocess
 import sys
 from toolsIo import ToolsIO
 import uuid
@@ -38,12 +38,14 @@ class HmmerScan:
     #   docker run --rm --privileged -v /data-hmm:/data-hmm inphinity-hmmer hmmsearch --tblout /data-hmm/results/hits.txt /data-hmm/Pfam-A.hmm /data-hmm/fasta/test_data.fasta
     ##
     def compute_domaine_from_host(self, fasta_filename, results_filename):
+
+
         #To solve conext dependent issue qith docker.sock linking
         path_to_core = self.configuration.get_path_to_core()
         print("Starting HmmerScan container for: %s" % fasta_filename)
         LOGGER.log_debug('HmmerScan: %s ' % fasta_filename)
 
-        p = Popen([
+        p = subprocess.Popen([
             "docker",
             "run",
             "--rm",
@@ -56,9 +58,13 @@ class HmmerScan:
             results_filename,
             "/data-hmm/Pfam-A.hmm",
             fasta_filename
-        ])
-        output = p.communicate()[0]
-        self.wait()
+        ], stdout=subprocess.PIPE, shell=True)
+        (output, err) = p.communicate()
+
+        #This makes the wait possible
+        p_status = p.wait()
+
+
 
         print("Ending HmmerScan container for: %s" % fasta_filename)
 
@@ -124,15 +130,19 @@ class HmmerScan:
 
         LOGGER.log_debug('Domains: %s' % returned_domains)
 
-        p = Popen([
+        p = subprocess.Popen([
             "rm",
             results_filename
         ])
+        p.communicate()
+        p_status = p.wait()
 
-        p = Popen([
+        p = subprocess.Popen([
             "rm",
             fasta_filename
         ])
+        p.communicate()
+        p_status = p.wait()
 
         return returned_domains
 
