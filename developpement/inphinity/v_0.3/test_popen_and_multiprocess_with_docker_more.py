@@ -7,17 +7,16 @@ from database_utilities import DBUtilties
 from Bio import *
 from Bio import SeqIO
 
-DEBUG=True
+DEBUG = True
+
 
 def cmd(values_tab):
     from time import gmtime, strftime
     start_time = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-    configuration = Config('inphinity/default.ini')
+
+    configuration = Config('inphinity/v_0.3/default.ini')
     io = ToolsIO()
     path_to_core = configuration.get_path_to_core()
-
-    # This command could have multiple commands separated by a new line \n
-    # some_command = "ls && sleep 10 && echo %d" % value
 
     fasta = '>' + values_tab[0] + '\n' + values_tab[1] + '\n'
     fasta_filename = '/data-hmm/tmp/' + str(uuid.uuid4()) + '.fasta'
@@ -78,14 +77,24 @@ def cmd(values_tab):
     p.communicate()
     p_status = p.wait()
 
-    return [start_time, end_time]
+    return [values_tab[0], returned_domains, [start_time, end_time]]
 
-
-def multiprocess(tab):
+#TODO: check seek_domaines() original fct
+def multiprocess(tab, id_cell):
+    bool_bacteria = 0
     pool_size = 10
+    print('Pool Size: %s' % pool_size)
 
     p = Pool(pool_size)
-    print(p.map(cmd, tab))
+    results = p.map(cmd, tab)
+
+    print(results)
+
+    for result in results:
+        id_prot = result[0]
+        domaines_returned = result[1]
+
+        db.execute_insert_domains(id_prot, domaines_returned, id_cell, bool_bacteria, "--")
 
 
 #####################################
@@ -97,18 +106,18 @@ def analyze_organisme(id, db):
     resultats_organismes = db.get_sequence_proteines_bacteria(id)
     pidss_bact, pseqss_bact = parse_sequences_prot(resultats_organismes[0][3])
 
-    if(DEBUG):
-        pidss_bact = pidss_bact[:25]
-        pseqss_bact = pseqss_bact[:25]
+    if (DEBUG):
+        pidss_bact = pidss_bact[:10]
+        pseqss_bact = pseqss_bact[:10]
 
     # seek_domaines(pidss_bact, pseqss_bact, id, 0)
     print('%d sequences to compute domaines!' % (len(pidss_bact)))
-    multiprocess(zip(pidss_bact, pseqss_bact))
+    multiprocess(zip(pidss_bact, pseqss_bact), id)
 
 
 # Parser les sequences multi-fasta
 def parse_sequences_prot(sequence):
-    configuration = Config('inphinity/default.ini')
+    configuration = Config('inphinity/v_0.3/default.ini')
     pid = []
     pseq = []
     text_file = open(configuration.get_temp_file_p_seqs(), "w")
@@ -119,7 +128,7 @@ def parse_sequences_prot(sequence):
     for fasta in fasta_sequences:
         pid.append(fasta.id)
 
-        #pseq.append(fasta.seq.tostring()) DEPRECATED (toSting())
+        # pseq.append(fasta.seq.tostring()) DEPRECATED (toSting())
         pseq.append(str(fasta.seq))
 
         # new_sequence = some_function(sequence)
