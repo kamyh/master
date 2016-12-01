@@ -7,4 +7,4 @@ docker-compose down
 docker-compose build
 
 #Doesn't need to run hmmer image for now
-docker-compose up database core
+docker-compose up -d database core

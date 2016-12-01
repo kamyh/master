@@ -82,5 +82,5 @@ class DBUtilties:
                        "(SELECT COUNT(*) FROM Phages) as Phages," +
                        "(SELECT COUNT(*) FROM Negative_Interactions) as Negative_Interactions")
         data = cursor.fetchall()
-        print(data)
+        print('Database State: %s' % data)
 

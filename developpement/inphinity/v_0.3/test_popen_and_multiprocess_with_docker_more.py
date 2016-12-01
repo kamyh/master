@@ -114,6 +114,7 @@ def analyze_organisme(id, db):
     print('%d sequences to compute domaines!' % (len(pidss_bact)))
     multiprocess(zip(pidss_bact, pseqss_bact), id)
 
+    db.show_tables_of_phage_bact()
 
 # Parser les sequences multi-fasta
 def parse_sequences_prot(sequence):
