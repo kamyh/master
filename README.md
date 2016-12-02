@@ -84,8 +84,35 @@ $ sudo nano config_v0.3.ini
 
 You have to set the variable 'path_to_core' to the correct path to the core directory (/developpement/dockers/core).
 
-##### Running 
+##### Running Docker compose
 
+Now we can start our application using docker-compose.
+
+```
+$ cd ../../compose/
+$ sudo sh run.sh
+$ docker ps
+```
+
+You should see this:
+```
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                              NAMES
+6817333ab720        compose_core        "/bin/bash"              11 seconds ago      Up 7 seconds                                           inphinity-core
+b494735f1440        compose_database    "tini -- /bin/bash /o"   12 seconds ago      Up 10 seconds       3309/tcp, 0.0.0.0:3309->3306/tcp   inphinity-database
+
+```
+
+##### Go to inphinity-core Docker container
+
+```
+$ docker exec -it inphinity-core /bin/bash
+```
+
+##### Run
+
+```
+$ python3 inphinity/v_0.3/test_popen_and_multiprocess_with_docker_more.py 
+```
 
 
 
