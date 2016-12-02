@@ -6,7 +6,7 @@
 ## Installations
 ### Docker
 
-#### Install Docker Engine
+##### Install Docker Engine
 
 ```
 $ sudo apt-get update
@@ -46,7 +46,7 @@ $ sudo usermod -aG docker $(whoami)
 
 You now have to reboot your machine.
 
-### Install Docker-compose (1.9)
+##### Install Docker-compose (1.9)
 
 ```
 $ curl -L "https://github.com/docker/compose/releases/download/1.9.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
@@ -59,5 +59,40 @@ You now should see:
 docker-compose version: 1.9.0
 ```
 
+### Deploy
+
+##### Get de source
+
+```
+$ git clone https://github.com/kamyh/master.git
+$ cd master/developpement/dockers/core/data-hmm/
+$ sh get_pfam_hmm.sh
+$ cd ../../database/data/
+$ wget https://www.dropbox.com/s/mzt9pxpfnvxl3wa/bacteriaVD.sql?dl=0
+$ mv bacteriaVD.sql?dl=0 bacteriaVD.sql
+```
+
+##### Edit Configuration
+
+You have to rename and edit the configuration file (config.example.ini)
+
+```
+$ cd ../../../inphinity/v_0.3
+$ cp config.example.ini config_v0.3.ini
+$ sudo nano config_v0.3.ini
+```
+
+You have to set the variable 'path_to_core' to the correct path to the core directory (/developpement/dockers/core).
+
+##### Running 
 
 
+
+
+
+
+
+
+
+
+.

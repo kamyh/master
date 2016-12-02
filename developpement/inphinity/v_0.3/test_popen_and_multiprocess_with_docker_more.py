@@ -14,7 +14,7 @@ def cmd(values_tab):
     from time import gmtime, strftime
     start_time = strftime("%Y-%m-%d %H:%M:%S", gmtime())
 
-    configuration = Config('inphinity/v_0.3/default.ini')
+    configuration = Config('inphinity/v_0.3/config_v0.3.ini')
     io = ToolsIO()
     path_to_core = configuration.get_path_to_core()
 
@@ -118,7 +118,7 @@ def analyze_organisme(id, db):
 
 # Parser les sequences multi-fasta
 def parse_sequences_prot(sequence):
-    configuration = Config('inphinity/v_0.3/default.ini')
+    configuration = Config('inphinity/v_0.3/config_v0.3.ini')
     pid = []
     pseq = []
     text_file = open(configuration.get_temp_file_p_seqs(), "w")

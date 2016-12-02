@@ -156,4 +156,12 @@ ENV/
 /developpement/dockers/core/data-hmm/Pfam-A.hmm
 
 *Pfam-A.hmm*
-/developpement/dockers/core/data-hmm/tmp/*
+/developpement/inphinity/v_0.3/config_v0.3.ini
+
+/developpement/dockers/core/data-hmm/results/*.txt
+/developpement/dockers/core/data-hmm/fasta/*.txt
+/developpement/dockers/core/data-hmm/tmp/*.txt
+
+/developpement/dockers/core/data-hmm/results/*.fasta
+/developpement/dockers/core/data-hmm/fasta/*.fasta
+/developpement/dockers/core/data-hmm/tmp/*.fasta

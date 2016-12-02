@@ -55,7 +55,7 @@ def test_20112016_parallel():
 ##                      ##
 
 def test_03112016_config_basic():
-    c = Config('inphinity/default.ini')
+    c = Config('inphinity/config_v0.3.ini')
     c.load_config()
     #c.load_config_test()
 
