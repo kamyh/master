@@ -6,11 +6,12 @@ from toolsIo import ToolsIO
 from database_utilities import DBUtilties
 from Bio import *
 from Bio import SeqIO
+import multiprocessing
 
 DEBUG = True
 
 
-def cmd(values_tab):
+def analyze_domaines(values_tab):
     from time import gmtime, strftime
     start_time = strftime("%Y-%m-%d %H:%M:%S", gmtime())
 
@@ -79,14 +80,17 @@ def cmd(values_tab):
 
     return [values_tab[0], returned_domains, [start_time, end_time]]
 
-#TODO: check seek_domaines() original fct
-def multiprocess(tab, id_cell):
+
+# TODO: check seek_domaines() original fct
+def seek_domaines_multiprocess(tab, id_cell):
     bool_bacteria = 0
-    pool_size = 10
+
+    print('CPU Count: %s' % multiprocessing.cpu_count())
+    pool_size = multiprocessing.cpu_count()
     print('Pool Size: %s' % pool_size)
 
     p = Pool(pool_size)
-    results = p.map(cmd, tab)
+    results = p.map(analyze_domaines, tab)
 
     print(results)
 
@@ -112,9 +116,10 @@ def analyze_organisme(id, db):
 
     # seek_domaines(pidss_bact, pseqss_bact, id, 0)
     print('%d sequences to compute domaines!' % (len(pidss_bact)))
-    multiprocess(zip(pidss_bact, pseqss_bact), id)
+    seek_domaines_multiprocess(zip(pidss_bact, pseqss_bact), id)
 
     db.show_tables_of_phage_bact()
+
 
 # Parser les sequences multi-fasta
 def parse_sequences_prot(sequence):
