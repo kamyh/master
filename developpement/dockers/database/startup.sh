@@ -24,6 +24,8 @@ if [ ! -f /var/lib/mysql/ibdata1 ]; then
 	sleep 10s
 
 	echo "GRANT ALL ON *.* TO admin@'%' IDENTIFIED BY 'root' WITH GRANT OPTION; FLUSH PRIVILEGES" | mysql
+
+	# For 1_F1 DetectDomains.py
 	echo "CREATE DATABASE phage_bact" | mysql
 	mysql phage_bact < /tmp/db/phagesVD.sql
 	mysql phage_bact < /tmp/db/bacteriaVD.sql
@@ -31,10 +33,14 @@ if [ ! -f /var/lib/mysql/ibdata1 ]; then
 	mysql phage_bact < /tmp/db/neg_interactionsVD.sql
 	mysql phage_bact < /tmp/db/protdom_create.sql
 
-	if [true]; then
-	    #TODO: reduce sample in db for testing
-	    echo "DELETE FROM Bacteria FROM (SELECT TOP 42 Bacterium_id FROM Bacteria) tbl WHERE Bacteria.Bacterium_id = tbl.Bacterium_id" | mysql
-	fi
+    # For 3_F1 countScoreInteraction.py
+	mysql phage_bact < /tmp/db/score_interactions_create.sql
+
+	echo "CREATE DATABASE domine" | mysql
+    mysql domine < /tmp/db/domTGo.sql
+    mysql domine < /tmp/db/domPfam.sql
+    mysql domine < /tmp/db/domPgmap.sql
+    mysql domine < /tmp/db/domTInteract.sql
 
 	killall mysqld
 	sleep 10s

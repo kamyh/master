@@ -115,7 +115,7 @@ class CountScoreInteraction():
 
 class Core:
     def __init__(self):
-        self.tools = Tools('inphinity/v_0.4/config.ini')
+        self.tools = Tools('inphinity/v_0.5/config.ini')
         self.detect_domaines = DetectDomaines(self.tools)
         self.count_score_interaction = CountScoreInteraction(self.tools)
 
