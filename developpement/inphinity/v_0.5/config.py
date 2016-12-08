@@ -39,3 +39,6 @@ class Config:
     def is_testing(self):
         return self.config.get('ENV','testing')
 
+    def verbose(self):
+        return self.config.get('INFORMATION','verbose')
+

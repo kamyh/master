@@ -160,6 +160,7 @@ def getAllIntractions():
     listInteractions = []
     listInteractionP = getInteractionsPositives()
     listInteractionN = getInteractionsNegatives()
+    #-----#
     listInteractions = listInteractionP + listInteractionN
     return listInteractions
     
@@ -253,6 +254,8 @@ def getScoresDomaines(vecDomBac, vecDomPha):
 
 
 listInteract = getAllIntractions()
+
+#--------------------------------------------------------#
 
 idsSeqBact = getidsSeqProt(0, 1)
 newDomBact = getExistAutresDomaines("PF11509")

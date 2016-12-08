@@ -56,7 +56,6 @@ class DBUtilties:
 
     def get_proteine_in_prot_dom(self, id_protein):
         cursor = self.db.cursor()
-        # TODO: replace all string concat by this technic
         rqt = "SELECT count(*) from PROTDOM WHERE ProtId = '%s'" % (id_protein)
         cursor.execute(rqt)
         data = cursor.fetchall()
@@ -70,14 +69,66 @@ class DBUtilties:
         for resultat in data:
             bactsIdRet.append(resultat[0])
 
-        return bactsIdRet[16:18]  # FOR TESTING RUN PURPOSE (TODO: REMOVE)
+        return bactsIdRet[17:18]  # FOR TESTING RUN PURPOSE (TODO: REMOVE)
         return bactsIdRet
 
     ################################################
     #   3_F1 countScoreInteraction.                #
     ################################################
 
+    # Obtenir les ID de toutes les interactions
+    def get_all_intractions(self):
+        list_interaction_pos = []
+        list_interaction_neg = []
+        list_interactions = []
+        list_interaction_pos = self.get_interactions_positives()
+        list_interaction_neg = self.get_interactions_negatives()
+        list_interactions = list_interaction_pos + list_interaction_neg
+        return list_interactions
 
+    # Obtenir les ID de toutes les interactions positives
+    def get_interactions_positives(self):
+        cursor = self.db.cursor()
+        cursor.execute("SELECT * from Interactions")
+        data = cursor.fetchall()
+        return data
+
+    # Obtenir les ID de toutes les interactions negatives
+    def get_interactions_negatives(self):
+        cursor = self.db.cursor()
+        cursor.execute("SELECT * from Negative_Interactions")
+        data = cursor.fetchall()
+        return data
+
+    # Retourne la seq proteique des proteines
+    # (1 = Bacteria; 2 = Phage)
+    def get_sequence_proteines(self, id_cellule, tipe_cell):
+        if tipe_cell == 1:
+            query = 'SELECT Bacterium_id, GI, Nb_proteins, prot_seq FROM Bacteria WHERE Bacterium_id = %d' % id_cellule
+        else:
+            query = 'SELECT Phage_id, GI, Nb_proteins, prot_seq FROM Phages WHERE Phage_id = %d' % id_cellule
+        cursor = self.db.cursor()
+        cursor.execute(query)
+        data = cursor.fetchall()
+        return data
+
+    # Obtenir les domaines d une protein d un organisme
+    # boolBact 1 - bact 0 - phage
+    def get_domains_cell(self, id_prot):
+        list_return_doms = []
+        list_doms = self.get_domaines_by_id_cell_offline(id_prot)
+        for dom in list_doms:
+            if len(dom[0]) > 2 and "NA" not in dom[0]:
+                list_return_doms.append(dom[0])
+        return list_return_doms
+
+    # consulte la db pour obtenir les domains
+    # boolbact 1 - bacterie 0 - phage
+    def get_domaines_by_id_cell_offline(self, id_prot):
+        cursor = self.db.cursor()
+        cursor.execute("SELECT DomainAcc FROM PROTDOM WHERE ProtId ='%d'" % id_prot)
+        data = cursor.fetchall()
+        return data
 
     ########################
     #   Auxiliary          #

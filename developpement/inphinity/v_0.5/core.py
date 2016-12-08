@@ -33,6 +33,7 @@ class DetectDomaines():
         self.list_id_organismes = self.tools.db.get_id_all_bacts()
 
         # Fichier pour parser les seqs
+        # TODO: usefull ????
         self.temp_file_pseqs = self.tools.configuration.get_path_to_core()
 
     # Parser les sequences multi-fasta
@@ -111,6 +112,57 @@ class DetectDomaines():
 class CountScoreInteraction():
     def __init__(self, tools):
         self.tools = tools
+        self.fectch_list_interaction()
+
+        # Fichier pour parser les seqs
+        self.temp_file_pseqs = self.tools.configuration.get_temp_file_p_seqs()
+
+    def run(self):
+        # TODO: parallel ???
+        for interaction in self.list_nteractions:
+            lis_domains_bac = []
+            lisDomainsPhage = []
+
+            id_interaction = interaction[0]
+            id_bacteria = interaction[1]
+            id_phage = interaction[2]
+            pos_neg_interaction = interaction[3]
+            print("Treatment of || id_interaction: %s, id_bacteria: %s, id_phage: %s" % (id_interaction, id_bacteria, id_phage))
+
+            ids_seq_bact = self.get_ids_seq_prot(id_bacteria, 1)
+            ids_seq_phage = self.get_ids_seq_prot(id_phage, 2)
+
+            for id_seq_bact in ids_seq_bact:
+                if self.tools.configuration.verbose():
+                    print("Id Bact: %d" % id_seq_bact)
+
+                lis_domains_bac = self.tools.db.get_domains_cell(id_seq_bact)
+
+                print('--> %s' % lis_domains_bac)
+
+    def fectch_list_interaction(self):
+        self.list_nteractions = self.tools.db.get_all_intractions()
+
+    # Retourne les ids de proteines d un organism
+    # 1 - bacterie 2 - phage
+    # Les domaines ons en relation avec l id de la protein de chaque organisme
+    def get_ids_seq_prot(self, id_cell, type_of_cell):
+        sequence = self.tools.db.get_sequence_proteines(id_cell, type_of_cell)
+        ids_seq = self.parse_sequences_prot(sequence[0][3])
+        return ids_seq
+
+    # Fais le parce d un fichier multifasta
+    def parse_sequences_prot(self, sequence):
+        pid = []
+
+        text_file = open(self.temp_file_pseqs, "w")
+        text_file.write(sequence)
+        text_file.close()
+
+        fasta_sequences = SeqIO.parse(open(self.temp_file_pseqs), 'fasta')
+        for fasta in fasta_sequences:
+            pid.append(fasta.id)
+        return pid
 
 
 class Core:
@@ -123,7 +175,7 @@ class Core:
         self.detect_domaines.run()
 
     def phase_2_count_score_interaction(self):
-        pass
+        self.count_score_interaction.run()
 
     def run(self):
         self.phase_1_detect_domains()
