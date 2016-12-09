@@ -118,6 +118,11 @@ class CountScoreInteraction():
         self.temp_file_pseqs = self.tools.configuration.get_temp_file_p_seqs()
 
     def run(self):
+        if (self.tools.configuration.verbose):
+            print ("processing..."),
+            animation = "|/-\\"
+            idx = 0
+
         # TODO: parallel ???
         for interaction in self.list_nteractions:
             lis_domains_bac = []
@@ -127,18 +132,33 @@ class CountScoreInteraction():
             id_bacteria = interaction[1]
             id_phage = interaction[2]
             pos_neg_interaction = interaction[3]
-            print("Treatment of || id_interaction: %s, id_bacteria: %s, id_phage: %s" % (id_interaction, id_bacteria, id_phage))
+            # print("Treatment of || id_interaction: %s, id_bacteria: %s, id_phage: %s" % (id_interaction, id_bacteria, id_phage))
+            if (self.tools.configuration.verbose):
+                sys.stdout.write(animation[idx % len(animation)] + "\r")
+                sys.stdout.flush()
+                idx += 1
 
             ids_seq_bact = self.get_ids_seq_prot(id_bacteria, 1)
             ids_seq_phage = self.get_ids_seq_prot(id_phage, 2)
 
             for id_seq_bact in ids_seq_bact:
-                if self.tools.configuration.verbose():
-                    print("Id Bact: %d" % id_seq_bact)
-
                 lis_domains_bac = self.tools.db.get_domains_cell(id_seq_bact)
 
-                print('--> %s' % lis_domains_bac)
+                if len(lis_domains_bac) > 0:
+                    for id_seq_phage in ids_seq_phage:
+                        lis_domains_phage = self.tools.db.get_domains_cell(id_seq_phage)
+
+                        if len(lis_domains_phage) > 0:
+                            print("Compute PPI of || id_interaction: %s, id_bacteria: %s, id_phage: %s" % (id_interaction, id_bacteria, id_phage))
+                            if self.tools.configuration.verbose():
+                                print("Id Bact: %s | Id Phage: %s" % (id_seq_bact, id_seq_phage))
+                            score_PPI = self.get_scores_domaines(lis_domains_bac, lis_domains_phage)
+
+                            if score_PPI > 0:
+                                if self.tools.configuration.verbose():
+                                    print("score_PPI: %s" % (score_PPI))
+
+                                self.tools.db.insert_score_IPP(id_seq_bact, id_seq_phage, pos_neg_interaction, id_interaction, score_PPI)
 
     def fectch_list_interaction(self):
         self.list_nteractions = self.tools.db.get_all_intractions()
@@ -164,6 +184,63 @@ class CountScoreInteraction():
             pid.append(fasta.id)
         return pid
 
+    # Calcul le score d interaction entre toutes les paire de proteines
+    # pour chaque IPP entre deux organisme va calculer le score et le retourner
+    def get_scores_domaines(self, vec_dom_bac, vec_dom_pha):
+        score_dom = 0
+
+        for dom_bac in vec_dom_bac:
+            new_dom_bact = self.tools.db.is_exist_other_domaines(dom_bac)
+
+            for dom_phag in vec_dom_pha:
+                # voir si pour ce domaine il en exist un actualise
+                new_dom_phag = self.tools.db.is_exist_other_domaines(dom_phag)
+                score_intermediate = 0
+                score_intermediate_b = 0
+                score_intermediate_c = 0
+                score_intermediate_d = 0
+                qtd_new_interact = 0.0
+                # pas de new domains
+                if "PF" not in new_dom_bact and "PF" not in new_dom_phag:
+                    score_intermediate = self.tools.db.is_interaction_existe_dom(dom_bac, dom_phag)
+                    if score_intermediate > 0:
+                        qtd_new_interact = 1.0
+                # new domaine only for bacteria
+                if "PF" in new_dom_bact and "PF" not in new_dom_phag:
+                    score_intermediate = self.tools.db.is_interaction_existe_dom(dom_bac, dom_phag)
+                    score_intermediate_b = self.tools.db.is_interaction_existe_dom(new_dom_bact, dom_phag)
+                    if score_intermediate > 0:
+                        qtd_new_interact = 1.0
+                    if score_intermediate_b > 0:
+                        qtd_new_interact = qtd_new_interact + 1.0
+                # new domaine only for Phages
+                if "PF" not in new_dom_bact and "PF" in new_dom_phag:
+                    score_intermediate = self.tools.db.is_interaction_existe_dom(dom_bac, dom_phag)
+                    score_intermediate_b = self.tools.db.is_interaction_existe_dom(new_dom_bact, new_dom_phag)
+                    if score_intermediate > 0:
+                        qtd_new_interact = 1.0
+                    if score_intermediate_b > 0:
+                        qtd_new_interact = qtd_new_interact + 1.0
+                # new domaine for both
+                if "PF" not in new_dom_bact and "PF" in new_dom_phag:
+                    score_intermediate = self.tools.db.is_interaction_existe_dom(dom_bac, dom_phag)
+                    score_intermediate_b = self.tools.db.is_interaction_existe_dom(new_dom_bact, dom_phag)
+                    score_intermediate_c = self.tools.db.is_interaction_existe_dom(dom_bac, new_dom_phag)
+                    score_intermediate_d = self.tools.db.is_interaction_existe_dom(new_dom_bact, new_dom_phag)
+                    if score_intermediate > 0:
+                        qtd_new_interact = 1.0
+                    if score_intermediate_b > 0:
+                        qtd_new_interact = qtd_new_interact + 1.0
+                    if score_intermediate_c > 0:
+                        qtd_new_interact = qtd_new_interact + 1.0
+                    if score_intermediate_d > 0:
+                        qtd_new_interact = qtd_new_interact + 1.0
+
+                if qtd_new_interact > 0:
+                    # print "QTDINteraction: " + str(qtdNewInteract)
+                    score_dom = score_dom + ((score_intermediate + score_intermediate_b + score_intermediate_c + score_intermediate_d) / qtd_new_interact)
+        return score_dom
+
 
 class Core:
     def __init__(self):
@@ -178,5 +255,9 @@ class Core:
         self.count_score_interaction.run()
 
     def run(self):
+        if self.tools.configuration.is_reset_db_at_start():
+            self.tools.db.reset_db()
+            self.tools.db.show_tables_of_phage_bact()
+
         self.phase_1_detect_domains()
         self.phase_2_count_score_interaction()

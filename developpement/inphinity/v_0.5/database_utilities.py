@@ -69,11 +69,11 @@ class DBUtilties:
         for resultat in data:
             bactsIdRet.append(resultat[0])
 
-        return bactsIdRet[17:18]  # FOR TESTING RUN PURPOSE (TODO: REMOVE)
+        return bactsIdRet[17:18]
         return bactsIdRet
 
     ################################################
-    #   3_F1 countScoreInteraction.                #
+    #   3_F1 countScoreInteraction                 #
     ################################################
 
     # Obtenir les ID de toutes les interactions
@@ -104,9 +104,9 @@ class DBUtilties:
     # (1 = Bacteria; 2 = Phage)
     def get_sequence_proteines(self, id_cellule, tipe_cell):
         if tipe_cell == 1:
-            query = 'SELECT Bacterium_id, GI, Nb_proteins, prot_seq FROM Bacteria WHERE Bacterium_id = %d' % id_cellule
+            query = 'SELECT Bacterium_id, GI, Nb_proteins, prot_seq FROM Bacteria WHERE Bacterium_id = %s' % id_cellule
         else:
-            query = 'SELECT Phage_id, GI, Nb_proteins, prot_seq FROM Phages WHERE Phage_id = %d' % id_cellule
+            query = 'SELECT Phage_id, GI, Nb_proteins, prot_seq FROM Phages WHERE Phage_id = %s' % id_cellule
         cursor = self.db.cursor()
         cursor.execute(query)
         data = cursor.fetchall()
@@ -126,9 +126,60 @@ class DBUtilties:
     # boolbact 1 - bacterie 0 - phage
     def get_domaines_by_id_cell_offline(self, id_prot):
         cursor = self.db.cursor()
-        cursor.execute("SELECT DomainAcc FROM PROTDOM WHERE ProtId ='%d'" % id_prot)
+        cursor.execute("SELECT DomainAcc FROM PROTDOM WHERE ProtId ='%s'" % id_prot)
         data = cursor.fetchall()
         return data
+
+    # Verifier si le domaine n a pas ete actualiser
+    # Si oui retourne le nouveau domaine
+    def is_exist_other_domaines(self, domaine):
+        try:
+            query = "SELECT NewDomain FROM PFAM WHERE DomainAcc='%s'" % domaine
+            cursor = self.db.cursor()
+            cursor.execute(query)
+            new_domaine = cursor.fetchone()
+            if "PF" in new_domaine[0]:
+                return new_domaine[0]
+            return ""
+        except:
+            return "--"
+
+    # Obtenir le scor d interaction entre deux domaines
+    def is_interaction_existe_dom(self, domaine_1, domaine_2):
+        query = "SELECT * from INTERACTION WHERE Domain1='%s' and Domain2='%s'" % (domaine_1, domaine_2)
+        cursor = self.db.cursor()
+        cursor.execute(query)
+        data = cursor.fetchall()
+
+        qtd_registre = data.rowcount
+        if qtd_registre == 0:
+            query = "SELECT * from INTERACTION WHERE Domain1='%s' and Domain2='%s'" % (domaine_2, domaine_1)
+            cursor = self.db.cursor()
+            cursor.execute(query)
+            data = cursor.fetchall()
+        qtd_registre = data.rowcount
+        if qtd_registre == 1:
+            aux = data.fetchone()
+            return sum(aux[2:16])
+        return -1
+
+    # Inserer le scor de l IPP dans le tableau Score_interactions
+    def insert_score_IPP(self, id_prot_bact, id_prot_phage, positiv_interaction, interaction_id, score):
+        query = "INSERT INTO Score_interactions (ProtBactId, ProtPhageId, Positiv_Interaction, Interaction_Id, Score_result) VALUES (%s, %s, %s, %s, %s)" % (id_prot_bact, id_prot_phage, positiv_interaction, interactionId, float(score))
+        cursor = self.db.cursor()
+        cursor.execute(query)
+
+    ################################################
+    #   4_F1 FreqQtdScores                         #
+    ################################################
+
+    ################################################
+    #   5_F1 createGradesDict                      #
+    ################################################
+
+    ################################################
+    #   6_F1 GenerateDS                            #
+    ################################################
 
     ########################
     #   Auxiliary          #
@@ -143,3 +194,7 @@ class DBUtilties:
                        "(SELECT COUNT(*) FROM Negative_Interactions) as Negative_Interactions")
         data = cursor.fetchall()
         print('Database State: %s' % data)
+
+    def reset_db(self):
+        cursor = self.db.cursor()
+        cursor.execute("TRUNCATE TABLE PROTDOM")

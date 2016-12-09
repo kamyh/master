@@ -34,11 +34,14 @@ class Config:
         return self.config.get('ENV','temp_file_pseqs')
 
     def get_detailed_logs(self):
-        return self.config.get('ENV','detailed_logs')
+        return self.config.get('INFORMATION','detailed_logs')
 
     def is_testing(self):
-        return self.config.get('ENV','testing')
+        return self.config.get('INFORMATION','testing')
 
     def verbose(self):
         return self.config.get('INFORMATION','verbose')
+
+    def is_reset_db_at_start(self):
+        return self.config.get('ENV','reset_db_at_start')
 

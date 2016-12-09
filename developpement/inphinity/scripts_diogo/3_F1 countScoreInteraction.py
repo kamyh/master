@@ -255,7 +255,7 @@ def getScoresDomaines(vecDomBac, vecDomPha):
 
 listInteract = getAllIntractions()
 
-#--------------------------------------------------------#
+
 
 idsSeqBact = getidsSeqProt(0, 1)
 newDomBact = getExistAutresDomaines("PF11509")
@@ -277,7 +277,6 @@ for interaction in listInteract:
                 lisDomainsPhage = getDomainsCell(idPhage, idSeqPhage, 0)
                 if len(lisDomainsPhage) > 0:
                     ScorePPI = getScoresDomaines(lisDomainsBac, lisDomainsPhage)
-                    
                     if ScorePPI > 0:
                         print ScorePPI
                         insertScoreIPP(idSeqBact, idSeqPhage, PosNegInteraction, idInteraction, ScorePPI)
