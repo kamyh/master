@@ -34,14 +34,16 @@ class Config:
         return self.config.get('ENV','temp_file_pseqs')
 
     def get_detailed_logs(self):
-        return self.config.get('INFORMATION','detailed_logs')
+        return self.config.get('INFORMATION','detailed_logs') == 1
 
     def is_testing(self):
-        return self.config.get('INFORMATION','testing')
+        return self.config.get('INFORMATION','testing') == 1
 
     def verbose(self):
-        return self.config.get('INFORMATION','verbose')
+        return self.config.get('INFORMATION','verbose') == 1
 
     def is_reset_db_at_start(self):
-        return self.config.get('ENV','reset_db_at_start')
+        return self.config.get('ENV','reset_db_at_start') == 1
 
+    def get_nbr_process(self):
+        return self.config.get('ENV','process')

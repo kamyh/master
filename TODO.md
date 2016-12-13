@@ -8,7 +8,6 @@
 - select doms from config values
 - LOGGER for phase 2
 - all comments in english
-- fct + config options to reset db before run
 
 ## Questions
 
@@ -17,3 +16,4 @@
     --> newDomBact = getExistAutresDomaines("PF11509") ==> Why ???
     
 -
+

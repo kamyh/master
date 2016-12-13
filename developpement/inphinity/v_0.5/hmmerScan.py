@@ -11,12 +11,13 @@ import uuid
 from Logger import Logger
 from config import Config
 from time import gmtime, strftime
+import MySQLdb
 
 LOGGER = Logger()
 
 
 class HmmerScan:
-    def __init__(self, configuration, io, verbose=False):
+    def __init__(self, configuration, io, db, verbose=False):
         self.io = io
         self.configuration = configuration
         self.verdose = verbose
@@ -38,13 +39,28 @@ class HmmerScan:
         print(output)
 
     ##
+    # beacuase of side-effect limitation due to multiprocess
+    # we cannot use database_utilities classe
+    # TODO: solve ?
+    ##
+    def get_proteine_in_prot_dom(self, id_protein):
+        db = MySQLdb.connect(host='172.25.0.102', user='admin', passwd='root', db='phage_bact')
+        cursor = db.cursor()
+        rqt = "SELECT count(*) from PROTDOM WHERE ProtId = '%s'" % (id_protein)
+        cursor.execute(rqt)
+        data = cursor.fetchall()
+
+        db.close()
+        return data[0][0]
+
+    ##
     #   Use <<inphinity-hmmer>> docker container
     #   to analyze domain in protein sequences
     ##
     def analyze_domaines(self, values_tab):
-
-        #proteinExist = self.tools.db.get_proteine_in_prot_dom(values_tab[0])
         proteinExist = 0
+        proteinExist = self.get_proteine_in_prot_dom(values_tab[0])
+
         if proteinExist == 0:
             start_time = strftime("%Y-%m-%d %H:%M:%S", gmtime())
 
@@ -93,7 +109,7 @@ class HmmerScan:
                 score = result_tab[5]
                 biais = result_tab[6]
 
-                #TODO: select domaines
+                # TODO: select domaines
 
                 returned_domains.append(num_domain)
 

@@ -18,6 +18,7 @@ from Bio import *
 #   Auxiliary tests      #
 ##                      ##
 def test_07122016_fusion_parallel_using_core():
+    print('Run Test: test_07122016_fusion_parallel_using_core')
     c = Core()
     c.run()
 

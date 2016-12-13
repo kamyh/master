@@ -15,9 +15,9 @@ import uuid
 from Bio import *
 import multiprocessing
 from tools import Tools
+from time import gmtime, strftime
 
 LOGGER = Logger()
-DEBUG = True
 
 
 #################################
@@ -29,7 +29,7 @@ class DetectDomaines():
     def __init__(self, tools, verdose=False):
         self.verdose = verdose
         self.tools = tools
-        self.hmmer_scan = HmmerScan(self.tools.configuration, self.tools.io, self.verdose)
+        self.hmmer_scan = HmmerScan(self.tools.configuration, self.tools.io, self.tools.db, self.verdose)
         self.list_id_organismes = self.tools.db.get_id_all_bacts()
 
         # Fichier pour parser les seqs
@@ -60,8 +60,6 @@ class DetectDomaines():
         # domaines_returned = p.map(cmd, zip(vec_id, vec_seq))
 
     def run(self):
-        LOGGER.log_debug('New Run')
-
         ##GENERATE Fasta
         list_id_organismes = self.tools.db.get_id_all_bacts()
 
@@ -82,7 +80,7 @@ class DetectDomaines():
         resultats_organismes = self.tools.db.get_sequence_proteines_bacteria(id)
         pidss_bact, pseqss_bact = self.parse_sequences_prot(resultats_organismes[0][3])
 
-        if (DEBUG):
+        if self.tools.configuration.is_testing():
             pidss_bact = pidss_bact[:10]
             pseqss_bact = pseqss_bact[:10]
 
@@ -95,9 +93,16 @@ class DetectDomaines():
 
         print('CPU Count: %s' % multiprocessing.cpu_count())
         pool_size = multiprocessing.cpu_count()
-        print('Pool Size: %s' % pool_size)
 
-        p = Pool(pool_size)
+        if self.tools.configuration.get_nbr_process() == '0':
+            p = Pool()
+        elif self.tools.configuration.get_nbr_process() == '-1':
+            print('Pool Size: %s' % pool_size)
+            p = Pool(pool_size)
+        else:
+            p = Pool(int(self.tools.configuration.get_nbr_process()))
+            print('Pool Size: %s' % self.tools.configuration.get_nbr_process())
+
         results = p.map(self.hmmer_scan.analyze_domaines, tab)
 
         print(results)
@@ -118,7 +123,7 @@ class CountScoreInteraction():
         self.temp_file_pseqs = self.tools.configuration.get_temp_file_p_seqs()
 
     def run(self):
-        if (self.tools.configuration.verbose):
+        if self.tools.configuration.verbose:
             print ("processing..."),
             animation = "|/-\\"
             idx = 0
@@ -255,9 +260,18 @@ class Core:
         self.count_score_interaction.run()
 
     def run(self):
+        start_time = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+        LOGGER.log_detailed('New run at: %s' % start_time)
+
         if self.tools.configuration.is_reset_db_at_start():
+            print('Rest DB starting...')
             self.tools.db.reset_db()
             self.tools.db.show_tables_of_phage_bact()
+            print('Rest DB done')
 
         self.phase_1_detect_domains()
         self.phase_2_count_score_interaction()
+
+        end_time = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+
+        print("Starting:%s | Ending:%s" % (start_time, end_time))
