@@ -26,6 +26,12 @@ class Logger():
                 print(msg)
             self.write(self.filename, msg)
 
+    def log_normal(self, msg):
+        msg = '\nNORMAL %s| %s' % (datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'), msg)
+        if(self.verbose):
+            print(msg)
+        self.write(self.filename, msg)
+
     def log_error(self, msg):
         msg = '\nERROR %s| %s' % (datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'), msg)
         if(self.verbose):

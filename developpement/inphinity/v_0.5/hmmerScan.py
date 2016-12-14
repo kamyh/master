@@ -128,3 +128,6 @@ class HmmerScan:
             p_status = p.wait()
 
             return [values_tab[0], returned_domains, [start_time, end_time]]
+
+        else:
+            return 'ALREADY PROCESSED'

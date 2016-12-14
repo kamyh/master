@@ -88,30 +88,47 @@ class DetectDomaines():
         print('%d sequences to compute domaines!' % (len(pidss_bact)))
         self.seek_domaines_multiprocess(zip(pidss_bact, pseqss_bact), id)
 
+    def chunks(self, tab, n):
+        return list([tab[x:x + n] for x in range(0, len(tab), n)])
+
     def seek_domaines_multiprocess(self, tab, id_cell):
         bool_bacteria = 0
+        total_processed = 0
+        pool_size = multiprocessing.cpu_count()
 
         print('CPU Count: %s' % multiprocessing.cpu_count())
-        pool_size = multiprocessing.cpu_count()
+
+        if self.tools.configuration.get_nbr_process() == '-1':
+            print('Pool Size: %s' % pool_size)
+        elif self.tools.configuration.get_nbr_process() != '0':
+            pool_size = int(self.tools.configuration.get_nbr_process())
+            print('Pool Size: %s' % self.tools.configuration.get_nbr_process())
 
         if self.tools.configuration.get_nbr_process() == '0':
             p = Pool()
-        elif self.tools.configuration.get_nbr_process() == '-1':
-            print('Pool Size: %s' % pool_size)
-            p = Pool(pool_size)
         else:
-            p = Pool(int(self.tools.configuration.get_nbr_process()))
-            print('Pool Size: %s' % self.tools.configuration.get_nbr_process())
+            p = Pool(pool_size)
 
-        results = p.map(self.hmmer_scan.analyze_domaines, tab)
+        chunk_size = pool_size * self.tools.configuration.get_chunk_size_multiplier()
+        chunks = self.chunks(list(tab), chunk_size)
 
-        print(results)
+        for chunk in chunks:
+            print('%d sequences processed!' % total_processed)
+            LOGGER.log_normal('%d sequences processed!' % total_processed)
+            total_processed += chunk_size
+            results = p.map(self.hmmer_scan.analyze_domaines, chunk)
+            print(results)
 
-        for result in results:
-            id_prot = result[0]
-            domaines_returned = result[1]
+            for result in results:
+                try:
+                    id_prot = result[0]
+                    domaines_returned = result[1]
 
-            self.tools.db.execute_insert_domains(id_prot, domaines_returned, id_cell, bool_bacteria, "--")
+                    self.tools.db.execute_insert_domains(id_prot, domaines_returned, id_cell, bool_bacteria, "--")
+                except TypeError:
+                    pass
+                    # TODO: TypeError come from no results ?
+                    #print('TypeError')
 
 
 class CountScoreInteraction():
@@ -261,7 +278,9 @@ class Core:
 
     def run(self):
         start_time = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-        LOGGER.log_detailed('New run at: %s' % start_time)
+        LOGGER.log_normal('New run at: %s' % start_time)
+
+        print(self.tools.configuration.is_testing())
 
         if self.tools.configuration.is_reset_db_at_start():
             print('Rest DB starting...')
