@@ -100,6 +100,7 @@ class HmmerScan:
             returned_domains = []
 
             for result in results:
+                has_to_be_returned = True
                 result_tab = result.split(' ')
                 result_tab = list(filter(None, result_tab))
 
@@ -109,9 +110,32 @@ class HmmerScan:
                 score = result_tab[5]
                 biais = result_tab[6]
 
-                # TODO: select domaines
+                # E-VALUE
+                if self.configuration.is_use_e_value_selection():
+                    min_e_value = self.configuration.get_min_e_value()
+                    max_e_value = self.configuration.get_max_e_value()
 
-                returned_domains.append(num_domain)
+                    if min_e_value > e_value > max_e_value:
+                        has_to_be_returned = False
+
+                # SCORE
+                if self.configuration.is_use_score_selection():
+                    min_score = self.configuration.get_min_score()
+                    max_score = self.configuration.get_max_score()
+
+                    if min_score > score > max_score:
+                        has_to_be_returned = False
+
+                # BIAIS
+                if self.configuration.is_use_biais_selection():
+                    min_biais = self.configuration.get_min_biais()
+                    max_biais = self.configuration.get_max_biais()
+
+                    if min_biais > biais > max_biais:
+                        has_to_be_returned = False
+
+                if has_to_be_returned:
+                    returned_domains.append(num_domain)
 
             p = subprocess.Popen([
                 "rm",

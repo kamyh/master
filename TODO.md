@@ -6,7 +6,7 @@
 ## Code
 
 - select doms from config values
-- LOGGER for phase 2
+- config --> choose to run not all phases ?
 - all comments in english
 
 ## Questions

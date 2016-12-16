@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-sudo rm -R /inphinity-data/mysql
+#sudo rm -R /inphinity-data/mysql
 
 docker-compose down
 

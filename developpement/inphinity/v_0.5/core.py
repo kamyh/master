@@ -59,6 +59,22 @@ class DetectDomaines():
         p = Pool(5)
         # domaines_returned = p.map(cmd, zip(vec_id, vec_seq))
 
+    def get_number_of_seq_to_analyze(self):
+        list_id_organismes = self.tools.db.get_id_all_bacts()
+        total = 0
+
+        nbr_organismes = len(list_id_organismes)
+        nbr_organismes_analyzed = 0
+
+        for id in list_id_organismes:
+            nbr_organismes_analyzed += 1
+            resultats_organismes = self.tools.db.get_sequence_proteines_bacteria(id)
+            pidss_bact, pseqss_bact = self.parse_sequences_prot(resultats_organismes[0][3])
+            total += len(pidss_bact)
+            LOGGER.log_normal('%d/%d | Organisme ID: %s - %d sequences to compute' % (nbr_organismes_analyzed, nbr_organismes, id, len(pidss_bact)))
+
+        LOGGER.log_normal('%d sequences to compute for %d organismes' % (total, nbr_organismes))
+
     def run(self):
         ##GENERATE Fasta
         list_id_organismes = self.tools.db.get_id_all_bacts()
@@ -67,6 +83,7 @@ class DetectDomaines():
         nbr_organismes_analyzed = 0
 
         for id in list_id_organismes:
+            LOGGER.log_normal('%d/%d organismes analysed' % (nbr_organismes_analyzed, nbr_organismes))
             print('%d/%d organismes analysed' % (nbr_organismes_analyzed, nbr_organismes))
             self.analyze_organisme(id)
             nbr_organismes_analyzed += 1
@@ -84,7 +101,7 @@ class DetectDomaines():
             pidss_bact = pidss_bact[:10]
             pseqss_bact = pseqss_bact[:10]
 
-        # seek_domaines(pidss_bact, pseqss_bact, id, 0)
+        LOGGER.log_normal('%d sequences to compute domaines!' % (len(pidss_bact)))
         print('%d sequences to compute domaines!' % (len(pidss_bact)))
         self.seek_domaines_multiprocess(zip(pidss_bact, pseqss_bact), id)
 
@@ -128,7 +145,7 @@ class DetectDomaines():
                 except TypeError:
                     pass
                     # TODO: TypeError come from no results ?
-                    #print('TypeError')
+                    # print('TypeError')
 
 
 class CountScoreInteraction():
@@ -271,6 +288,8 @@ class Core:
         self.count_score_interaction = CountScoreInteraction(self.tools)
 
     def phase_1_detect_domains(self):
+        # Only for developpement purpose!
+        self.detect_domaines.get_number_of_seq_to_analyze()
         self.detect_domaines.run()
 
     def phase_2_count_score_interaction(self):
