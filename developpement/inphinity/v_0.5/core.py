@@ -157,12 +157,9 @@ class CountScoreInteraction():
         self.temp_file_pseqs = self.tools.configuration.get_temp_file_p_seqs()
 
     def run(self):
-        if self.tools.configuration.verbose:
-            print ("processing..."),
-            animation = "|/-\\"
-            idx = 0
 
         # TODO: parallel ???
+        LOGGER.log_normal("%d" % (len(self.list_nteractions)))
         for interaction in self.list_nteractions:
             lis_domains_bac = []
             lisDomainsPhage = []
@@ -172,13 +169,11 @@ class CountScoreInteraction():
             id_phage = interaction[2]
             pos_neg_interaction = interaction[3]
             # print("Treatment of || id_interaction: %s, id_bacteria: %s, id_phage: %s" % (id_interaction, id_bacteria, id_phage))
-            if (self.tools.configuration.verbose):
-                sys.stdout.write(animation[idx % len(animation)] + "\r")
-                sys.stdout.flush()
-                idx += 1
 
             ids_seq_bact = self.get_ids_seq_prot(id_bacteria, 1)
             ids_seq_phage = self.get_ids_seq_prot(id_phage, 2)
+
+            LOGGER.log_normal("interaction: id_interaction-%s, id_bacteria-%s, id_phage-%s, pos_neg_interaction-%s" % (id_interaction, id_bacteria, id_phage, pos_neg_interaction))
 
             for id_seq_bact in ids_seq_bact:
                 lis_domains_bac = self.tools.db.get_domains_cell(id_seq_bact)
@@ -186,16 +181,17 @@ class CountScoreInteraction():
                 if len(lis_domains_bac) > 0:
                     for id_seq_phage in ids_seq_phage:
                         lis_domains_phage = self.tools.db.get_domains_cell(id_seq_phage)
-
+                        #TODO: HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
+                        print('%s' % len(lis_domains_phage))
                         if len(lis_domains_phage) > 0:
-                            print("Compute PPI of || id_interaction: %s, id_bacteria: %s, id_phage: %s" % (id_interaction, id_bacteria, id_phage))
+                            LOGGER.log_normal("Compute PPI of || id_interaction: %s, id_bacteria: %s, id_phage: %s" % (id_interaction, id_bacteria, id_phage))
                             if self.tools.configuration.verbose():
-                                print("Id Bact: %s | Id Phage: %s" % (id_seq_bact, id_seq_phage))
+                                LOGGER.log_normal("Id Bact: %s | Id Phage: %s" % (id_seq_bact, id_seq_phage))
                             score_PPI = self.get_scores_domaines(lis_domains_bac, lis_domains_phage)
 
                             if score_PPI > 0:
                                 if self.tools.configuration.verbose():
-                                    print("score_PPI: %s" % (score_PPI))
+                                    LOGGER.log_normal("score_PPI: %s" % (score_PPI))
 
                                 self.tools.db.insert_score_IPP(id_seq_bact, id_seq_phage, pos_neg_interaction, id_interaction, score_PPI)
 
@@ -298,8 +294,6 @@ class Core:
     def run(self):
         start_time = strftime("%Y-%m-%d %H:%M:%S", gmtime())
         LOGGER.log_normal('New run at: %s' % start_time)
-
-        print(self.tools.configuration.is_testing())
 
         if self.tools.configuration.is_reset_db_at_start():
             print('Rest DB starting...')

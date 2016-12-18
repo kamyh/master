@@ -186,7 +186,7 @@ class DBUtilties:
     # Si oui retourne le nouveau domaine
     def is_exist_other_domaines(self, domaine):
         try:
-            query = "SELECT NewDomain FROM PFAM WHERE DomainAcc='%s'" % domaine
+            query = "SELECT NewDomain FROM domine.PFAM WHERE DomainAcc='%s'" % domaine
             try:
                 cursor = self.db.cursor()
                 cursor.execute(query)
@@ -202,7 +202,7 @@ class DBUtilties:
 
     # Obtenir le scor d interaction entre deux domaines
     def is_interaction_existe_dom(self, domaine_1, domaine_2):
-        query = "SELECT * from INTERACTION WHERE Domain1='%s' and Domain2='%s'" % (domaine_1, domaine_2)
+        query = "SELECT * from domine.INTERACTION WHERE Domain1='%s' and Domain2='%s'" % (domaine_1, domaine_2)
         try:
             cursor = self.db.cursor()
             cursor.execute(query)
@@ -213,7 +213,7 @@ class DBUtilties:
 
         qtd_registre = data.rowcount
         if qtd_registre == 0:
-            query = "SELECT * from INTERACTION WHERE Domain1='%s' and Domain2='%s'" % (domaine_1, domaine_2)
+            query = "SELECT * from domine.INTERACTION WHERE Domain1='%s' and Domain2='%s'" % (domaine_1, domaine_2)
             try:
                 cursor = self.db.cursor()
                 cursor.execute(query)
@@ -239,6 +239,18 @@ class DBUtilties:
         except MySQLdb.OperationalError:
             self.connect()
             self.insert_score_IPP(id_prot_bact, id_prot_phage, positiv_interaction, interaction_id, score)
+
+    def get_new_domains(self):
+        query = "SELECT NewDomain FROM domine.PFAM"
+        try:
+            cursor = self.db.cursor()
+            cursor.execute(query)
+            new_domaines = cursor.fetchall()
+        except MySQLdb.OperationalError:
+            self.connect()
+            return self.get_new_domains()
+
+        return new_domaines
 
     ################################################
     #   4_F1 FreqQtdScores                         #

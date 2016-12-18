@@ -8,6 +8,7 @@
 - select doms from config values
 - config --> choose to run not all phases ?
 - all comments in english
+- db --> phase 2 connection to domine !!!
 
 ## Questions
 
