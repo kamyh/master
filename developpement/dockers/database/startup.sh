@@ -42,6 +42,9 @@ if [ ! -f /var/lib/mysql/ibdata1 ]; then
     mysql domine < /tmp/db/domPgmap.sql
     mysql domine < /tmp/db/domTInteract.sql
 
+    # For 4_F1 FreqQtdScores.py
+	mysql phage_bact < /tmp/db/qtd_scores_create.sql
+
 	killall mysqld
 	sleep 10s
 fi

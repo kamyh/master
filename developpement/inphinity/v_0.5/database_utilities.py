@@ -105,6 +105,23 @@ class DBUtilties:
             return bactsIdRet[17:18]
         return bactsIdRet
 
+    def get_id_all_phages(self):
+        query = "SELECT Phage_id FROM Phages"
+        try:
+            cursor = self.db.cursor()
+            cursor.execute(query)
+            data = cursor.fetchall()
+        except MySQLdb.OperationalError:
+            self.connect()
+            return self.get_id_all_phages()
+        phages_id_ret = []
+        for resultat in data:
+            phages_id_ret.append(resultat[0])
+
+        if self.configuration.is_testing():
+            return phages_id_ret[17:18]
+        return phages_id_ret
+
     ################################################
     #   3_F1 countScoreInteraction                 #
     ################################################
@@ -211,9 +228,9 @@ class DBUtilties:
             self.connect()
             return self.is_interaction_existe_dom(domaine_1, domaine_2)
 
-        qtd_registre = data.rowcount
+        qtd_registre = cursor.rowcount
         if qtd_registre == 0:
-            query = "SELECT * from domine.INTERACTION WHERE Domain1='%s' and Domain2='%s'" % (domaine_1, domaine_2)
+            query = "SELECT * from domine.INTERACTION WHERE Domain1='%s' and Domain2='%s'" % (domaine_2, domaine_1)
             try:
                 cursor = self.db.cursor()
                 cursor.execute(query)
@@ -221,10 +238,9 @@ class DBUtilties:
             except MySQLdb.OperationalError:
                 self.connect()
                 return self.is_interaction_existe_dom(domaine_1, domaine_2)
-        qtd_registre = data.rowcount
+        qtd_registre = cursor.rowcount
         if qtd_registre == 1:
-            aux = data.fetchone()
-            return sum(aux[2:16])
+            return sum(data[2:16])
         return -1
 
     # Inserer le scor de l IPP dans le tableau Score_interactions
@@ -255,6 +271,8 @@ class DBUtilties:
     ################################################
     #   4_F1 FreqQtdScores                         #
     ################################################
+
+
 
     ################################################
     #   5_F1 createGradesDict                      #

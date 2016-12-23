@@ -8,6 +8,9 @@ from hmmerScan import HmmerScan
 import sys
 from Bio import *
 from Bio import SeqIO
+from Bio.SeqRecord import SeqRecord
+from Bio.Alphabet import IUPAC
+from Bio import Seq
 from Logger import Logger
 import subprocess
 from multiprocessing import Pool
@@ -19,12 +22,17 @@ from time import gmtime, strftime
 
 LOGGER = Logger()
 
-
 #################################
 #   This class cannot have
 #   an object with side effet
 #   eg. db_utilities
 #################################
+
+"""
+Phase 1 - Detect Domaines
+"""
+
+
 class DetectDomaines():
     def __init__(self, tools, verdose=False):
         self.verdose = verdose
@@ -60,6 +68,22 @@ class DetectDomaines():
         # domaines_returned = p.map(cmd, zip(vec_id, vec_seq))
 
     def get_number_of_seq_to_analyze(self):
+        list_id_organismes = self.tools.db.get_id_all_phages()
+        is_detailed_log = self.tools.configuration.get_detailed_logs()
+        total = 0
+
+        nbr_organismes = len(list_id_organismes)
+        nbr_organismes_analyzed = 0
+
+        for id in list_id_organismes:
+            nbr_organismes_analyzed += 1
+            resultats_organismes = self.tools.db.get_sequence_proteines_phage(id)
+            pidss_bact, pseqss_bact = self.parse_sequences_prot(resultats_organismes[0][3])
+            total += len(pidss_bact)
+            LOGGER.log_detailed('%d/%d | Organisme ID: %s - %d sequences to compute' % (nbr_organismes_analyzed, nbr_organismes, id, len(pidss_bact)), is_detailed_log)
+
+        LOGGER.log_detailed('%d sequences to compute for %d organismes' % (total, nbr_organismes), is_detailed_log)
+
         list_id_organismes = self.tools.db.get_id_all_bacts()
         total = 0
 
@@ -71,30 +95,47 @@ class DetectDomaines():
             resultats_organismes = self.tools.db.get_sequence_proteines_bacteria(id)
             pidss_bact, pseqss_bact = self.parse_sequences_prot(resultats_organismes[0][3])
             total += len(pidss_bact)
-            LOGGER.log_normal('%d/%d | Organisme ID: %s - %d sequences to compute' % (nbr_organismes_analyzed, nbr_organismes, id, len(pidss_bact)))
+            LOGGER.log_detailed('%d/%d | Organisme ID: %s - %d sequences to compute' % (nbr_organismes_analyzed, nbr_organismes, id, len(pidss_bact)), is_detailed_log)
 
-        LOGGER.log_normal('%d sequences to compute for %d organismes' % (total, nbr_organismes))
+        LOGGER.log_detailed('%d sequences to compute for %d organismes' % (total, nbr_organismes), is_detailed_log)
 
     def run(self):
-        ##GENERATE Fasta
-        list_id_organismes = self.tools.db.get_id_all_bacts()
+        """Phages"""
+        list_id_phages = self.tools.db.get_id_all_phages()
 
-        nbr_organismes = len(list_id_organismes)
-        nbr_organismes_analyzed = 0
+        nbr_phages = len(list_id_phages)
+        nbr_phages_analyzed = 0
 
-        for id in list_id_organismes:
-            LOGGER.log_normal('%d/%d organismes analysed' % (nbr_organismes_analyzed, nbr_organismes))
-            print('%d/%d organismes analysed' % (nbr_organismes_analyzed, nbr_organismes))
-            self.analyze_organisme(id)
-            nbr_organismes_analyzed += 1
+        for id in list_id_phages:
+            LOGGER.log_normal('%d/%d phages analysed' % (nbr_phages_analyzed, nbr_phages))
+            print('%d/%d phages analysed' % (nbr_phages_analyzed, nbr_phages))
+            print('Organism ID: ' + str(id))
+            resultats_organismes = self.tools.db.get_sequence_proteines_phage(id)
+            self.analyze_organisme(resultats_organismes, id)
+            nbr_phages_analyzed += 1
 
         self.tools.db.show_tables_of_phage_bact()
 
-    def analyze_organisme(self, id):
-        print('Organism ID: ' + str(id))
+        """Bacterias"""
+        list_id_bacterias = self.tools.db.get_id_all_bacts()
+
+        nbr_bacterias = len(list_id_bacterias)
+        nbr_bacterias_analyzed = 0
+
+        for id in list_id_bacterias:
+            LOGGER.log_normal('%d/%d bacteria analysed' % (nbr_bacterias_analyzed, nbr_bacterias))
+            print('%d/%d bacteria analysed' % (nbr_bacterias_analyzed, nbr_bacterias))
+            print('Organism ID: ' + str(id))
+            resultats_organismes = self.tools.db.get_sequence_proteines_bacteria(id)
+            self.analyze_organisme(resultats_organismes, id)
+            nbr_bacterias_analyzed += 1
+
+        self.tools.db.show_tables_of_phage_bact()
+
+    def analyze_organisme(self, resultats_organismes, id):
         pidss_bact = []
         pseqss_bact = []
-        resultats_organismes = self.tools.db.get_sequence_proteines_bacteria(id)
+
         pidss_bact, pseqss_bact = self.parse_sequences_prot(resultats_organismes[0][3])
 
         if self.tools.configuration.is_testing():
@@ -148,6 +189,11 @@ class DetectDomaines():
                     # print('TypeError')
 
 
+"""
+Phase 2 - Count Score Interaction
+"""
+
+
 class CountScoreInteraction():
     def __init__(self, tools):
         self.tools = tools
@@ -181,17 +227,12 @@ class CountScoreInteraction():
                 if len(lis_domains_bac) > 0:
                     for id_seq_phage in ids_seq_phage:
                         lis_domains_phage = self.tools.db.get_domains_cell(id_seq_phage)
-                        #TODO: HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
-                        print('%s' % len(lis_domains_phage))
+                        # print('%s - %s' % (len(lis_domains_phage), id_seq_phage))
                         if len(lis_domains_phage) > 0:
-                            LOGGER.log_normal("Compute PPI of || id_interaction: %s, id_bacteria: %s, id_phage: %s" % (id_interaction, id_bacteria, id_phage))
-                            if self.tools.configuration.verbose():
-                                LOGGER.log_normal("Id Bact: %s | Id Phage: %s" % (id_seq_bact, id_seq_phage))
                             score_PPI = self.get_scores_domaines(lis_domains_bac, lis_domains_phage)
 
                             if score_PPI > 0:
-                                if self.tools.configuration.verbose():
-                                    LOGGER.log_normal("score_PPI: %s" % (score_PPI))
+                                LOGGER.log_normal("score_PPI: %s" % (score_PPI))
 
                                 self.tools.db.insert_score_IPP(id_seq_bact, id_seq_phage, pos_neg_interaction, id_interaction, score_PPI)
 
@@ -206,7 +247,7 @@ class CountScoreInteraction():
         ids_seq = self.parse_sequences_prot(sequence[0][3])
         return ids_seq
 
-    # Fais le parce d un fichier multifasta
+    # Parser les sequences multi-fasta
     def parse_sequences_prot(self, sequence):
         pid = []
 
@@ -217,6 +258,26 @@ class CountScoreInteraction():
         fasta_sequences = SeqIO.parse(open(self.temp_file_pseqs), 'fasta')
         for fasta in fasta_sequences:
             pid.append(fasta.id)
+        return pid
+
+    # TODO: KEEP like that ? or file tmp ?
+    def parse_sequences_prot_from_string(self, sequence):
+        pid = []
+
+        fasta_sequences = sequence.split('\n>')
+        print(len(fasta_sequences))
+
+        for fasta in fasta_sequences:
+            if '\t' in fasta.split(' ')[0]:
+                if '>' in fasta.split('\t')[0][1]:
+                    pid.append(fasta.split('\t')[0][1:])
+                    print('---> %s' % fasta.split('\t')[0][1:])
+                else:
+                    pid.append(fasta.split('\t')[0])
+                    print('---> %s' % fasta.split('\t')[0])
+            else:
+                pid.append(fasta.split(' ')[0])
+                print('---> %s' % fasta.split(' ')[0])
         return pid
 
     # Calcul le score d interaction entre toutes les paire de proteines
@@ -277,11 +338,74 @@ class CountScoreInteraction():
         return score_dom
 
 
+"""
+Phase 3 - Freq Qtd Scores
+"""
+
+
+class FreqQtdScores():
+    def __init__(self, tools):
+        self.tools = tools
+        self.ids_bact = self.tools.db.get_id_all_bacts()
+        self.ids_phages = self.tools.db.get_id_all_phages()
+        self.bact_qtd_prots = {}
+        self.phage_qtd_prots = {}
+
+    def run(self):
+        # TODO: Parallel ?
+        for id_bact in self.ids_bact:
+            resultats_bact = self.tools.db.get_sequence_proteines_bacteria(id_bact)
+            size = self.get_number_proteins(resultats_bact[0][3])
+            self.bact_qtd_prots[(int(id_bact))] = size
+            # print("QTD Prot Bact: %s" % (size))
+
+        for id_phage in self.ids_phages:
+            resultats_phage = self.tools.db.get_sequence_proteines_phage(id_phage)
+            size = self.get_number_proteins(resultats_phage[0][3])
+            self.phage_qtd_prots[(int(id_phage))] = size
+            # print("%d : QTD Prot Phage: %d" % (id_phage,size))
+
+    def get_number_proteins(self, sequence):
+        fasta_sequences = sequence.split('>')[1:]
+
+        qtdProts = sum(1 for x in fasta_sequences)
+        return qtdProts
+
+
+"""
+Phase 4 - Create Grades Dict
+"""
+
+
+class CreateGradesDict():
+    def __init__(self, tools):
+        self.tools = tools
+
+    def run(self):
+        pass
+
+
+"""
+Phase 5 - Generate DS
+"""
+
+
+class GenerateDS():
+    def __init__(self, tools):
+        self.tools = tools
+
+    def run(self):
+        pass
+
+
 class Core:
     def __init__(self):
         self.tools = Tools('inphinity/v_0.5/config.ini')
         self.detect_domaines = DetectDomaines(self.tools)
         self.count_score_interaction = CountScoreInteraction(self.tools)
+        self.freq_qtd_scores = FreqQtdScores(self.tools)
+        self.create_grades_dict = CreateGradesDict(self.tools)
+        self.generate_ds = GenerateDS(self.tools)
 
     def phase_1_detect_domains(self):
         # Only for developpement purpose!
@@ -290,6 +414,15 @@ class Core:
 
     def phase_2_count_score_interaction(self):
         self.count_score_interaction.run()
+
+    def phase_3_freq_qtd_scores(self):
+        self.freq_qtd_scores.run()
+
+    def phase_4_create_grades_dict(self):
+        self.create_grades_dict.run()
+
+    def phase_5_generate_ds(self):
+        self.generate_ds.run()
 
     def run(self):
         start_time = strftime("%Y-%m-%d %H:%M:%S", gmtime())
@@ -303,6 +436,7 @@ class Core:
 
         self.phase_1_detect_domains()
         self.phase_2_count_score_interaction()
+        self.phase_3_freq_qtd_scores()
 
         end_time = strftime("%Y-%m-%d %H:%M:%S", gmtime())
 

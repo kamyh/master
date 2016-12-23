@@ -10,3 +10,7 @@ class Tools():
 
     def get_configuration(self):
         return self.configuration
+
+    def stop_app(self):
+        import sys
+        sys.exit()

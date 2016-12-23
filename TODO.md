@@ -16,5 +16,8 @@
     
     --> newDomBact = getExistAutresDomaines("PF11509") ==> Why ???
     
--
+- STOP THAT
 
+        text_file = open(self.temp_file_pseqs, "w")
+        text_file.write(sequence)
+        text_file.close()
