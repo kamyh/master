@@ -152,7 +152,7 @@ class DetectDomaines():
     def seek_domaines_multiprocess(self, tab, id_cell):
         bool_bacteria = 0
         total_processed = 0
-        pool_size = multiprocessing.cpu_count()
+        pool_size = multiprocessing.cpu_count() - 1
 
         print('CPU Count: %s' % multiprocessing.cpu_count())
 
