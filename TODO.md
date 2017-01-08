@@ -10,6 +10,7 @@
 - all comments in english
 - db --> phase 2 connection to domine !!!
 - test phase 3,4,5
+- Identify other multiprocess points
 
 ## Questions
 

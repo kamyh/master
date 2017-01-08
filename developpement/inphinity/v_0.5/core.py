@@ -506,7 +506,7 @@ class GenerateDS():
 
         for id_inter in self.vec_id:
             if inter_id_preced != id_inter:
-                print qtd_score_tot
+                print(qtd_score_tot)
                 for score in vec_aux_scores:
                     score_normal = score / qtd_score_tot
 
@@ -534,7 +534,7 @@ class GenerateDS():
             try:
                 x = int(input("Number of Bins (1) or Vector of Bins (2) :"))
             except:
-                print "Input not legal"
+                print("Input not legal")
             if (x == 1 or x == 2):
                 aux = 0
         if (x == 1):
@@ -543,7 +543,7 @@ class GenerateDS():
                 try:
                     x = int(input("Number of Bins (1-" + str(max_score_doms) + ") :"))
                 except:
-                    print "Input not legal"
+                    print("Input not legal")
                 if (x > 0 and x <= max_score_doms):
                     aux = 0
             return x, 1
@@ -565,7 +565,7 @@ class GenerateDS():
                         x = float(input("Space Between bins ( >0.0 [Min. founded: " + str(self.min_score) + " ] - " + str(value_max_score) + " ) :"))
                         aux_min_score = 0
                 except:
-                    print "input not legal"
+                    print("input not legal")
                 if (x > aux_min_score and x < max_value_autoriz):
                     aux = 0
 
@@ -591,16 +591,14 @@ class GenerateDS():
         vec_results_prov = []
         position = 0
 
-        print str(len(self.vec_id))
         for id_inter in self.vec_id:
 
             if inter_id_preced != id_inter:
-                print "ID: " + str(inter_id_preced)
+                print("ID: %d" % (inter_id_preced))
 
                 self.vec_ids_ds.append(inter_id_preced)
                 self.vec_type_class.append(self.vec_cla[position])
                 inter_id_preced = id_inter
-                print len(vec_results_prov)
 
                 if bool_normalize_data_set == True:
                     qtd_values = len(vec_results_prov)
@@ -625,7 +623,7 @@ class GenerateDS():
             position = position + 1
         # a l epoque j ai eu des problemes avec la derniere ligne et j ai pas trop perdu de temps avec
         # le probleme se trouve dans le premier cycle for dans les conditions IF
-        print "last Line"
+
         position = position - 1
         self.vec_ids_ds.append(inter_id_preced)
         self.vec_type_class.append(self.vec_cla[position])
@@ -653,7 +651,6 @@ class GenerateDS():
 
     # Ecrire le fichier
     def write_file_ds(self, n, bins_list, vec_id, vec_cla, path_file, bool_normalize):
-        print "Start wrinting"
         position = 0
         bins_list_r = [round(i, 5) for i in bins_list]
 
