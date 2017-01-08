@@ -177,6 +177,9 @@ class DetectDomaines():
             results = p.map(self.hmmer_scan.analyze_domaines, chunk)
             print(results)
 
+            for prot in chunk:
+                self.tools.db.analyze_done(prot[0], 1)
+
             for result in results:
                 try:
                     id_prot = result[0]
@@ -346,6 +349,7 @@ Phase 3 - Freq Qtd Scores
 class FreqQtdScores():
     def __init__(self, tools):
         self.tools = tools
+        self.list_interact = self.tools.db.get_all_intractions()
         self.ids_bact = self.tools.db.get_id_all_bacts()
         self.ids_phages = self.tools.db.get_id_all_phages()
         self.bact_qtd_prots = {}
@@ -365,11 +369,38 @@ class FreqQtdScores():
             self.phage_qtd_prots[(int(id_phage))] = size
             # print("%d : QTD Prot Phage: %d" % (id_phage,size))
 
+    def scoring(self):
+        sum_qtd = 0
+        qtd_of_zeros = 0
+        for interact in self.list_interact:
+            sum_qtd = 0
+            qtd_of_zeros = 0
+
+            id_interaction = interact[0]
+            id_bacteria = interact[1]
+            id_phage = interact[2]
+            type_class = interact[3]
+            all_scores = self.get_all_scores_by_id_inter_class(id_interaction, type_class)
+            for Score in all_scores:
+                qtd_scors = self.tools.db.get_qtd_scores(id_interaction, type_class, Score)
+                self.tools.db.insert_qtds_scores(id_interaction, type_class, Score, qtd_scors)
+                sum_qtd = sum_qtd + qtd_scors
+            # Le nombre de fois qu apparait 0 est equivalant au nombre d IPP moin la freq des autres scores
+            qtd_of_zeros = (self.bact_qtd_prots[(int(id_bacteria))] * self.phage_qtd_prots[(int(id_phage))]) - sum_qtd
+            self.tools.db.insert_qtds_scores(id_interaction, type_class, 0, qtd_of_zeros)
+
     def get_number_proteins(self, sequence):
         fasta_sequences = sequence.split('>')[1:]
 
-        qtdProts = sum(1 for x in fasta_sequences)
-        return qtdProts
+        qtd_prots = sum(1 for x in fasta_sequences)
+        return qtd_prots
+
+    def get_all_scores_by_id_inter_class(self, id_interaction, positiv_class):
+        aux = self.tools.db.get_results_by_int_class_db(id_interaction, positiv_class)
+        results = []
+        for rst in aux:
+            results.append(rst[0])
+        return results
 
 
 """
@@ -380,9 +411,29 @@ Phase 4 - Create Grades Dict
 class CreateGradesDict():
     def __init__(self, tools):
         self.tools = tools
+        self.vec_id, self.vec_cla, self.vec_scor, self.vec_qtd = self.get_infos_in_vectors()
+        self.grades_file_pseqs = self.tools.configuration.get_grades_file_pseqs()
 
     def run(self):
-        pass
+        f = open(self.grades_file_pseqs, 'w')  # Pickle file is newly created where foo1.py is
+        # TODO: test with python3
+        cPickle.dump([self.vec_id, self.vec_cla, self.vec_scor, self.vec_qtd], f)  # dump data to f
+        f.close()
+
+    # retourne 4 vecteurs contenant id classe score et frequence
+    def get_infos_in_vectors(self):
+        infos = self.tools.db.get_all_infos_scores()
+        vec_id_inter = []
+        vec_class_inter = []
+        vec_score_inter = []
+        vec_qtd_score_inter = []
+        for info in infos:
+            # print "Information: " + str(info[0])
+            vec_id_inter.append(int(info[1]))
+            vec_class_inter.append(int(info[2]))
+            vec_score_inter.append(int(info[3]))
+            vec_qtd_score_inter.append(int(info[4]))
+        return vec_id_inter, vec_class_inter, vec_score_inter, vec_qtd_score_inter
 
 
 """
@@ -393,9 +444,252 @@ Phase 5 - Generate DS
 class GenerateDS():
     def __init__(self, tools):
         self.tools = tools
+        self.max_score = -1
+        self.max_score_norm = -1
+
+        self.vec_ids_ds = []
+        self.vec_type_class = []
+        self.vec_qtd_proteins = []
+        self.vec_result_final = []
+        self.vec_result_normal = []
+
+        self.vec_qtd_scores_histo_results = []
+        self.vec_seq_histo_results = []
+
+        self.aux = 0
+        # vec avec id des bins qui est utilise pour la premiere ligne des datasets
+        self.aux_vec = []
+
+        # TODO: ask diogo if it's the right file
+        self.path_file_pickle = self.tools.configuration.get_grades_file_pseqs()
+        # TODO: ask diogo wich extension file
+        self.path_file_save = self.tools.configuration.get_ds_file_save()
 
     def run(self):
-        pass
+        f = open(self.path_file_pickle, 'r')
+        self.vec_id, self.vec_cla, self.vec_score, self.vec_qtd = cPickle.load(f)
+        f.close()
+
+        self.max_score = max(self.vec_score)
+
+        type_data_set = self.tools.configuration.normalisation()
+        if type_data_set == 1:
+            # normaliser les donnes en accord avec le nombre d'IPP
+            self.max_score_norm, self.min_score = self.get_max_score_normalized()
+
+        self.bins_config, self.type_config = self.get_user_config_binds(self.max_score, self.max_score_norm, type_data_set)
+
+        # creer les bins et retourne l intervalle de chacun d eux et les frequence
+        vec_qtd_scores_histo_results, vec_seq_histo_results = self.create_vec_n_bins(type_data_set)
+
+        # vec avec qtd interaction
+        self.qtd_interactions_all = self.create_vec_size(vec_qtd_scores_histo_results)
+
+        # num de bins
+        vec_num_bins = len(vec_qtd_scores_histo_results[0])
+
+        while (self.aux < vec_num_bins):
+            self.aux_vec.append(self.aux)
+            self.aux = self.aux + 1
+
+        # Ecrire le dataset
+        writeFile(vec_qtd_scores_histo_results, self.aux_vec, self.vec_ids_ds, self.vec_type_class, self.path_file_save, 0)
+
+    # normaliser les scores
+    def get_max_score_normalized(self):
+        inter_id_preced = self.vec_id[0]
+        max_score = 0.00000000001
+        min_final_score = 1.0
+        qtd_score_tot = 0
+        position = 0
+        vec_aux_scores = []
+
+        for id_inter in self.vec_id:
+            if inter_id_preced != id_inter:
+                print qtd_score_tot
+                for score in vec_aux_scores:
+                    score_normal = score / qtd_score_tot
+
+                    if score_normal < min_final_score and score_normal != 0.0:
+                        min_final_score = score_normal
+                    if score_normal > max_score:
+                        max_score = score_normal
+                vec_aux_scores = []
+                qtd_score_tot = 0
+                inter_id_preced = id_inter
+
+            qtd_score_tot = qtd_score_tot + self.vec_qtd[position]
+
+            vec_aux_scores.append(self.vec_score[position])
+
+            position = position + 1
+        return max_score, min_final_score
+
+    # TODO: How to put those input into config file ????
+    # demander a l utilisateur les configurations des bins
+    def get_user_config_binds(self, max_score_doms, max_score_norm_doms, type_data_set):
+        aux = 1
+        x = -1
+        while (aux == 1):
+            try:
+                x = int(input("Number of Bins (1) or Vector of Bins (2) :"))
+            except:
+                print "Input not legal"
+            if (x == 1 or x == 2):
+                aux = 0
+        if (x == 1):
+            aux = 1
+            while (aux == 1):
+                try:
+                    x = int(input("Number of Bins (1-" + str(max_score_doms) + ") :"))
+                except:
+                    print "Input not legal"
+                if (x > 0 and x <= max_score_doms):
+                    aux = 0
+            return x, 1
+        if (x == 2):
+            aux = 1
+            max_value_autoriz = 0
+            while (aux == 1):
+                try:
+                    if type_data_set == 0:
+                        x = (input("Space Between bins (1-" + str(max_score_doms) + ") :"))
+                        aux_min_score = 0
+                        max_value_autoriz = max_score_doms
+                    else:
+                        # aux_min_score = maxScoreNormDoms/100
+                        max_value_autoriz = max_score_norm_doms
+
+                        # valueMinScore = format(aux_min_score, '.15f')
+                        value_max_score = format(max_score_norm_doms, '.15f')
+                        x = float(input("Space Between bins ( >0.0 [Min. founded: " + str(self.min_score) + " ] - " + str(value_max_score) + " ) :"))
+                        aux_min_score = 0
+                except:
+                    print "input not legal"
+                if (x > aux_min_score and x < max_value_autoriz):
+                    aux = 0
+
+            if type_data_set == 1:
+                max_score_doms = max_score_norm_doms
+            vec_bins = []
+            while (aux < max_score_doms):
+                vec_bins.append(aux)
+                aux = aux + x
+            if aux >= max_score_doms:
+                vec_bins.append(max_score_doms)
+
+            return vec_bins, 2
+
+    # creation de vecteurs
+    def create_vec_n_bins(self, bool_normalize_data_set):
+        qtd_scores_histo = []
+        sep_histo = []
+        vecnormal_values = []
+        vec_qtd_scores_histo = []
+        vec_seq_histo = []
+        inter_id_preced = self.vec_id[0]
+        vec_results_prov = []
+        position = 0
+
+        print str(len(self.vec_id))
+        for id_inter in self.vec_id:
+
+            if inter_id_preced != id_inter:
+                print "ID: " + str(inter_id_preced)
+
+                self.vec_ids_ds.append(inter_id_preced)
+                self.vec_type_class.append(self.vec_cla[position])
+                inter_id_preced = id_inter
+                print len(vec_results_prov)
+
+                if bool_normalize_data_set == True:
+                    qtd_values = len(vec_results_prov)
+                    qtd_values = qtd_values + 0.0
+                    for value_inter in vec_results_prov:
+                        aux_score = value_inter / qtd_values
+                        vecnormal_values.append(aux_score)
+                    qtd_scores_histo, sep_histo = np.histogram(vecnormal_values, bins=self.bins_config)
+                else:
+                    qtd_scores_histo, sep_histo = np.histogram(vec_results_prov, bins=self.bins_config)
+                vec_qtd_scores_histo.append(qtd_scores_histo)
+                vec_seq_histo.append(sep_histo)
+                # print qtd_scores_histo
+                # print sep_histo
+                vec_results_prov = []
+                vecnormal_values = []
+            qtd_scores = self.vec_qtd[position]
+            aux = 0
+            while aux < qtd_scores:
+                vec_results_prov.append(self.vec_score[position])
+                aux = aux + 1
+            position = position + 1
+        # a l epoque j ai eu des problemes avec la derniere ligne et j ai pas trop perdu de temps avec
+        # le probleme se trouve dans le premier cycle for dans les conditions IF
+        print "last Line"
+        position = position - 1
+        self.vec_ids_ds.append(inter_id_preced)
+        self.vec_type_class.append(self.vec_cla[position])
+
+        if bool_normalize_data_set == True:
+            qtd_values = len(vec_results_prov)
+            qtd_values = qtd_values + 0.0
+            for value_inter in vec_results_prov:
+                aux_score = value_inter / qtd_values
+                vecnormal_values.append(aux_score)
+            qtd_scores_histo, sep_histo = np.histogram(vecnormal_values, bins=self.bins_config)
+        else:
+            qtd_scores_histo, sep_histo = np.histogram(vec_results_prov, bins=self.bins_config)
+            vec_qtd_scores_histo.append(qtd_scores_histo)
+            vec_seq_histo.append(sep_histo)
+
+        return vec_qtd_scores_histo, vec_seq_histo
+
+    # retourne un vec avec qtd interactions
+    def create_vec_size(self, mat_values):
+        qtd_interactions = []
+        for nm_interactions in mat_values:
+            qtd_interactions.append(sum(nm_interactions))
+        return qtd_interactions
+
+    # Ecrire le fichier
+    def write_file_ds(self, n, bins_list, vec_id, vec_cla, path_file, bool_normalize):
+        print "Start wrinting"
+        position = 0
+        bins_list_r = [round(i, 5) for i in bins_list]
+
+        if bool_normalize == 1:
+            bins_list_r = [format(i, '.8f') for i in bins_list_r]
+
+        bins_list_r.insert(0, "ID_interaction")
+        bins_list_r.append("Class_interactions")
+
+        with open(path_file, 'w') as out_csv:
+            writer = csv.writer(out_csv, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL, lineterminator='\n')
+            writer.writerow(bins_list_r)
+            for id_interact, type_class, list_histo in zip(vec_id, vec_cla, n):
+                list_aux = list_histo.tolist()
+                list_aux.append(type_class)
+                list_aux.insert(0, id_interact)
+
+                list_aux_b = self.control_number_interactions_only_one(list_aux, position)
+                writer.writerow(list_aux_b)
+                position = position + 1
+
+    # Controle que la freq de tout les scores est egale a la qtd d IPP
+    def control_number_interactions_only_one(self, vec_list_qtd_inter, position):
+        qtd_interaction_int = []
+        only_zeros = 0
+        for i in vec_list_qtd_inter:
+            qtd_interaction_int.append(int(i))
+            if i == self.qtd_interactions_all[position]:
+                only_zeros = 1
+        if only_zeros == 1 and self.type_config == 1:
+            qtd_interaction_int = [0] * (len(vec_list_qtd_inter) - 3)
+            qtd_interaction_int.insert(0, vec_list_qtd_inter[0])
+            aux_size = len(vec_list_qtd_inter) - 1
+            qtd_interaction_int.insert(1, self.qtd_interactions_all[position])
+            qtd_interaction_int.append(vec_list_qtd_inter[aux_size])
+        return qtd_interaction_int
 
 
 class Core:
@@ -436,7 +730,10 @@ class Core:
 
         self.phase_1_detect_domains()
         self.phase_2_count_score_interaction()
-        self.phase_3_freq_qtd_scores()
+        #TODO: test those phases
+        # self.phase_3_freq_qtd_scores()
+        # self.phase_4_create_grades_dict()
+        # self.phase_5_generate_ds()
 
         end_time = strftime("%Y-%m-%d %H:%M:%S", gmtime())
 

@@ -88,6 +88,28 @@ class DBUtilties:
             return self.get_proteine_in_prot_dom(id_protein)
         return data[0][0]
 
+    def analyze_done(self, prot_id, status):
+        if self.has_been_done(prot_id) == 0:
+            query = "INSERT INTO progress (prot_id, status) VALUES ('%s', '%s')" % (prot_id, status)
+            try:
+                cursor = self.db.cursor()
+                cursor.execute(query)
+                self.db.commit()
+            except MySQLdb.OperationalError:
+                self.connect()
+                return self.execute_insert_domains(prot_id, status)
+
+    def has_been_done(self, prot_id):
+        query = "SELECT count(*) from progress WHERE prot_id = '%s'" % (prot_id)
+        try:
+            cursor = self.db.cursor()
+            cursor.execute(query)
+            data = cursor.fetchall()
+        except MySQLdb.OperationalError:
+            self.connect()
+            return self.has_been_done(prot_id)
+        return data[0][0] > 0
+
     def get_id_all_bacts(self):
         query = "SELECT Bacterium_id FROM Bacteria"
         try:
@@ -272,11 +294,59 @@ class DBUtilties:
     #   4_F1 FreqQtdScores                         #
     ################################################
 
+    def get_results_by_int_class_db(self, id_interaction, positiv_class):
+        query = "select distinct Score_result from Score_interactions Where Positiv_Interaction = '%d' AND Interaction_Id = '%d' ORDER BY Score_result" % (positiv_class, id_interaction)
+        try:
+            cursor = self.db.cursor()
+            cursor.execute(query)
+            data = cursor.fetchall()
+        except MySQLdb.OperationalError:
+            self.connect()
+            return self.get_resutlados_byInt_class_db(id_interaction, positiv_class)
 
+        return data
+
+    # retourn la frequence d un score dans une interaction
+    def get_qtd_scores(self, id_interaction, positiv_class, score_value):
+        query = "select count(*) from Score_interactions WHERE Positiv_Interaction = '%d' AND Interaction_Id = '%d' AND Score_result = '%d'" % (positiv_class, id_interaction, score_value)
+        try:
+            cursor = self.db.cursor()
+            cursor.execute(query)
+            data = int(cursor.fetchone()[0])
+        except MySQLdb.OperationalError:
+            self.connect()
+            return self.get_qtd_scores(id_interaction, positiv_class, score_value)
+
+        return data
+
+    # Inserer la frequence d un score dans le tableau qtdScore
+    def insert_qtds_scores(self, id_interaction, class_interaction, score_number, quantity_score):
+        query = "INSERT INTO QtdScores (Interaction_Id, Positiv_Interaction, ScoreNumber, QuantityScore) VALUES (%s, %s, %s, %s)" % (id_interaction, class_interaction, score_number, quantity_score)
+
+        try:
+            cursor = self.db.cursor()
+            cursor.execute(query)
+            self.db.commit()
+        except MySQLdb.OperationalError:
+            self.connect()
+            return self.insert_qtds_scores(id_interaction, class_interaction, score_number, quantity_score)
 
     ################################################
     #   5_F1 createGradesDict                      #
     ################################################
+
+    # retourne le contenu du tableau QtdScore
+    def get_all_infos_scores(self):
+        query = "select * from QtdScores "
+        try:
+            cursor = self.db.cursor()
+            cursor.execute(query)
+            data = cursor.fetchall()
+        except MySQLdb.OperationalError:
+            self.connect()
+            return self.get_all_infos_scores()
+
+        return data
 
     ################################################
     #   6_F1 GenerateDS                            #

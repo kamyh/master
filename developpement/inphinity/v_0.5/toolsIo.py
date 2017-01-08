@@ -33,3 +33,4 @@ class ToolsIO:
                 self.LOGGER.log_detailed('%s ' % line, logged_detailed)
                 matching_lines.append(line)
         return matching_lines
+

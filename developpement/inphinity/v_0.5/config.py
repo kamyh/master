@@ -33,6 +33,12 @@ class Config:
     def get_temp_file_p_seqs(self):
         return self.config.get('ENV', 'temp_file_pseqs')
 
+    def get_grades_file_pseqs(self):
+        return self.config.get('ENV', 'grades_file_pseqs')
+
+    def get_ds_file_save(self):
+        return self.config.get('ENV', 'ds_file_save')
+
     def get_detailed_logs(self):
         return self.config.get('INFORMATION', 'detailed_logs') == '1'
 
@@ -80,3 +86,6 @@ class Config:
 
     def get_max_biais(self):
         return int(self.config.get('DOMS_SELECTION', 'max_biais'))
+
+    def normalisation(self):
+        return int(self.config.get('DATASET_GENERATION', 'normalisation'))

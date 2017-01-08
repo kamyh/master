@@ -53,13 +53,23 @@ class HmmerScan:
         db.close()
         return data[0][0]
 
+    def has_been_done(self, prot_id):
+        db = MySQLdb.connect(host='172.25.0.102', user='admin', passwd='root', db='phage_bact')
+        cursor = db.cursor()
+        query = "SELECT count(*) from progress WHERE prot_id = '%s'" % (prot_id)
+        cursor.execute(query)
+        data = cursor.fetchall()
+
+        db.close()
+        return data[0][0] > 0
+
     ##
     #   Use <<inphinity-hmmer>> docker container
     #   to analyze domain in protein sequences
     ##
     def analyze_domaines(self, values_tab):
         proteinExist = 0
-        proteinExist = self.get_proteine_in_prot_dom(values_tab[0])
+        proteinExist = self.has_been_done(values_tab[0]) or self.get_proteine_in_prot_dom(values_tab[0])
 
         if proteinExist == 0:
             start_time = strftime("%Y-%m-%d %H:%M:%S", gmtime())
