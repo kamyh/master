@@ -34,10 +34,10 @@ class Config:
         return self.config.get('ENV', 'temp_file_pseqs')
 
     def get_grades_file_pseqs(self):
-        return self.config.get('ENV', 'grades_file_pseqs')
+        return self.config.get('DATASET_GENERATION', 'grades_file_pseqs')
 
     def get_ds_file_save(self):
-        return self.config.get('ENV', 'ds_file_save')
+        return self.config.get('DATASET_GENERATION', 'ds_file_save')
 
     def get_detailed_logs(self):
         return self.config.get('INFORMATION', 'detailed_logs') == '1'
@@ -89,3 +89,6 @@ class Config:
 
     def normalisation(self):
         return int(self.config.get('DATASET_GENERATION', 'normalisation'))
+
+    def get_phases_to_run(self):
+        return self.config.get('ENV', 'phases_to_run').split(",")

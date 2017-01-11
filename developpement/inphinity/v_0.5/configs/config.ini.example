@@ -6,15 +6,14 @@ testing = 0
 path_to_core = /home/kamyh/projects/master/developpement/dockers/core
 #Dile to parse sequences
 temp_file_pseqs = /tmp/tmpMF.txt
-grades_file_pseqs = /home/kamyh/projects/master/gradesDict.p
-ds_file_save = /home/kamyh/projects/master/ds.p
 reset_db_at_start = 0
 #if = 0 --> auto
 #if = -1 --> nbr of core
 #if = x --> x
-process = 0
+process = -1
 # Smaller the chunk are, the more time is lost
 chunk_size_multiplier = 4
+phases_to_run = 2,3,4,5
 [DOMS_SELECTION]
 use_e_value_selection = 0
 min_e_value = 9.8e-25
@@ -27,3 +26,7 @@ max_score = 1500
 use_biais_selection = 0
 min_biais = 0
 max_biais = 1500
+[DATASET_GENERATION]
+grades_file_pseqs = /home/kamyh/projects/master/gradesDict.p
+ds_file_save = /home/kamyh/projects/master/ds.p
+normalisation = 0

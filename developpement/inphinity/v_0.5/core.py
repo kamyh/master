@@ -493,7 +493,7 @@ class GenerateDS():
             self.aux = self.aux + 1
 
         # Ecrire le dataset
-        writeFile(vec_qtd_scores_histo_results, self.aux_vec, self.vec_ids_ds, self.vec_type_class, self.path_file_save, 0)
+        self.write_file_ds(vec_qtd_scores_histo_results, self.aux_vec, self.vec_ids_ds, self.vec_type_class, self.path_file_save, 0)
 
     # normaliser les scores
     def get_max_score_normalized(self):
@@ -690,8 +690,8 @@ class GenerateDS():
 
 
 class Core:
-    def __init__(self):
-        self.tools = Tools('inphinity/v_0.5/config.ini')
+    def __init__(self, config_file):
+        self.tools = Tools(config_file)
         self.detect_domaines = DetectDomaines(self.tools)
         self.count_score_interaction = CountScoreInteraction(self.tools)
         self.freq_qtd_scores = FreqQtdScores(self.tools)
@@ -725,9 +725,25 @@ class Core:
             self.tools.db.show_tables_of_phage_bact()
             print('Rest DB done')
 
-        self.phase_1_detect_domains()
-        self.phase_2_count_score_interaction()
-        #TODO: test those phases
+        phases_to_run = self.tools.configuration.get_phases_to_run()
+
+        if '1' in phases_to_run:
+            print('Run phase 1')
+            self.phase_1_detect_domains()
+        if '2' in phases_to_run:
+            print('Run phase 2')
+            self.phase_2_count_score_interaction()
+        if '3' in phases_to_run:
+            print('Run phase 3')
+            self.phase_3_freq_qtd_scores()
+        if '4' in phases_to_run:
+            print('Run phase 4')
+            self.phase_4_create_grades_dict()
+        if '5' in phases_to_run:
+            print('Run phase 5')
+            self.phase_5_generate_ds()
+
+        # TODO: test those phases
         # self.phase_3_freq_qtd_scores()
         # self.phase_4_create_grades_dict()
         # self.phase_5_generate_ds()

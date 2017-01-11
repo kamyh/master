@@ -96,7 +96,7 @@ class DetectDomaines():
 
 class Core:
     def __init__(self):
-        self.configuration = Config('inphinity/config.example.ini')
+        self.configuration = Config('inphinity/config.ini.example')
         self.db = DBUtilties(False)
         self.detect_domaines = DetectDomaines(self.configuration)
 
