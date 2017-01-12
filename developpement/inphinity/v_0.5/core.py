@@ -24,6 +24,7 @@ import numpy as np
 import csv
 import time
 import datetime
+import os
 
 LOGGER = Logger()
 
@@ -545,7 +546,7 @@ class GenerateDS():
 
         for id_inter in self.vec_id:
             if inter_id_preced != id_inter:
-                print(qtd_score_tot)
+                #print(qtd_score_tot)
                 for score in vec_aux_scores:
                     score_normal = score / qtd_score_tot
 
@@ -702,6 +703,7 @@ class GenerateDS():
                 list_aux_b = self.control_number_interactions_only_one(list_aux, position)
                 writer.writerow(list_aux_b)
                 position = position + 1
+        os.chmod(path_file, 0o777)
 
     # Controle que la freq de tout les scores est egale a la qtd d IPP
     def control_number_interactions_only_one(self, vec_list_qtd_inter, position):
