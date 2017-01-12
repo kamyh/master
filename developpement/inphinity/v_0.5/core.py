@@ -19,6 +19,11 @@ from Bio import *
 import multiprocessing
 from tools import Tools
 from time import gmtime, strftime
+import pickle
+import numpy as np
+import csv
+import time
+import datetime
 
 LOGGER = Logger()
 
@@ -100,37 +105,39 @@ class DetectDomaines():
         LOGGER.log_detailed('%d sequences to compute for %d organismes' % (total, nbr_organismes), is_detailed_log)
 
     def run(self):
-        """Phages"""
-        list_id_phages = self.tools.db.get_id_all_phages()
+        if self.tools.configuration.do_phage():
+            """Phages"""
+            list_id_phages = self.tools.db.get_id_all_phages()
 
-        nbr_phages = len(list_id_phages)
-        nbr_phages_analyzed = 0
+            nbr_phages = len(list_id_phages)
+            nbr_phages_analyzed = 0
 
-        for id in list_id_phages:
-            LOGGER.log_normal('%d/%d phages analysed' % (nbr_phages_analyzed, nbr_phages))
-            print('%d/%d phages analysed' % (nbr_phages_analyzed, nbr_phages))
-            print('Organism ID: ' + str(id))
-            resultats_organismes = self.tools.db.get_sequence_proteines_phage(id)
-            self.analyze_organisme(resultats_organismes, id)
-            nbr_phages_analyzed += 1
+            for id in list_id_phages:
+                LOGGER.log_normal('%d/%d phages analysed' % (nbr_phages_analyzed, nbr_phages))
+                print('%d/%d phages analysed' % (nbr_phages_analyzed, nbr_phages))
+                print('Organism ID: ' + str(id))
+                resultats_organismes = self.tools.db.get_sequence_proteines_phage(id)
+                self.analyze_organisme(resultats_organismes, id)
+                nbr_phages_analyzed += 1
 
-        self.tools.db.show_tables_of_phage_bact()
+            self.tools.db.show_tables_of_phage_bact()
 
-        """Bacterias"""
-        list_id_bacterias = self.tools.db.get_id_all_bacts()
+        if self.tools.configuration.do_bacteria():
+            """Bacterias"""
+            list_id_bacterias = self.tools.db.get_id_all_bacts()
 
-        nbr_bacterias = len(list_id_bacterias)
-        nbr_bacterias_analyzed = 0
+            nbr_bacterias = len(list_id_bacterias)
+            nbr_bacterias_analyzed = 0
 
-        for id in list_id_bacterias:
-            LOGGER.log_normal('%d/%d bacteria analysed' % (nbr_bacterias_analyzed, nbr_bacterias))
-            print('%d/%d bacteria analysed' % (nbr_bacterias_analyzed, nbr_bacterias))
-            print('Organism ID: ' + str(id))
-            resultats_organismes = self.tools.db.get_sequence_proteines_bacteria(id)
-            self.analyze_organisme(resultats_organismes, id)
-            nbr_bacterias_analyzed += 1
+            for id in list_id_bacterias:
+                LOGGER.log_normal('%d/%d bacteria analysed' % (nbr_bacterias_analyzed, nbr_bacterias))
+                print('%d/%d bacteria analysed' % (nbr_bacterias_analyzed, nbr_bacterias))
+                print('Organism ID: ' + str(id))
+                resultats_organismes = self.tools.db.get_sequence_proteines_bacteria(id)
+                self.analyze_organisme(resultats_organismes, id)
+                nbr_bacterias_analyzed += 1
 
-        self.tools.db.show_tables_of_phage_bact()
+            self.tools.db.show_tables_of_phage_bact()
 
     def analyze_organisme(self, resultats_organismes, id):
         pidss_bact = []
@@ -208,39 +215,46 @@ class CountScoreInteraction():
     def run(self):
 
         # TODO: parallel ???
-        LOGGER.log_normal("%d" % (len(self.list_nteractions)))
-        for interaction in self.list_nteractions:
-            lis_domains_bac = []
-            lisDomainsPhage = []
+        LOGGER.log_normal("Number of interactions: %d" % (len(self.list_interactions)))
+        for interaction in self.list_interactions:
+            if not self.tools.db.interaction_has_been_done(interaction[0]):
+                lis_domains_bac = []
+                lisDomainsPhage = []
 
-            id_interaction = interaction[0]
-            id_bacteria = interaction[1]
-            id_phage = interaction[2]
-            pos_neg_interaction = interaction[3]
-            # print("Treatment of || id_interaction: %s, id_bacteria: %s, id_phage: %s" % (id_interaction, id_bacteria, id_phage))
+                id_interaction = interaction[0]
+                id_bacteria = interaction[1]
+                id_phage = interaction[2]
+                pos_neg_interaction = interaction[3]
+                # print("Treatment of || id_interaction: %s, id_bacteria: %s, id_phage: %s" % (id_interaction, id_bacteria, id_phage))
 
-            ids_seq_bact = self.get_ids_seq_prot(id_bacteria, 1)
-            ids_seq_phage = self.get_ids_seq_prot(id_phage, 2)
+                ids_seq_bact = self.get_ids_seq_prot(id_bacteria, 1)
+                ids_seq_phage = self.get_ids_seq_prot(id_phage, 2)
 
-            LOGGER.log_normal("interaction: id_interaction-%s, id_bacteria-%s, id_phage-%s, pos_neg_interaction-%s" % (id_interaction, id_bacteria, id_phage, pos_neg_interaction))
+                LOGGER.log_normal("interaction: id_interaction-%s, id_bacteria-%s, id_phage-%s, pos_neg_interaction-%s" % (id_interaction, id_bacteria, id_phage, pos_neg_interaction))
 
-            for id_seq_bact in ids_seq_bact:
-                lis_domains_bac = self.tools.db.get_domains_cell(id_seq_bact)
+                for id_seq_bact in ids_seq_bact:
 
-                if len(lis_domains_bac) > 0:
-                    for id_seq_phage in ids_seq_phage:
-                        lis_domains_phage = self.tools.db.get_domains_cell(id_seq_phage)
-                        # print('%s - %s' % (len(lis_domains_phage), id_seq_phage))
-                        if len(lis_domains_phage) > 0:
-                            score_PPI = self.get_scores_domaines(lis_domains_bac, lis_domains_phage)
+                    lis_domains_bac = self.tools.db.get_domains_cell(id_seq_bact)
+                    # print(lis_domains_bac)
 
-                            if score_PPI > 0:
-                                LOGGER.log_normal("score_PPI: %s" % (score_PPI))
+                    if len(lis_domains_bac) > 0:
+                        for id_seq_phage in ids_seq_phage:
 
-                                self.tools.db.insert_score_IPP(id_seq_bact, id_seq_phage, pos_neg_interaction, id_interaction, score_PPI)
+                            lis_domains_phage = self.tools.db.get_domains_cell(id_seq_phage)
+                            # print(lis_domains_phage)
+                            # print('%s - %s' % (len(lis_domains_phage), id_seq_phage))
+                            if len(lis_domains_phage) > 0:
+                                score_PPI = self.get_scores_domaines(lis_domains_bac, lis_domains_phage)
+
+                                if score_PPI > 0:
+                                    # LOGGER.log_normal("score_PPI: %s" % (score_PPI))
+
+                                    self.tools.db.insert_score_IPP(id_seq_bact, id_seq_phage, pos_neg_interaction, id_interaction, score_PPI)
+
+                self.tools.db.interaction_analyze_done(interaction[0], 1)
 
     def fectch_list_interaction(self):
-        self.list_nteractions = self.tools.db.get_all_intractions()
+        self.list_interactions = self.tools.db.get_all_intractions()
 
     # Retourne les ids de proteines d un organism
     # 1 - bacterie 2 - phage
@@ -290,6 +304,7 @@ class CountScoreInteraction():
 
         for dom_bac in vec_dom_bac:
             new_dom_bact = self.tools.db.is_exist_other_domaines(dom_bac)
+            # print(dom_bac)
 
             for dom_phag in vec_dom_pha:
                 # voir si pour ce domaine il en exist un actualise
@@ -299,9 +314,24 @@ class CountScoreInteraction():
                 score_intermediate_c = 0
                 score_intermediate_d = 0
                 qtd_new_interact = 0.0
+
+                '''
+                if dom_bac == 'PF00270':
+                    print("dom_bac: %s | dom_phag: %s" % (dom_bac,dom_phag))
+
+                if dom_bac == 'PF00270' and dom_phag == 'PF00271':
+                    print("-dom_bac: %s | dom_phag: %s" % (dom_bac,dom_phag))
+                    score_intermediate = self.tools.db.is_interaction_existe_dom(dom_bac, dom_phag)
+                    print(score_intermediate)
+
+                if dom_bac == 'PF00271' and dom_phag == 'PF00270':
+                    print("dom_bac: %s | dom_phag: %s" % (dom_bac,dom_phag))
+                '''
                 # pas de new domains
                 if "PF" not in new_dom_bact and "PF" not in new_dom_phag:
+                    # print("dom_bac: %s | dom_phag: %s" % (dom_bac,dom_phag))
                     score_intermediate = self.tools.db.is_interaction_existe_dom(dom_bac, dom_phag)
+                    # print("score_intermediate: %s" % (score_intermediate))
                     if score_intermediate > 0:
                         qtd_new_interact = 1.0
                 # new domaine only for bacteria
@@ -336,7 +366,7 @@ class CountScoreInteraction():
                         qtd_new_interact = qtd_new_interact + 1.0
 
                 if qtd_new_interact > 0:
-                    # print "QTDINteraction: " + str(qtdNewInteract)
+                    # print("QTDINteraction: %d" % (qtd_new_interact))
                     score_dom = score_dom + ((score_intermediate + score_intermediate_b + score_intermediate_c + score_intermediate_d) / qtd_new_interact)
         return score_dom
 
@@ -363,11 +393,14 @@ class FreqQtdScores():
             self.bact_qtd_prots[(int(id_bact))] = size
             # print("QTD Prot Bact: %s" % (size))
 
+        # TODO: Parallel ?
         for id_phage in self.ids_phages:
             resultats_phage = self.tools.db.get_sequence_proteines_phage(id_phage)
             size = self.get_number_proteins(resultats_phage[0][3])
             self.phage_qtd_prots[(int(id_phage))] = size
             # print("%d : QTD Prot Phage: %d" % (id_phage,size))
+
+        self.scoring()
 
     def scoring(self):
         sum_qtd = 0
@@ -380,6 +413,9 @@ class FreqQtdScores():
             id_bacteria = interact[1]
             id_phage = interact[2]
             type_class = interact[3]
+
+            LOGGER.log_normal("Scoring of interaction (id): %s" % id_interaction)
+
             all_scores = self.get_all_scores_by_id_inter_class(id_interaction, type_class)
             for Score in all_scores:
                 qtd_scors = self.tools.db.get_qtd_scores(id_interaction, type_class, Score)
@@ -415,9 +451,10 @@ class CreateGradesDict():
         self.grades_file_pseqs = self.tools.configuration.get_grades_file_pseqs()
 
     def run(self):
-        f = open(self.grades_file_pseqs, 'w')  # Pickle file is newly created where foo1.py is
+        LOGGER.log_normal("Create Grades Dict")
+        f = open(self.grades_file_pseqs, 'wb')  # Pickle file is newly created where foo1.py is
         # TODO: test with python3
-        cPickle.dump([self.vec_id, self.vec_cla, self.vec_scor, self.vec_qtd], f)  # dump data to f
+        pickle.dump([self.vec_id, self.vec_cla, self.vec_scor, self.vec_qtd], f)  # dump data to f
         f.close()
 
     # retourne 4 vecteurs contenant id classe score et frequence
@@ -463,11 +500,13 @@ class GenerateDS():
         # TODO: ask diogo if it's the right file
         self.path_file_pickle = self.tools.configuration.get_grades_file_pseqs()
         # TODO: ask diogo wich extension file
-        self.path_file_save = self.tools.configuration.get_ds_file_save()
+        ts = time.time()
+        st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d_%H-%M-%S')
+        self.path_file_save = "%s%s_%s.ds" % (self.tools.configuration.get_ds_dir(),self.tools.path_to_config.split('.')[0],st)
 
     def run(self):
-        f = open(self.path_file_pickle, 'r')
-        self.vec_id, self.vec_cla, self.vec_score, self.vec_qtd = cPickle.load(f)
+        f = open(self.path_file_pickle, 'rb')
+        self.vec_id, self.vec_cla, self.vec_score, self.vec_qtd = pickle.load(f)
         f.close()
 
         self.max_score = max(self.vec_score)
@@ -528,46 +567,37 @@ class GenerateDS():
     # TODO: How to put those input into config file ????
     # demander a l utilisateur les configurations des bins
     def get_user_config_binds(self, max_score_doms, max_score_norm_doms, type_data_set):
-        aux = 1
-        x = -1
-        while (aux == 1):
-            try:
-                x = int(input("Number of Bins (1) or Vector of Bins (2) :"))
-            except:
-                print("Input not legal")
-            if (x == 1 or x == 2):
-                aux = 0
-        if (x == 1):
-            aux = 1
-            while (aux == 1):
-                try:
-                    x = int(input("Number of Bins (1-" + str(max_score_doms) + ") :"))
-                except:
-                    print("Input not legal")
-                if (x > 0 and x <= max_score_doms):
-                    aux = 0
-            return x, 1
-        if (x == 2):
+        type_bins = self.tools.configuration.get_type_bins()
+
+        if (type_bins == 1):
+            number_of_bins = self.tools.configuration.get_number_of_bins()
+
+            if (number_of_bins < 0 and number_of_bins > max_score_doms):
+                LOGGER.log_error("Number of bins to high, set at maximum automatically!")
+                number_of_bins = max_score_doms
+            return number_of_bins, 1
+        if (type_bins == 2):
             aux = 1
             max_value_autoriz = 0
-            while (aux == 1):
-                try:
-                    if type_data_set == 0:
-                        x = (input("Space Between bins (1-" + str(max_score_doms) + ") :"))
-                        aux_min_score = 0
-                        max_value_autoriz = max_score_doms
-                    else:
-                        # aux_min_score = maxScoreNormDoms/100
-                        max_value_autoriz = max_score_norm_doms
+            aux_min_score = 0
 
-                        # valueMinScore = format(aux_min_score, '.15f')
-                        value_max_score = format(max_score_norm_doms, '.15f')
-                        x = float(input("Space Between bins ( >0.0 [Min. founded: " + str(self.min_score) + " ] - " + str(value_max_score) + " ) :"))
-                        aux_min_score = 0
-                except:
-                    print("input not legal")
-                if (x > aux_min_score and x < max_value_autoriz):
-                    aux = 0
+            if type_data_set == 0:
+                aux_min_score = 0
+                max_value_autoriz = max_score_doms
+                x = self.tools.configuration.get_space_between_bins()
+            else:
+                # aux_min_score = maxScoreNormDoms/100
+                max_value_autoriz = max_score_norm_doms
+
+                # valueMinScore = format(aux_min_score, '.15f')
+                value_max_score = format(max_score_norm_doms, '.15f')
+                #x = float(input("Space Between bins ( >0.0 [Min. founded: " + str(self.min_score) + " ] - " + str(value_max_score) + " ) :"))
+                x = self.tools.configuration.get_space_between_bins()
+                aux_min_score = 0
+
+            if (x < aux_min_score and x > max_value_autoriz):
+                LOGGER.log_error("Number of bins to high, set at maximum automatically!")
+                x = max_value_autoriz
 
             if type_data_set == 1:
                 max_score_doms = max_score_norm_doms
@@ -594,7 +624,7 @@ class GenerateDS():
         for id_inter in self.vec_id:
 
             if inter_id_preced != id_inter:
-                print("ID: %d" % (inter_id_preced))
+                LOGGER.log_detailed("Interaction Proceed (id): %d" % (inter_id_preced), self.tools.configuration.get_detailed_logs())
 
                 self.vec_ids_ds.append(inter_id_preced)
                 self.vec_type_class.append(self.vec_cla[position])
@@ -651,6 +681,7 @@ class GenerateDS():
 
     # Ecrire le fichier
     def write_file_ds(self, n, bins_list, vec_id, vec_cla, path_file, bool_normalize):
+        LOGGER.log_normal("Writting Dataset: %s" % path_file)
         position = 0
         bins_list_r = [round(i, 5) for i in bins_list]
 
@@ -718,6 +749,7 @@ class Core:
     def run(self):
         start_time = strftime("%Y-%m-%d %H:%M:%S", gmtime())
         LOGGER.log_normal('New run at: %s' % start_time)
+        LOGGER.log_normal('Config file: %s' % self.tools.path_to_config)
 
         if self.tools.configuration.is_reset_db_at_start():
             print('Rest DB starting...')
@@ -728,26 +760,21 @@ class Core:
         phases_to_run = self.tools.configuration.get_phases_to_run()
 
         if '1' in phases_to_run:
-            print('Run phase 1')
+            LOGGER.log_normal('Run phase 1')
             self.phase_1_detect_domains()
         if '2' in phases_to_run:
-            print('Run phase 2')
+            LOGGER.log_normal('Run phase 2')
             self.phase_2_count_score_interaction()
         if '3' in phases_to_run:
-            print('Run phase 3')
+            LOGGER.log_normal('Run phase 3')
             self.phase_3_freq_qtd_scores()
         if '4' in phases_to_run:
-            print('Run phase 4')
+            LOGGER.log_normal('Run phase 4')
             self.phase_4_create_grades_dict()
         if '5' in phases_to_run:
-            print('Run phase 5')
+            LOGGER.log_normal('Run phase 5')
             self.phase_5_generate_ds()
-
-        # TODO: test those phases
-        # self.phase_3_freq_qtd_scores()
-        # self.phase_4_create_grades_dict()
-        # self.phase_5_generate_ds()
 
         end_time = strftime("%Y-%m-%d %H:%M:%S", gmtime())
 
-        print("Starting:%s | Ending:%s" % (start_time, end_time))
+        LOGGER.log_normal("Starting:%s | Ending:%s" % (start_time, end_time))

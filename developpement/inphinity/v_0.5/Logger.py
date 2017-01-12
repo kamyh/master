@@ -19,8 +19,8 @@ class Logger():
         file.write(txt)
         file.close()
 
-    def log_detailed(self, msg, loge_detailed=False):
-        if(loge_detailed):
+    def log_detailed(self, msg, log_detailed=False):
+        if(log_detailed):
             msg = '\nDETAILS %s| %s' % (datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'), msg)
             if(self.verbose):
                 print(msg)

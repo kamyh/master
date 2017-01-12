@@ -33,6 +33,7 @@ if [ ! -f /var/lib/mysql/ibdata1 ]; then
 	mysql phage_bact < /tmp/db/neg_interactionsVD.sql
 	mysql phage_bact < /tmp/db/protdom_create.sql
 	mysql phage_bact < /tmp/db/progress_create.sql
+	mysql phage_bact < /tmp/db/progress_interaction_create.sql
 
     # For 3_F1 countScoreInteraction.py
 	mysql phage_bact < /tmp/db/score_interactions_create.sql

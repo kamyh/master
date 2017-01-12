@@ -13,7 +13,10 @@ reset_db_at_start = 0
 process = -1
 # Smaller the chunk are, the more time is lost
 chunk_size_multiplier = 4
-phases_to_run = 2,3,4,5
+phases_to_run = 1,2,3,4,5
+[PHASE_1]
+analyze_phage = 1
+analyze_bacteria = 1
 [DOMS_SELECTION]
 use_e_value_selection = 0
 min_e_value = 9.8e-25
@@ -27,6 +30,11 @@ use_biais_selection = 0
 min_biais = 0
 max_biais = 1500
 [DATASET_GENERATION]
-grades_file_pseqs = /home/kamyh/projects/master/gradesDict.p
-ds_file_save = /home/kamyh/projects/master/ds.p
+grades_file_pseqs = /inphinity/grades/gradesDict.p
+ds_dir = /inphinity/datasets/
 normalisation = 0
+# 1 --> Number of bins
+# 2 --> Vector of bins
+type_bins = 1
+number_of_bins = 1
+space_between_bins = 1

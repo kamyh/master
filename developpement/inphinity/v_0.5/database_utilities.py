@@ -60,7 +60,6 @@ class DBUtilties:
         return data
 
     # Inserer domaines d interactions d'une proteines
-    # TODO: can we remove ProtSeq column ???
     def execute_insert_domains(self, id_protein, domaines, id_Cell, bool_Bacteria, seq_prot):
         domaines_no_rep = list(set(domaines))
         for dom in domaines_no_rep:
@@ -97,7 +96,7 @@ class DBUtilties:
                 self.db.commit()
             except MySQLdb.OperationalError:
                 self.connect()
-                return self.execute_insert_domains(prot_id, status)
+                return self.analyze_done(prot_id, status)
 
     def has_been_done(self, prot_id):
         query = "SELECT count(*) from progress WHERE prot_id = '%s'" % (prot_id)
@@ -144,9 +143,33 @@ class DBUtilties:
             return phages_id_ret[17:18]
         return phages_id_ret
 
+
+
     ################################################
     #   3_F1 countScoreInteraction                 #
     ################################################
+
+    def interaction_analyze_done(self, interaction_id, status):
+        if self.has_been_done(interaction_id) == 0:
+            query = "INSERT INTO progress_interaction (interaction_id, status) VALUES ('%s', '%s')" % (interaction_id, status)
+            try:
+                cursor = self.db.cursor()
+                cursor.execute(query)
+                self.db.commit()
+            except MySQLdb.OperationalError:
+                self.connect()
+                return self.interaction_analyze_done(interaction_id, status)
+
+    def interaction_has_been_done(self, interaction_id):
+        query = "SELECT count(*) from progress_interaction WHERE interaction_id = %s" % (interaction_id)
+        try:
+            cursor = self.db.cursor()
+            cursor.execute(query)
+            data = cursor.fetchall()
+        except MySQLdb.OperationalError:
+            self.connect()
+            return self.interaction_has_been_done(interaction_id)
+        return data[0][0] > 0
 
     # Obtenir les ID de toutes les interactions
     def get_all_intractions(self):
@@ -262,18 +285,19 @@ class DBUtilties:
                 return self.is_interaction_existe_dom(domaine_1, domaine_2)
         qtd_registre = cursor.rowcount
         if qtd_registre == 1:
-            return sum(data[2:16])
+            #print(sum(data[0][2:16]))
+            return sum(data[0][2:16])
         return -1
 
     # Inserer le scor de l IPP dans le tableau Score_interactions
     def insert_score_IPP(self, id_prot_bact, id_prot_phage, positiv_interaction, interaction_id, score):
-        query = "INSERT INTO Score_interactions (ProtBactId, ProtPhageId, Positiv_Interaction, Interaction_Id, Score_result) VALUES (%s, %s, %s, %s, %s)" % (
+        query = "INSERT INTO Score_interactions (ProtBactId, ProtPhageId, Positiv_Interaction, Interaction_Id, Score_result) VALUES ('%s', '%s', %s, %s, %s)" % (
             id_prot_bact, id_prot_phage, positiv_interaction, interaction_id, float(score))
 
         try:
             cursor = self.db.cursor()
             cursor.execute(query)
-            data = cursor.fetchall()
+            self.db.commit()
         except MySQLdb.OperationalError:
             self.connect()
             self.insert_score_IPP(id_prot_bact, id_prot_phage, positiv_interaction, interaction_id, score)

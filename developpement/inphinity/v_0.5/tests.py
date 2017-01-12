@@ -20,7 +20,7 @@ import glob, os
 ##                      ##
 def test_07122016_fusion_parallel_using_core():
     print('Run Test: test_07122016_fusion_parallel_using_core')
-    c = Core('inphinity/v_0.5/configs/config_1.ini')
+    c = Core('inphinity/v_0.5/configs/1_config.ini')
     c.run()
 
 

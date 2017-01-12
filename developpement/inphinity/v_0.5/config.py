@@ -36,8 +36,8 @@ class Config:
     def get_grades_file_pseqs(self):
         return self.config.get('DATASET_GENERATION', 'grades_file_pseqs')
 
-    def get_ds_file_save(self):
-        return self.config.get('DATASET_GENERATION', 'ds_file_save')
+    def get_ds_dir(self):
+        return self.config.get('DATASET_GENERATION', 'ds_dir')
 
     def get_detailed_logs(self):
         return self.config.get('INFORMATION', 'detailed_logs') == '1'
@@ -89,6 +89,21 @@ class Config:
 
     def normalisation(self):
         return int(self.config.get('DATASET_GENERATION', 'normalisation'))
+
+    def get_type_bins(self):
+        return int(self.config.get('DATASET_GENERATION', 'type_bins'))
+
+    def get_number_of_bins(self):
+        return int(self.config.get('DATASET_GENERATION', 'number_of_bins'))
+
+    def get_space_between_bins(self):
+        return int(self.config.get('DATASET_GENERATION', 'space_between_bins'))
+
+    def do_phage(self):
+        return int(self.config.get('PHASE_1', 'analyze_phage'))
+
+    def do_bacteria(self):
+        return int(self.config.get('PHASE_1', 'analyze_bacteria'))
 
     def get_phases_to_run(self):
         return self.config.get('ENV', 'phases_to_run').split(",")
