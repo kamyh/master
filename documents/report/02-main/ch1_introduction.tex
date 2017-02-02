@@ -1,21 +1,30 @@
 \chapter{Introduction}
 \label{ch:introduction}
 
-Ce travail à été réalisé la la suite d'une autre thèse de master dont l'interet était de prouvé la pertinence d'une méthode d'analyse par \emph{machine learning}. En effet, il s'agit d'une méthode permettant [TODO: completer].
+Ce travail a été réalisé dans le cadre du projet INPHINITY [TODO: pour qui ?]. Avec l'émergence de bactéries résistantes aux antibiotiques devenant une problématique mondiale qui menace les progrès de la médecine moderne, une alternative prometteuse pour lutter contre des bactéries multi-résistantes consiste à utiliser leurs prédateurs naturels, des bactériophages, virus mangeurs de bactéries. Ces bactériophages, innofensif pour l'homme, sont extrêmement spécifiques, ne reconnaissant qu'un type bien précis de bactéries. Ceci présente l'avantage de ne pas détériorer la flore bactérienne humaine mais pose, par contre, une limitation pour leur développement rapide. En effet, pour chaque type de bactérie il faut trouver le bactériophage correspondant. Face à la nécessité d'examiner systématiquement une multitude d'interactions possibles, le développement rapide des bactériophages comme alternative aux antibiotiques ne pourra se faire qu'avec l'aide d'un modèle permettant de prédire les interactions entre bactériophages et bactéries. Ceci permettra notamment de réduire le nombre de validations expérimentales nécessaires à l'identification du bactériophage approprié et contribuera à l'essor de cette voie thérapeutique.
 
-Dans la présente thèse il est question de mettre en place plusieurs aspect permettant l'anrichissement du processus d'analyse de la thèse \emph{[TODO: these name of diogo]}. 
+Ce travail se place également dans la continuité d'une précédente thèse de master dont l'objectif était de prouver la pertinence d'une méthode d'analyse par \emph{machine learning}. En effet, il s'agit d'une méthode permettant [TODO 1: compléter].
 
-Notamment, l'utilisation de python 3 pour remplacer l'utilisation de python2, moins efficace. %TODO: proof
+Dans la présente thèse, il est question de mettre en place plusieurs aspects permettant l'enrichissement du processus d'analyse de la thèse \emph{[TODO 2: these name of diogo]}. 
 
-De plus, ont souhait être capable d'automatiser le lancement de "l'application" et par la même occasion rendre le déploiement facile et unifier quelque soit la machine cible, pour autant qu'elle utilise le système d'exploitation Linux.
+Afin de réaliser ces objectifs, une première phase du travail a consisté à réaliser des états de l'art pour les différents domaines utilisés (cf.\cf{ch:state_art}).
 
-Troisièmement, on souhaite pouvoir lancer l'analyse pour différentes configuration, créées à l'avance.
+Plusieurs phases distinctes de travail ont été nécessaires durant ce travail.
 
-Un objectif important, était de remplacer l'utilisation à une API en ligne par une utilisation local cf.\cf{ch:setup}.
+Premièrement, il a fallu reprendre la thèse [TODO: ref these diogo] et comprendre ce qu'il y a été fait. Les informations concernant la thèse de Mr.Leite Diogo nécessaires à la compréhension de ce travail ont été abordées dans l'introduction, pour davantage d'informations veuillez consulter la thèse en question.
 
-Afin de réaliser ces objectif une première phase du travail à consisté à realiser des états de l'art pour les différents domaines utilisé (cf.\cf{ch:state_art}). %TODO: link to chapter 3
+Deuxièmement, une fois les objectifs de thèse fixés, il a été important de réaliser un état de l'art des différentes technologies et aspects techniques susceptibles d'êtres utilisés dans la présente thèse, voir chapitre~\cf{ch:state_art} .
 
+Troisièmement, c'est uniquement après ces deux premières phases que le développement a pu commencer, voir chapitre~\cf{ch:parallel} et chapitre~\cf{ch:app}.
+Durant cette phase un certain nombre d'aspect on été développé:
+Notamment, l'utilisation de python 3 afin de remplacer l'utilisation de python2, moins efficace.
+
+De plus, on souhaite être capable d'automatiser le lancement de "l'application" et par la même occasion rendre le déploiement facile et unifier quelque soit la machine hôte, pour autant qu'elle utilise le système d'exploitation Linux. Ensuite, on souhaite pouvoir lancer l'analyse pour différentes configurations, créées à l'avance. Un autre objectif important était de remplacer l'utilisation d'une API en ligne par une utilisation de sa version locale cf.\cf{ch:setup}.
+
+Finalement, le temps de travail étant limité, il faut penser aux utilisations futures de ce qui a été développé. Ceci passe notamment par l'utilisation de l'application réalisée dans ce travail de manière simple voir chapitre~\cf{ch:simple}, mais aussi par les améliorations possibles à cette thèse, voir chapitre~\cf{ch:improve}. C'est pous cela qu'un environement de developpement et d'execution Docker à été produit dans ce travail, qui pourra êtres utile au autres membre du projet. 
+
+Il faut aussi préciser que certains résultats et métriques ont été réalisés et sont regroupés dans le chapitre~\cf{ch:results}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%
-%TODO: Information concernant la volonté de réaliser un Docker for Bio-Informatique
+\emph{TODO: Information concernant la volonté de réaliser un Docker for Bio-Informatique}
 %%%%%%%%%%%%%%%%%%%%%%%%
