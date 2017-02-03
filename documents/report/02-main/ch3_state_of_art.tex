@@ -4,7 +4,7 @@
 \section{introduction}
 Dans ce chapitre nous aborderons les différentes pistes envisagées afin de remplir les objectifs fixés dans cette thèse, comme listé dans l'introduction (\cf{ch:introduction}).
 
-Avant toutes choses il à fallu se mettre au niveau et comprendre la thèse [TODO cf name diogo thesis].
+Avant toutes choses il à fallu se mettre au niveau et comprendre la thèse \thLeite.
 
 \section{Automatisation}
 En terme d'automatisation, une pratique bien courante chez les developpeur s'agit à utiliser des script bash afin de pouvoir executer une certain nombre de commande et de code succecivement. Bien que cette méthode présente l'avantage d'etres simple, il suffit d'une console UNIX et d'un editeur de texte, elle présente un défault majeur. En effet, le developpeur du script contrôle quel commande et code sont executé et peut également definir des paramètres pour ceux-ci, mais il ne peu pas contrôlé l'environnement d'execution.
@@ -17,29 +17,72 @@ Vous l'aurez bien compris, le choix qui à été fait est celui de l'utilisation
 
 En ce qui concerne la recherche d'une méthode afin de réalisé facilement des fichiers de configurations pré-créées, beaucoup de solutions existent. Ces différentes méthodes sont plus ou moins flexible aux modifications.
 
-Les fichiers de configurations dont il est question ici, sont spécifique à la partie python du code qui sera executé par notre application \cf{ch:app}
+Les fichiers de configurations dont il est question ici, sont spécifique à la partie python du code qui sera executé par notre application \cf{ch:app}. En effet, l'on souhaite entre autre être capable de donner des fichiers de configuration en entrée et d'obtenir pour chacuns un résultats en sortie.
+
+Nous ne citerons ici uniquement la solution retenu, car les autres solutions trouvée sont soit trop incompatible soit presque identique à la solution retenu.
+
+Nous utilisons le module python \emph{Configparser}, qui permet de lire et parser des fichiers à l'extension .ini de manière simple. De plus, la structure d'un fichier .ini est très simple et ne laisse donc que très peu de place aux erreurs de format.
  
-%configparser
+ 
+\section{Hmmer}
+%Hmmer
+Dans la thèse \thLeite les séquences protéiniques sont recherché dans la base de données de profile-HMM à l'aide d'une \gls{api} en ligne. Cette \gls{api} est disponible depuis le site \emph{https://www.ebi.ac.uk/Tools/hmmer/}. 
+
+Comme dis précédement, un de objectifs de ce travail est de se passer de l'utilisation de cette \gls{api} car sont accès n'est pas toujours disponible ou stable.
+
+Une recherche rapide à permis de se rendre compte que l'application utilisé derrière cette \gls{api} est disponible au téléchergement et peut donc etres utilisée de manière local. Pour d'avantage d'information \cf{ch:app}, sous-chapitre Hmmer.
+
 
 \section{Parallélisation}
+
+La version existante du code se trouvant dans la thèse \thLeite est une version sous forme de scrit, proof-of-concept, en python2 et non \emph{multiprocessed}. Afin de garantir une utilisation optimal des ressources de la machine hote, sur laquelle le code est executé, nous souhaitons rendre le code parallèle là où il est possible de le faire.
+
+Plusieures solution sont possible, encore une fois les solution le plus complliquées ne sont pas toujours celle les plus efficace. De plus une méthode trop complexe pourrait réduire la bonne transmition du code à d'autre développeurs.
+
+
+\subsection{Simple}
+\subsubsection{Docker}
 %Docker parallelisation
+
+\subsubsection{Python}
+%python
+
+\subsection{Avancée}
+\subsubsection{Docker Swarm}
 %Docker Swarm
+
+\subsubsection{BioPython}
 %Biopython parallelisation
+
+\subsubsection{Spark}
 %Spark
 	%%local
 	%%Spark on Amazone cloud
 	
-
-\subsection{Simple}
-\subsection{Avancée}
-
+	
+	
 \section{Optimisations}
 %python3
 %Cython
 
-\section{Hmmer}
-%Hmmer
+
 
 \section{conclusion}
 %Docker + python
 %premier tests divers
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

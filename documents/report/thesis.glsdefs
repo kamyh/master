@@ -1,0 +1,30 @@
+\ifglsentryexists{cd}{}%
+{%
+\gls@defglossaryentry{cd}%
+{%
+name={CD},%
+sort={CD},%
+type={main},%
+first={compact disk\glsspace (CD)},%
+firstplural={compact disk\glsspace (CD)},%
+text={CD},%
+plural={CD},%
+description={compact disk},%
+descriptionplural={compact disk\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={compact disk},%
+longplural={compact disk},%
+short={CD},%
+shortplural={CD},%
+counter={page},%
+parent={},%
+%
+}%
+}%
