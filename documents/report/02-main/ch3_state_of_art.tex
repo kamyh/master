@@ -37,35 +37,46 @@ Une recherche rapide à permis de se rendre compte que l'application utilisé de
 
 La version existante du code se trouvant dans la thèse \thLeite est une version sous forme de scrit, proof-of-concept, en python2 et non \emph{multiprocessed}. Afin de garantir une utilisation optimal des ressources de la machine hote, sur laquelle le code est executé, nous souhaitons rendre le code parallèle là où il est possible de le faire.
 
-Plusieures solution sont possible, encore une fois les solution le plus complliquées ne sont pas toujours celle les plus efficace. De plus une méthode trop complexe pourrait réduire la bonne transmition du code à d'autre développeurs.
+Plusieures solution sont possible, encore une fois les solutions les plus compliquées ne sont pas toujours celle les plus efficaces. De plus une méthode trop complexe pourrait réduire la bonne transmition du code à d'autre développeurs.
 
+La partie principal que l'on souhaite paralleliser est l'utilisation de la fonction de scanne de HMMMER, étant donné qu'un très grand nombre de séquences protéinique doivent être analysées.
 
 \subsection{Simple}
 \subsubsection{Docker}
-%Docker parallelisation
+Docker, mise à part de rendre le déploiement et l'execution d'application automatisée, parmet également de lancer plusieurs containers simultanéement, \cf{ch:docker}. Un container englobe un systeme de fichier complete possèdant tous se qu'y est necessaire a remplir sa fonction. 
 
 \subsubsection{Python}
-%python
+En python on retrouve deux principal méthode permettant de réaliser de code parallel. En effet, on peut utiliser le \emph{multiprocessing} ou le \emph{multithreading}.
+
+Notre bute est de réaliser et d'optimiser un code \gls{cpu} dépendant, c'est-à-dire coeurs dépendant. Lors de l'utilisation du langage python il faut savoir qu'avec des code \gls{cpu} dépendant, python limite les possibilité de parallelisme à cause de la \gls{gli}. La \gls{gli} est necessaire en python, car python n'est pas \emph{tread safe}. En effet, il y a, en python, un verrou global lorsque l'on essaye d'acceder a un objet depuis un thread.
+
+A cause de se verrous les codes \gls{cpu} dépendant ne gagnerons pas en pérformance lorsqu'ils sont parallélisé à l'aide de \emph{multithreading}, mais uniquement avec le \emph{multiprocessing}.
 
 \subsection{Avancée}
 \subsubsection{Docker Swarm}
-%Docker Swarm
-
-\subsubsection{BioPython}
-%Biopython parallelisation
+Une autre méthode utilisant une librairie avancé de Docker, consiste à utiliser Docker Swarm. Docker Swarm apporte à DOcker une gestion native du \emph{clustering}, afin de transformer un groupe de \emph{Docker engines} en un unique et virtuel \emph{Docker engine}. Grâce à cela il est possible d'executer une application sur un architecture partagée sur plusieurs système physiquement indépendant. 
 
 \subsubsection{Spark}
-%Spark
-	%%local
-	%%Spark on Amazone cloud
-	
-	
+Spark est un framework \emph{open source} de calcule distribué. Il permet d'effectuer des analyse complexes sur un grand nombre de données.
+
+Il est également un ensemble d'outils pour le traitemnt de grandes source de données, notament grace à des fonctions \emph{MapReduce}.
 	
 \section{Optimisations}
-%python3
-%Cython
+Le code repris de la thèse \thLeite est un code séquetielle, sous forme de script necessitant des input utilisateurs a chaque étapes. De plus ce code est ecrit en python dans sa version 2.
 
+Grâce au travail du Dr. Brett Cannon, \href{https://speakerdeck.com/pyconslides/python-3-dot-3-trust-me-its-better-than-python-2-dot-7-by-dr-brett-cannon}{See here}, on se rend compte que python 3.3 pourrait optimiser les performance de notre application. On peu lire 
+\href{https://mail.python.org/pipermail/python-dev/2012-October/121923.html}{ici} que même 'appel des fonctions est en moyenne 1.20 fois plus rapide. De plus, les \emph{threadded count} sont également plus rapide.
 
+Une autre possibilité est d'utiliser \emph{Cython}. Cython est un compilateur/language de python permettant d'utiliser de appele au langague C et de compiler un code python en executable C. Il faut savoir qu'un executable C est généralement plus rapide que l'execution de l'interpreteur python. 
+
+On trouve le tableau suivant dans la documentation de Cython, qui permet de nous rendre compte des différences.
+
+\begin{figure}[H] 
+\centering 
+\includegraphics[width=1\columnwidth]{img/table_cython} 
+\caption[Tableau performences Cython]{Tableau de comparaison de Cython - \url{http://notes-on-cython.readthedocs.io/en/latest/std_dev.html/}).}
+\label{fig:galleria} 
+\end{figure}
 
 \section{conclusion}
 %Docker + python
