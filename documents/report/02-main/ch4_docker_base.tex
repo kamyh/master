@@ -122,11 +122,221 @@ Premièrement, interessons nous à la commande \emph{pull}:
 
 \begin{lstlisting}[frame=single]
 $ docker pull debian:jessie
+
+jessie: Pulling from library/debian
+5040bd298390: Pull complete 
+Digest: sha256:abbe80c8c87b7e1f652fe5e99ff1799cdf9e0878c7009035afe1bccac129cad8
+Status: Downloaded newer image for debian:jessie
 \end{lstlisting}
 
-http://putaindecode.io/fr/articles/docker/
+Avec cette commande l'engin Docker à téléchargé l'image de debian Jessie depuis le \emph{Docker Hub}. Vous pouvez trouver un grand nombre d'image sur \emph{Docker Hub} - \hyperref[Docker Hub]{https://hub.docker.com/}.
 
-\subsection{Serveur Web}
+Il est possible de gèrer les images contenu sur une machine hôte. La commande suivante permet d'afficher la liste des images:
+
+\begin{lstlisting}[frame=single]
+$ docker images
+
+REPOSITORY           TAG                 IMAGE ID            CREATED             SIZE
+debian               jessie              e5599115b6a6        2 weeks ago         123 MB
+\end{lstlisting}
+
+Il est egalement possible de supprimer une images, afin de liberer de l'espace disque:
+
+\begin{lstlisting}[frame=single]
+$ docker rmi e5599115b6a6
+
+Untagged: debian:jessie
+Untagged: debian@sha256:abbe80c8c87b7e1f652fe5e99ff1799cdf9e0878c7009035afe1bccac129cad8
+Deleted: sha256:e5599115b6a67e08278d176b05a3defb30e5564f5be6d73264ec560b484514a2
+Deleted: sha256:a2ae92ffcd29f7ededa0320f4a4fd709a723beae9a4e681696874932db7aee2c
+\end{lstlisting}
+
+Je tiens a signaler que l'on peu déjà se rendre compte d'un avantage de Docker par rapport a une machine virtuelle, l'image de Debian que l'on viens de télécharger ne fait que 123MB.
+
+A présent lançons notre premier conteneurs Docker:
+
+\begin{lstlisting}[frame=single]
+$ docker run -it debian:jessie /bin/bash
+
+root@47e35436f723:/# 
+\end{lstlisting}
+
+Il est maintenant possible d'executer nimporte quelle commande à l'interieur du conteneur:
+
+\begin{lstlisting}[frame=single]
+$ date
+
+Sun Feb  5 11:01:11 UTC 2017
+\end{lstlisting}
+
+\emph{Ctrl+d} permet de sortir du conteneur.
+
+\begin{lstlisting}[frame=single]
+$ docker run -itd debian:jessie
+
+5c09ebfa8bc99235ad482256dfb9fa1fa470a42314ed61654b6a653aff6fee6b
+\end{lstlisting}
+
+En ajoutant l'option "d" le conteneur est executé de manière \emph{détachée}.
+
+En utilisant la commande suivant il est possible de visualiser les conteneurs en cours d'execution:
+
+\begin{lstlisting}[frame=single]
+$ docker ps
+
+CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS              PORTS               NAMES
+5c09ebfa8bc9        debian:jessie       "/bin/bash"         About a minute ago   Up About a minute                       admiring_brattain
+\end{lstlisting}
+
+Il est possible d'executer nimporte quelle commande dans un conteneur en cours d'execution:
+
+\begin{lstlisting}[frame=single]
+$ docker exec -it admiring_brattain date
+
+Sun Feb  5 11:06:21 UTC 2017
+\end{lstlisting}
+
+Ici le conteneur est identifié par son nom, si à l'execution aucun nom n'est définit, Docker en attribue un de manière aléatoire. Il est également possible d'identifier un conteneur en utilisant son \emph{CONTAINER ID}.
+
+En effet, il est possible et bien utile de définir un nom à vos conteneurs:
+
+\begin{lstlisting}[frame=single]
+$ docker run -itd --name inphinity debian:jessie
+
+c4be3f837adcbd5ab077e2b4a7903d2c1d4b5c434c7f877079c3ab5e22a2c555
+
+$ docker ps
+
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+c4be3f837adc        debian:jessie       "/bin/bash"         3 seconds ago       Up 3 seconds                            inphinity
+\end{lstlisting}
+
+Finalement, abordons la commande \emph{build}. En effet, pour le moment nous n'avons fait qu'utiliser des images déjà construite. Un aspect très interessant de Docker est de pouvoir décrire en détails la construction d'une image qui sera ensuite utilisé afin de lancer notre conteneur.
+
+Prennons comme exemple le cas ou vous souhaité lancer un conteneur qui possède Python 3 pré-installé dans la version que l'on souhaite.
+
+Pour se faire il faut créer un fichier \emph{Dockerfile} dans un dossier vide. Retrouvé le fichier de cet exemple dans le dossier "sources" et en annexe.
+
+\begin{enumerate}
+\item Il faut spécifier l'image de base:
+\begin{lstlisting}[frame=single]
+FROM debian:jessie
+\end{lstlisting}
+
+\item On souhaite premièrement mettre à jour les packets:
+\begin{lstlisting}[frame=single]
+RUN apt-get update && \
+    apt-get upgrade -y
+\end{lstlisting}
+
+\item Finalement on install le packet que l'on souhaite, python dans sa version 3:
+\begin{lstlisting}[frame=single]
+RUN apt-get install -y python3
+\end{lstlisting}
+
+\end{enumerate}
+
+A présent, on peut \emph{build} notre image Docker, lexecuter et voir que python 3 est bien présent:
+
+\begin{lstlisting}[frame=single]
+docker build -t exemple_1 .
+
+[...]
+Successfully built dead33da7d24
+
+$ docker run -it exemple_1
+
+root@41ac57ce9c0f:/# python3
+Python 3.4.2 (default, Oct  8 2014, 10:45:20) 
+[GCC 4.9.1] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> 
+
+\end{lstlisting}
+
+\subsection{Serveur Web: Docker compose}
+Afin de montrer l'utilisation de \emph{Docker Compose} nous allons réaliser un petit serveur web. Cela nous permettras également de voir comment plusieurs micro-services encapsulé chacuns dans un conteneur Docker, peuvent former une application.
+
+Toutes les sources de cet exemple sont disponible dans le dossier, \emph{$sources/exemple_2$}.
+
+Cet exemple, consiste en deux conteneurs Docker, construit a partir de deux \emph{Dockerfile}.
+
+Premièrement, un conteneur avec mysql, qui gére la base de donnée:
+
+\begin{lstlisting}[frame=single]
+FROM mysql:5.7
+
+COPY ./my.cnf /etc/mysql/conf.d/
+\end{lstlisting}
+
+Deuxièmement, un conteneur avec php et apache, afin d'executer les page web:
+
+\begin{lstlisting}[frame=single]
+FROM php:7-apache
+
+COPY php.ini /usr/local/etc/php/
+
+RUN apt-get update \
+  && apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng12-dev libmcrypt-dev \
+  && docker-php-ext-install pdo_mysql mysqli mbstring gd iconv mcrypt
+\end{lstlisting}
+
+De plus, les source se trouverrons dans se que l'on appel un volumes, une source de données pour nos conteneur. Dans cet exemple nous y mettons uniquement un fichier \emph{index.php} avec la commande \emph{phpinfo()}, afin de vérifier que notre application fonctionne bien.
+
+Nous allons utiliser \emph{Docker Compose}, afin de lancer notre application complète:
+
+\begin{lstlisting}[frame=single]
+$ nano docker-compose.yml
+
+version: '2'
+services:
+  mysql:
+    build: ./mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: pass
+    volumes:
+      - db:/var/lib/mysql
+  php:
+    build: ./php
+    ports:
+      - '8080:80'
+    volumes:
+      - ./html:/var/www/html
+    depends_on:
+      - mysql
+volumes:
+  db:
+
+\end{lstlisting}
+
+Executons, à présent, notre application web:
+
+\begin{lstlisting}[frame=single]
+$ cd exemple_2/
+$ docker-compose up -d
+
+[...]
+
+Creating exemple2_mysql_1
+Creating exemple2_php_1
+
+$ docker ps
+
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                  NAMES
+e921dc5930ac        exemple2_php        "docker-php-entrypoin"   4 minutes ago       Up 4 minutes        0.0.0.0:8080->80/tcp   exemple2_php_1
+cdb19eaa3cb7        exemple2_mysql      "docker-entrypoint.sh"   4 minutes ago       Up 4 minutes        3306/tcp               exemple2_mysql_1
+
+\end{lstlisting}
+
+Pour vérifier que tous fonctionne utilisez votre naviguateur favoris et accèdez à l'addresse \emph{localhost:8080} \ref{fig:phpinfo}.
+
+\begin{figure}[H] 
+\centering 
+\includegraphics[width=1\columnwidth]{img/phpinfo} 
+\caption[phpinfo]{phpinfo()}
+\label{fig:phpinfo} 
+\end{figure}
+
 \subsection{Biopython}
 \subsection{Parallélisation}
 
