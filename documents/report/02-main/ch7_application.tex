@@ -158,11 +158,90 @@ La figure \ref{fig:architecture} montre l'architecture qui est mise en place à 
 \begin{figure}[H] 
 \centering 
 \includegraphics[width=0.7\columnwidth]{img/architecture} 
-\caption[architecture]{Virtual machine vs Docker}
+\caption[architecture]{Architecture de l'environnement}
 \label{fig:architecture} 
 \end{figure}
 
+La figure \ref{fig:architecture} montre qu'un conteneur construit à partir de l'image \emph{Core} controllera l'execution du code applicatif et la création de conteneurs basé sur l'image \emph{hmmer}. De plus, tous se qui a trait au donnée stocké en Sql sera géré par le conteneur \emph{Database}.
 
+De cette manière le conteneur \emph{Core} peut créer des conteneurs \emph{hmmer} pour executer les recherche de domaines protéiniques.
+
+Regardons comment cela est mis en place grâce à \emph{Docker Compose}. 
+
+Premièrement, il nous faut un service qui lancera notre conteneur de base de donnée:
+
+\begin{lstlisting}[frame=single]
+database:
+    build: ../dockers/database
+    tty: true
+    environment:
+      MYSQL_ROOT_PASSWORD: SecretPasswordInphinity
+      MYSQL_USER: inphinity
+      MYSQL_PASSWORD: SecretPasswordInphinity
+      MYSQL_DATABASE: phage_bact
+    ports:
+      - 3309:3306
+    networks:
+      mynet:
+        ipv4_address: 172.25.0.102
+    container_name: inphinity-database
+    volumes:
+      - /inphinity-data/mysql:/var/lib/mysql
+\end{lstlisting}
+
+On specifie que l'on souhaite construire notre conteneur à partir de l'image se trouvant dans le dossier \emph{$/dockers/database$}. En effet, à l'execution de la commande de lancement de notre \emph{compose}, docker compose construira l'image \emph{Database} et créera un conteneur à partir de cette image.
+
+On fixe les paramètres de configuration de Mysql, tel que le mot de passe root, l'utilisateur, sont mot de passe et le nom de la base de donnée par défaut.
+
+On route les ports utile au conteneurs, ainsi que le réseau virtuelle qui sera utilisé.
+
+On fixe manuellement le nom du conteneur qui sera créé afin de facilement pouvoir y acceder en cas de besoins (debug, tests, etc).
+
+Finalement, on ajoute les volumes que l'on souaite à notre conteneur. En effet, avec cette dernière commande, ont attache le dossier hôte \emph{$/inphinity-data/mysql$} au dossier \emph{$/var/lib/mysql$} du conteneur. De cette manière lorsque l'on arrete et relance notre application notre base de donnée ne sera pas détruite. Si l'on souaite supprimer la base de donnée et en recréé une vierge il suffit de supprimer le contenu du dossier \emph{$/inphinity-data/mysql$}.
+
+Deuxièmement, il nous faut un service qui lancera le conteneur de notre contrôleur:
+
+\begin{lstlisting}[frame=single]
+core:
+    build: ../dockers/core
+    hostname: core
+    networks:
+      mynet:
+        ipv4_address: 172.25.0.101
+    tty: true
+    volumes:
+      - ../inphinity:/inphinity:Z
+      - ../dockers/core/data-hmm:/data-hmm:Z
+      - /var/run/docker.sock:/var/run/docker.sock
+    privileged: true
+    links:
+      - database:database
+    depends_on:
+      - database
+    container_name: inphinity-core
+\end{lstlisting}
+
+On suit exactement la même logique que pour notre premier service. On specifie que l'on souhaite construire notre conteneur à partir de l'image se trouvant dans le dossier \emph{$/dockers/core$}. En effet, à l'execution de la commande de lancement de notre \emph{compose}, docker compose construira l'image \emph{COre} et créera un conteneur à partir de cette image.
+
+On attribue le réseau virtuelle qui sera utilisé, le même que pour le service de la base de donnée.
+
+On fixe manuellement le nom du conteneur qui sera créé, afin de facilement pouvoir y acceder en cas de besoins (debug, tests, etc).
+
+On ajoute les volumes necessaire:
+
+\begin{itemize}
+\item ../inphinity:/inphinity, contient le code applicatif;
+\item ../dockers/core/data-hmm:/data-hmm, servira à transmettre les fichiers de résultats des analyses réalisé par les conteneurs hmmer au contrôleur;
+\item /var/run/docker.sock:/var/run/docker.sock, permet au controleur de communiquer avec l'engin Docker de l'hôte et donc de créer les conteneur hmmer à la volée.
+\end{itemize}
+
+On lie, grâce à la commande \emph{links}, le contôleur à la base de données.
+
+La copmmande \emph{$depends_on$} permet de garantir que le conteneur "core" sera crée uniquement après la création du conteneur "database".
+
+Le troisième service se trouvant le le fichier compose n'est pas necessaire car on lancéra les conteneur hmmer directement depuis le code python de notre application. 
+
+Finalement, on définit un réseau dans lequel on place les conteneur de l'application.
 
 \section{<<Inphinity>>}
 %TODO: change title

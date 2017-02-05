@@ -4,7 +4,6 @@ services:
     build: ../dockers/database
     tty: true
     environment:
-      #TODO: remove ???
       MYSQL_ROOT_PASSWORD: SecretPasswordInphinity
       MYSQL_USER: inphinity
       MYSQL_PASSWORD: SecretPasswordInphinity
@@ -15,12 +14,11 @@ services:
       mynet:
         ipv4_address: 172.25.0.102
     container_name: inphinity-database
-    volumes: #needed to acces db from python! Why ?
+    volumes:
       - /inphinity-data/mysql:/var/lib/mysql
 
   core:
     build: ../dockers/core
-    #command: sudo sh run.sh
     hostname: core
     networks:
       mynet:
