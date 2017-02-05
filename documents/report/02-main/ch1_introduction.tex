@@ -1,30 +1,27 @@
 \chapter{Introduction}
 \label{ch:introduction}
 
-Ce travail a été réalisé dans le cadre du projet INPHINITY [TODO: pour qui ?]. Avec l'émergence de bactéries résistantes aux antibiotiques devenant une problématique mondiale qui menace les progrès de la médecine moderne, une alternative prometteuse pour lutter contre des bactéries multi-résistantes consiste à utiliser leurs prédateurs naturels, des bactériophages, virus mangeurs de bactéries. Ces bactériophages, innofensif pour l'homme, sont extrêmement spécifiques, ne reconnaissant qu'un type bien précis de bactéries. Ceci présente l'avantage de ne pas détériorer la flore bactérienne humaine mais pose, par contre, une limitation pour leur développement rapide. En effet, pour chaque type de bactérie il faut trouver le bactériophage correspondant. Face à la nécessité d'examiner systématiquement une multitude d'interactions possibles, le développement rapide des bactériophages comme alternative aux antibiotiques ne pourra se faire qu'avec l'aide d'un modèle permettant de prédire les interactions entre bactériophages et bactéries. Ceci permettra notamment de réduire le nombre de validations expérimentales nécessaires à l'identification du bactériophage approprié et contribuera à l'essor de cette voie thérapeutique.
+Ce travail a été réalisé dans le cadre du projet INPHINITY [TODO: pour qui ?]. Avec l'émergence de bactéries résistantes aux antibiotiques devenant une problématique mondiale qui menace les progrès de la médecine moderne, une alternative prometteuse pour lutter contre des bactéries multirésistantes consiste à utiliser leurs prédateurs naturels, des bactériophages, virus mangeurs de bactéries. Ces bactériophages, inoffensif pour l'homme, sont extrêmement spécifiques, ne reconnaissant qu'un type bien précis de bactéries. Ceci présente l'avantage de ne pas détériorer la flore bactérienne humaine, mais pose, par contre, une limitation pour leur développement rapide. En effet, pour chaque type de bactérie il faut trouver le bactériophage correspondant. Face à la nécessité d'examiner systématiquement une multitude d'interactions possibles, le développement rapide des bactériophages comme alternative aux antibiotiques ne pourra se faire qu'avec l'aide d'un modèle permettant de prédire les interactions entre bactériophages et bactéries. Ceci permettra notamment de réduire le nombre de validations expérimentales nécessaires à l'identification du bactériophage approprié et contribuera à l'essor de cette voie thérapeutique.
 
 Ce travail se place également dans la continuité d'une précédente thèse de master dont l'objectif était de prouver la pertinence d'une méthode d'analyse par \emph{machine learning}. En effet, il s'agit d'une méthode permettant [TODO 1: compléter].
 
-Dans la présente thèse, il est question de mettre en place plusieurs aspects permettant l'enrichissement du processus d'analyse de la thèse \emph{[TODO 2: these name of diogo]}. 
+Dans la présente thèse, il est question de mettre en place plusieurs aspects permettant l'enrichissement du processus d'analyse de la thèse \thLeite. 
 
 Afin de réaliser ces objectifs, une première phase du travail a consisté à réaliser des états de l'art pour les différents domaines utilisés (cf.\cf{ch:state_art}).
 
 Plusieurs phases distinctes de travail ont été nécessaires durant ce travail.
 
-Premièrement, il a fallu reprendre la thèse [TODO: ref these diogo] et comprendre ce qu'il y a été fait. Les informations concernant la thèse de Mr.Leite Diogo nécessaires à la compréhension de ce travail ont été abordées dans l'introduction, pour davantage d'informations veuillez consulter la thèse en question.
+Premièrement, il a fallu reprendre la thèse \thLeite et comprendre ce qu'il y a été fait. Les informations concernant la thèse de Mr.Leite Diogo nécessaires à la compréhension de ce travail ont été abordées dans l'introduction, pour davantage d'informations veuillez consulter la thèse en question.
 
-Deuxièmement, une fois les objectifs de thèse fixés, il a été important de réaliser un état de l'art des différentes technologies et aspects techniques susceptibles d'êtres utilisés dans la présente thèse, voir chapitre~\cf{ch:state_art} .
+Deuxièmement, une fois les objectifs de thèse fixés, il a été important de réaliser un état de l'art des différentes technologies et aspects techniques susceptibles d'être utilisés dans la présente thèse, voir chapitre~\cf{ch:state_art} .
 
 Troisièmement, c'est uniquement après ces deux premières phases que le développement a pu commencer, voir chapitre~\cf{ch:parallel} et chapitre~\cf{ch:app}.
-Durant cette phase un certain nombre d'aspect on été développé:
+Durant cette phase, un certain nombre d'aspects ont été développés:
 Notamment, l'utilisation de python 3 afin de remplacer l'utilisation de python2, moins efficace.
 
-De plus, on souhaite être capable d'automatiser le lancement de "l'application" et par la même occasion rendre le déploiement facile et unifier quelque soit la machine hôte, pour autant qu'elle utilise le système d'exploitation Linux. Ensuite, on souhaite pouvoir lancer l'analyse pour différentes configurations, créées à l'avance. Un autre objectif important était de remplacer l'utilisation d'une API en ligne par une utilisation de sa version locale cf.\cf{ch:setup}.
+De plus, on souhaite être capable d'automatiser le lancement de "l'application" et par la même occasion rendre le déploiement facile et unifié, quelle que soit la machine hôte, pour autant qu'elle utilise le système d'exploitation Linux. Ensuite, on souhaite pouvoir lancer l'analyse pour différentes configurations, créées à l'avance. Un autre objectif important était de remplacer l'utilisation d'une API en ligne par une utilisation de sa version locale cf.\cf{ch:setup}.
 
-Finalement, le temps de travail étant limité, il faut penser aux utilisations futures de ce qui a été développé. Ceci passe notamment par l'utilisation de l'application réalisée dans ce travail de manière simple voir chapitre~\cf{ch:simple}, mais aussi par les améliorations possibles à cette thèse, voir chapitre~\cf{ch:improve}. C'est pous cela qu'un environement de developpement et d'execution Docker à été produit dans ce travail, qui pourra êtres utile au autres membre du projet. 
+Finalement, le temps de travail étant limité, il faut penser aux utilisations futures de ce qui a été développé. Ceci passe notamment par l'utilisation de l'application réalisée dans ce travail de manière simple voir chapitre~\cf{ch:simple}, mais aussi par les améliorations possibles à cette thèse, voir chapitre~\cf{ch:improve}. C'est pour cela qu'un environnement de développement et d'exécution Docker a été produit dans ce travail, qui pourra être utile à d'autres membres du projet. 
 
 Il faut aussi préciser que certains résultats et métriques ont été réalisés et sont regroupés dans le chapitre~\cf{ch:results}.
 
-%%%%%%%%%%%%%%%%%%%%%%%%
-\emph{TODO: Information concernant la volonté de réaliser un Docker for Bio-Informatique}
-%%%%%%%%%%%%%%%%%%%%%%%%
