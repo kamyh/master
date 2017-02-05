@@ -95,7 +95,6 @@ class HmmerScan:
                 results_filename + " " +
                 "/data-hmm/Pfam-A.hmm " +
                 fasta_filename
-                # "/data-hmm/fasta/seq_diogo_03102016.fasta"
             ], stdout=subprocess.PIPE, shell=True)
 
             (output, err) = p.communicate()

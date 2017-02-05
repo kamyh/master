@@ -243,12 +243,205 @@ Le troisième service se trouvant le le fichier compose n'est pas necessaire car
 
 Finalement, on définit un réseau dans lequel on place les conteneur de l'application.
 
-\section{<<Inphinity>>}
-%TODO: change title
+\section{<<Inphinity Environment>>}
 
-%python3 trad
-%classes
-%config
+Comme déjà précisé précédement, une première optimisation du code est passé par le fait de traduire les code existant du python2 vers le python3.3 .
+
+Au niveau du code, la logique suivie à été de diviser le code en \emph{phases} successives. Chacune de ces phases est chargées d'un traitement spécifique, de remplir un objectif.
+
+Attention, ce chapitre n'aborde pas la logique du code réalisé dans la thèse \thLeite , il n'est question ici que de la plusvalue ajouté lors de se travail de master.
+
+Les fonction utilisées dans les script de la thède \thLeite reste très proche de celle de se travail!
+
+\subsection{Diagramme de classes}
+\begin{figure}[H] 
+\centering 
+\includegraphics[width=1\columnwidth]{img/class_diagram} 
+\caption[classdiagram]{Diagramme de classes}
+\label{fig:classdiagram} 
+\end{figure}
+
+\subsubsection{Core}
+La classe \emph{Core} est la classe principal de l'application. C'est elle qui est chargée d'instancier les classe neccessaire au bon déroulement du code et de lancer les phase du processus.
+
+Comme ont le voit sur la figure \ref{fig:classdiagram}, la classe \emph{Core} possède une instance des cinq classes, représentant chacune une phase du processus. Elle possède également une instance de la classe \emph{Tools}, qui donne accès a l'objet de la classe \emph{Config}, gerant le \emph{parsing} de la configuration en cours. De plus, la classe \emph{Tools} possède un acces à l'objet \emph{DBUtilities}, qui gère l'ensemble des accès aux base de données.
+
+\subsubsection{Phase 1 - DetectDomaines}
+
+C'est durant cette phase que l'utilisation à HMMER est faite, c'est dans cette phase que la parallélisation de cette utilisation est réalisée. Plus précisément regardons la fonction \emph{$seek_domaines_multiprocess()$}, on y initialise une \emph{Multiprocessing.Pool} avec un certain nombre de coeurs à disposition. Ce nombre de coeurs est définit dans les fichiers de configuration, cf. \ref{ch:config}.
+
+Ensuite, on divise le tableau des séquence à traité en \emph{chunk}, cela permet d'obtenir les résultats également par series de 'n' réponse et de les incerer dans la base de donnée au fur et à mesure. Cela afin d'éviter de perdre du temps d'analyse en cas d'arrète de l'application.
+
+\lstset{language=python}
+\begin{lstlisting}[frame=single]
+chunk_size = pool_size * self.tools.configuration.get_chunk_size_multiplier()
+        chunks = self.chunks(list(tab), chunk_size)
+\end{lstlisting} 
+
+Lorsque l'on insert les résultats dans la base de donnée ont inssert également dans la table \emph{progress} qu'elle séquences ont été analysé. Cela nous permet d'arreter et de relancer l'application quand ont veut sans pour autant devoir recommencer la phase d'analyse a zéro.
+
+Ont execute le code suivant pour chacun des \emph{chunks}:
+\begin{lstlisting}[frame=single]
+for chunk in chunks:
+            print('%d sequences processed!' % total_processed)
+            LOGGER.log_normal('%d sequences processed!' % total_processed)
+            total_processed += chunk_size
+            results = p.map(self.hmmer_scan.analyze_domaines, chunk)
+            print(results)
+
+            for prot in chunk:
+                self.tools.db.analyze_done(prot[0], 1)
+
+            for result in results:
+                try:
+                    id_prot = result[0]
+                    domaines_returned = result[1]
+
+                    self.tools.db.execute_insert_domains(id_prot, domaines_returned, id_cell, bool_bacteria, "--")
+\end{lstlisting} 
+
+On fait appelle de manière parallel à la fonction \emph{$hmmerScan.analyze_domaines()$}. Grâce à la \emph{pool} de processus la fonction sera executée simultanément un certain nombre de fois.
+
+Allons voir plus en détail se qui se passe dans cette fonction. Pour voir le code de la fonction en détail, veuillez vous rendre directement dans les sources du code (\emph{$developpement/inphinity/v_0.5/hmmerScan.py$}).
+
+La séquence envoyé à la fonction est \emph{parsé} dans un fichier temporaire:
+
+\begin{lstlisting}[frame=single]
+fasta = '>' + values_tab[0] + '\n' + values_tab[1] + '\n'
+fasta_filename = '/data-hmm/tmp/' + str(uuid.uuid4()) + '.fasta'
+self.io.write(fasta_filename, fasta)
+\end{lstlisting} 
+
+On crée également un fichiers temporaire ou sera stoqué le résultats de l'analyse par \emph{HMMER scan}:
+
+\begin{lstlisting}[frame=single]
+results_filename = "/data-hmm/results/hits_test_" + str(uuid.uuid4()) + ".txt"
+\end{lstlisting} 
+
+Par la suite le code fait appele à la fonction \emph{Subprocess.Popen()} permettant de réaliser de commande UNIX directement depuis un code python. Grâce à cela on peu lancer une commande qui créera un nouveau conteneur Docker qui effectuera une analyse de séquence, Une fois l'analyse effectuée le conteneur s'arrete automatiquement.
+
+
+\begin{lstlisting}[frame=single]
+p = subprocess.Popen([
+                "docker " +
+                "run " +
+                "--rm " +
+                "--privileged " +
+                "-v " +
+                path_to_core + "/data-hmm:/data-hmm " +
+                "inphinity-hmmer " +
+                "hmmsearch " +
+                "--tblout " +
+                results_filename + " " +
+                "/data-hmm/Pfam-A.hmm " +
+                fasta_filename
+            ], stdout=subprocess.PIPE, shell=True)
+
+            (output, err) = p.communicate()
+
+            # This makes the wait possible
+            p_status = p.wait()
+\end{lstlisting} 
+
+Cette commande lance un conteneur docker avec l'image que l'on à préalablement créée pour encapsuler HMMER. On spécifie le fichier dans lequel se trouve la séquence au format \emph{FASTA}, ainsi que le fichier dans lequel oont souhaite inscrire les résultats de l'analyse.
+
+Ensuite, on lit, récupere et filtre les résultats:
+
+\begin{lstlisting}[frame=single]
+results = self.io.read_results(results_filename, self.configuration.get_detailed_logs())
+
+[...]
+\end{lstlisting}
+
+Nous aborderont la selection des résultats dans la section \ref{ch:config}.
+
+Finalement on supprime les deux fichiers temporaire et ont retourne les résultats.
+
+\begin{lstlisting}[frame=single]
+p = subprocess.Popen([
+	"rm",
+	results_filename
+ ])
+ p.communicate()
+ p_status = p.wait()
+
+ p = subprocess.Popen([
+ 	"rm",
+ 	fasta_filename
+ ])
+ p.communicate()
+ p_status = p.wait()
+
+return [values_tab[0], returned_domains, [start_time, end_time]]
+\end{lstlisting}
+
+\subsection{Configuration}
+\label{ch:config}
+
+Toutes les interactions utilisateurs que les scripts produit lors de la thèse \thLeite ont été remplacé par une valeur dans le fichier de configuration.
+
+\subsubsection{Lancement des configurations}
+
+La classe \emph{Main} de l'application (app.py) est fait pour lancer la fonction \emph{$Core.run()$} pour chaque fichier de configuration se trouvant dans le dossier \emph{$inphinity/v_0.5/configs$}. Il faut préciser que seule les fichier finissant par l'extension \emph{.ini} sont considéré comme des fichier de configuration. Donc pour garder une configuration, tout en empechant quelle soit utilisée, il suffit d'ajouter \emph{.old} à la fin, par exemple.
+
+\begin{lstlisting}[frame=single]
+if __name__ == '__main__':
+    os.chdir("inphinity/v_0.5/configs")
+    configs = glob.glob("*.ini")
+
+    for config_file in configs:
+        print('Config file: %s' % config_file)
+
+        c = Core(config_file)
+        c.run()
+\end{lstlisting}
+
+Voici, un fichier de configuration standard:
+
+\begin{lstlisting}[frame=single]
+[INFORMATION]
+verbose = 0
+detailed_logs = 0
+testing = 0
+[ENV]
+path_to_core = /home/kamyh/projects/master/developpement/dockers/core
+#Dile to parse sequences
+temp_file_pseqs = /tmp/tmpMF.txt
+reset_db_at_start = 0
+#if = 0 --> auto
+#if = -1 --> nbr of core
+#if = x --> x
+process = -1
+# Smaller the chunk are, the more time is lost
+chunk_size_multiplier = 4
+phases_to_run = 1,2,3,4,5
+[PHASE_1]
+analyze_phage = 1
+analyze_bacteria = 1
+[DOMS_SELECTION]
+use_e_value_selection = 0
+min_e_value = 9.8e-25
+max_e_value = 1500
+
+use_score_selection = 0
+min_score = 0
+max_score = 1500
+
+use_biais_selection = 0
+min_biais = 0
+max_biais = 1500
+[DATASET_GENERATION]
+grades_file_pseqs = /inphinity/grades/gradesDict.p
+ds_dir = /inphinity/datasets/
+normalisation = 0
+# 1 --> Number of bins
+# 2 --> Vector of bins
+type_bins = 1
+number_of_bins = 1
+space_between_bins = 1
+\end{lstlisting}
+
+\subsection{Loggs}
 %logs
 
 

@@ -498,9 +498,7 @@ class GenerateDS():
         # vec avec id des bins qui est utilise pour la premiere ligne des datasets
         self.aux_vec = []
 
-        # TODO: ask diogo if it's the right file
         self.path_file_pickle = self.tools.configuration.get_grades_file_pseqs()
-        # TODO: ask diogo wich extension file
         ts = time.time()
         st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d_%H-%M-%S')
         self.path_file_save = "%s%s_%s.ds" % (self.tools.configuration.get_ds_dir(),self.tools.path_to_config.split('.')[0],st)
@@ -565,7 +563,6 @@ class GenerateDS():
             position = position + 1
         return max_score, min_final_score
 
-    # TODO: How to put those input into config file ????
     # demander a l utilisateur les configurations des bins
     def get_user_config_binds(self, max_score_doms, max_score_norm_doms, type_data_set):
         type_bins = self.tools.configuration.get_type_bins()
