@@ -1,13 +1,168 @@
 \chapter{Environnement et application}
 \label{ch:app}
 
+Nous allons aborder, dans ce chapitre, le nouvel environnement créé a l'aide de Docker et le nouveau code produit à partir de celui de la thèse \thLeite.
+
+L'environnement est réalisé à l'aide de \emph{Docker Compose}, il est composer de trois images différentes. Le code, orienté objet sera executé dans ce nouvel environnement.
+
+
+
 \section{Images Docker}
+Tous les fichiers necessaire à la construction des images de notre environnement se trouve dans le dossier \emph{$developpement/dockers$}.
+
 \subsection{Hmmer}
+La première image est celle visant à remplacer l'utilisation de l'\gls{api} en ligne de HMMER. Il sagit d'encapsuler l'application HMMER afin de pouvoir l'utiliser pour traiter les séquences protéinique.
+
+Les fichiers necessaire se trouvent dans le dossier \emph{$developpement/dockers/hmmer$}. Il sagit d'un image basées sur \emph{centos}, qui est un image de base Docker très legere.
+
+Tout d'abord, le \emph{Dockerfile} de cette image, install le compilateur C++ \emph{gcc}. Puis, il recupere les sources de l'application HMMER et les compilent.
+
+Pour davantage de detail veuillez consulter directement le fichier \emph{Dockerfile} de l'image.
+
 \subsection{Database}
+L'application necessite plusieurs base de données Mysql. L'image \emph{database}, dont les sources se trouve dans le dossier \emph{$developpement/dockers/database$}, remplis cette fonctionnalitée.
+
+Pour des raison de simplicité, cette image est construite à partir de Debian Jessie, la différence entre Centos et Debian est négligeable du fait que nous ne lanceront qu'un seul conteneur de cette image.
+
+Due à la fois à la phase de débug et pour de futurs debug, l'image est construite avec un certains nombres de paquets afin de facilité la vie du developpeur.
+
+La mise en place d'une image \emph{Docker} avec un serveur mysql n'est, par experience, jamais une chose facile à réaliser. C'est pour cela que nous allons entré un peu plus dans les détail les différentes commande qui composent le fichier \emph{Dockerfile} de cette image. Il n'est pas forcément necessaire de lire ce sous-chapitre pour comprendre les aboutissant de cette thèse, mais il est necessaire que les informations qui suivent y figure.
+
+Premièrement, afin de pouvoir accèder au conteneur lancé à partir de cette image, il faut faire en sorte que mysql écoute les connexions en entrée.
+
+\lstset{language=bash}
+\begin{lstlisting}[frame=single]
+RUN sed -i -e"s/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/" /etc/mysql/my.cnf
+\end{lstlisting}
+
+Maintenant que notre conteneur peut reçevoir des connexions, on install \emph{mysql-server mysql-client libmysqlclient-dev} qui installent Mysql sur notre image.
+
+On peut démarrer le service Mysql:
+
+\begin{lstlisting}[frame=single]
+RUN mysqld &
+RUN service mysql start
+\end{lstlisting}
+
+On oublie pas d'exposer le port de connection que l'on souhaite. Ici le 3306 qui est le port par défault de Mysql.
+
+\begin{lstlisting}[frame=single]
+EXPOSE 3306
+\end{lstlisting}
+
+On modifie également quelques configuration Mysql, afin de pouvoir utiliser des fichiers \emph{.sql} de tailles plus grandes.
+
+\begin{lstlisting}[frame=single]
+RUN sed -ire 's/max_allowed_packet.*=.*/max_allowed_packet = 200M/g' /etc/mysql/my.cnf
+RUN sed -ire 's/key_buffer_size.*=.*/key_buffer_size = 128M/g' /etc/mysql/my.cnf
+\end{lstlisting}
+
+On ajoute le fichier \emph{startup.sh} et ont fixe qu'au lancement du conteneur il soit executé.
+
+\begin{lstlisting}[frame=single]
+ADD ./startup.sh /opt/startup.sh
+
+CMD ["/bin/bash", "/opt/startup.sh"]
+\end{lstlisting}
+
+Regardons se que l'on trouve dans le fichier \emph{startup.sh}:
+
+\begin{lstlisting}[frame=single]
+
+if [ ! -f /var/lib/mysql/ibdata1 ]; then
+
+	mysql_install_db
+
+	/usr/bin/mysqld_safe &
+	sleep 10s
+
+	echo "GRANT ALL ON *.* TO admin@'%' IDENTIFIED BY 'root' WITH GRANT OPTION; FLUSH PRIVILEGES" | mysql
+
+	# For 1_F1 DetectDomains.py
+	echo "CREATE DATABASE phage_bact" | mysql
+	mysql phage_bact < /tmp/db/phagesVD.sql
+	mysql phage_bact < /tmp/db/bacteriaVD.sql
+	mysql phage_bact < /tmp/db/interactionsVD.sql
+	mysql phage_bact < /tmp/db/neg_interactionsVD.sql
+	mysql phage_bact < /tmp/db/protdom_create.sql
+	mysql phage_bact < /tmp/db/progress_create.sql
+	mysql phage_bact < /tmp/db/progress_interaction_create.sql
+
+    # For 3_F1 countScoreInteraction.py
+	mysql phage_bact < /tmp/db/score_interactions_create.sql
+
+	echo "CREATE DATABASE domine" | mysql
+    mysql domine < /tmp/db/domTGo.sql
+    mysql domine < /tmp/db/domPfam.sql
+    mysql domine < /tmp/db/domPgmap.sql
+    mysql domine < /tmp/db/domTInteract.sql
+
+    # For 4_F1 FreqQtdScores.py
+	mysql phage_bact < /tmp/db/qtd_scores_create.sql
+
+	killall mysqld
+	sleep 10s
+fi
+
+/usr/bin/mysqld_safe
+\end{lstlisting}
+
+Dans se script, on commence par donner les privilèges Mysql à l'utilisateur admin. Ensuite ont mets en place les différentes base de données, \emph{$phage_bact, domine$}, dont l'application à besoins. On crée ces deux base de données et leurs tables.
+
+Dans l'éventualité ou l'on souhaiterais ajouter une nouvelle base de donnée c'est ici qu'il faudra ajouter la command Mysql de création.
+
+De plus si l'on souaite ajouter des table ou données à une de nos base de données, c'est également dans se fichier qu'il faudra le faire.
+
+Comme vous pouvez le voir tous les fichier \emph{.sql} necessaire sont placé dans le dossier \emph{$developpement/dockers/database/data$}.
+
+
 \subsection{Core}
 %image for bio-info!
+Due à la fois à la phase de débug et pour de futurs debug, l'image est construite avec un certains nombres de paquets afin de facilité la vie du developpeur.
+
+C'est véritablemenmt cette images qui contient tous se qui est necessaire à l'execution de l'aspect bioinformatique de l'application. C'est également elle qui controlle l'application, étant donné que cest dans se conteneur que le code de l'application est executé.
+
+Comme pour l'image \emph{database} ont install les paquets necessaire à utiliser Mysql, \emph{mysql-server, mysql-client, libmysqlclient-dev} et python.
+
+On install pip3, le gestionnaire de paquets pip pour python3:
+
+\begin{lstlisting}[frame=single]
+RUN apt-get install -y python3-pip r-base
+\end{lstlisting}
+
+On install aussi un des paquets les plus important de cestte image.
+
+\begin{lstlisting}[frame=single]
+RUN pip3 install biopython
+\end{lstlisting}
+
+Afin d'acceder à la base de donnée depuis le code python il nous faut installer le paquet:
+
+\begin{lstlisting}[frame=single]
+RUN pip install mysql-connector
+\end{lstlisting}
+
+Finalement, on install Docker, car il nous faudra pouvoir communiquer avec l'engin Docker de l'hôte, afin d'executer des conteneur de l'image HMMER.
+
+\begin{lstlisting}[frame=single]
+RUN apt-get install -y curl
+RUN curl -fsSL https://get.docker.com/ | sh
+\end{lstlisting}
+
 
 \section{Docker Compose}
+Maintenant que nous avons toutes les images necessaire à notre environnement applicatif orienté bioinformatique, nous allonms voir comment les combiner à l'aide de \emph{Docker Compose}.
+
+La figure \ref{fig:architecture} montre l'architecture qui est mise en place à l'aide de \emph{Docker}.
+
+\begin{figure}[H] 
+\centering 
+\includegraphics[width=0.7\columnwidth]{img/architecture} 
+\caption[architecture]{Virtual machine vs Docker}
+\label{fig:architecture} 
+\end{figure}
+
+
 
 \section{<<Inphinity>>}
 %TODO: change title
@@ -16,3 +171,19 @@
 %classes
 %config
 %logs
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
