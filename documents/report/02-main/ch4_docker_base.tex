@@ -2,15 +2,15 @@
 \label{ch:docker}
 
 \section{Introduction}
-Dans ce chapitre nous allons parler du fonctionnement de \emph{Docker} et \emph{Docker COmpose}. Ce chapitre est réalisé sous le ton d'un cours d'introduction à Docker, afin de pouvoir transmettre les connaissance de base a l'utilisation et à la modification du travail réalisé lors de cette thèse. Cela passera entre autre par certain exemple et code qui seront fournit en annexe notamment.
+Dans ce chapitre nous allons parler du fonctionnement de \emph{Docker} et \emph{Docker Compose}. Ce chapitre est réalisé sous le ton d'un cours d'introduction à Docker, afin de pouvoir transmettre les connaissances de base a l'utilisation et à la modification du travail réalisé lors de cette thèse. Cela passera entre autres par certains exemples et codes qui seront fournis en annexe notamment.
 
-Docker permet l'execution de code dans un conteneurs indépendant de vote systeme hôte. 
+Docker permet l'exécution de code dans un conteneur indépendant de vote système hôte. 
 
 \subsection{Utilisations}
 \subsection{Compatibilité inter-OS}
-Docker permet d'éviter les problemes liés aux différences entre les environnements d'execution. En effet, lorsque l'on execute un code avec Docker ont contrôle exactement l'états et le type d'environnement d'execution. Cela rend donc possible l'execution d'un code sous différent \gls{os} hôte (OSX, Linux, Windows).
+Docker permet d'éviter les problèmes liés aux différences entre les environnements d'exécution. En effet, lorsque l'on exécute un code avec Docker ont contrôlé exactement l'état et le type d'environnement d'exécution. Cela rend donc possible l'exécution d'un code sous différent \gls{os} hôte (OSX, Linux, Windows).
 
-Mais pourquoi ne pas utiliser une simple machine virtuelle ? Une première différence entre une machine virtuelle et DOcker est le fait que Docker n'encapsule pas tout un \gls{os}, ceci permet une execution beaucoup plus rapide, et c'est bien se que l'on cherche dans ce travail.
+Mais pourquoi ne pas utiliser une simple machine virtuelle ? Une première différence entre une machine virtuelle et Docker est le fait que Docker n'encapsule pas tout un \gls{os}, ceci permet une exécution beaucoup plus rapide, et c'est bien se que l'on cherche dans ce travail.
 
 \begin{figure}[H] 
 \centering 
@@ -20,13 +20,13 @@ Mais pourquoi ne pas utiliser une simple machine virtuelle ? Une première diff�
 \end{figure}
 
 \subsection{Miracle or illusion}
-Je tiens ici à faire une mise en garde vis-à-vis de l'utilisation de Docker. Dans sont utilisation Docker est, à mon sens, une solution assez miraculeuse, notamment par le fait que l'on peu partage une application sans se poser de question sur l'hôte cible. Mais attention Docker n'est pas aussi miraculeux que cela dans le développement d'une solution applicative. En effet, il peu parfois etres compliquer d'arriver du premier coup à réaliser se que l'on souhaite.
+Je tiens ici à faire une mise en garde vis-à-vis de l'utilisation de Docker. Dans sont utilisation Docker est, à mon sens, une solution assez miraculeuse, notamment par le fait que l'on peu partage une application sans se poser de question sur l'hôte cible. Mais attention Docker n'est pas aussi miraculeux que cela dans le développement d'une solution applicative. En effet, il peut parfois êtres compliquer d'arriver du premier coup à réaliser se que l'on souhaite.
 
-Docker n'est donc pas une solution miracle, mais présente beaucoup d'avantages en terme d'execution standardisé, de partage de code et de déploiment.
+Docker n'est donc pas une solution miracle, mais présente beaucoup d'avantages en termes d'exécution standardisée, de partage de code et de déploiement.
 
 \section{Pré-requis}
 \subsection{Connaissance}
-Il est necessaire d'etres à laise avec l'\gls{os} Linux et l'utilisation de commande UNIX. En effet, la pluspart du temps les conteneurs utiliserons un systeme Linux. Pour plus d'information cf. ci-après.
+Il est nécessaire d'êtres à l’aise avec l'\gls{os} Linux et l'utilisation de commande UNIX. En effet, la plupart du temps les conteneurs utiliseront un système Linux. Pour plus d'information cf. ci-après.
 
 
 \subsection{Installations}
@@ -65,7 +65,7 @@ Il faut à présent configurer Docker pour votre utilisateur hôte.
 $ sudo usermod -aG docker $(whoami)
 \end{lstlisting}
 
-A se point ci, il vous faut redémarer votre machine.
+À se point ci, il vous faut redémarrer votre machine.
 
 \subsubsection{Installation Docker-compose (1.9)}
 
@@ -84,41 +84,41 @@ docker-compose version: 1.9.0
 
 \section{Fonctionnement}
 \subsection{Docker}
-Il faut commencer par clarifier de quoi ont parle lorsque l'on utilise le mot conteneur. Il s'agit d'une \emph{enveloppe} virtuelle permettant de packager une application ou un code avec toutes les dépendance necessaire au fonctionnement de l'application. On package donc les fichiers source, librairies, runtime, outils, fichiers, base de données, etc. 
+Il faut commencer par clarifier de quoi on parle lorsque l'on utilise le mot conteneur. Il s'agit d'une \emph{enveloppe} virtuelle permettant de packager une application ou un code avec toutes les dépendances nécessaires au fonctionnement de l'application. On package donc les fichiers source, librairies, runtime, outils, fichiers, base de données, etc. 
 
-Un conteneur n'embarque pas de \gls{os}, il s'appuie sur celui de l'hôte sur lequel il est deployé. Ce qui rend un conteneurs baucoup plus légé qu'une machine virtuelle \ref{fig:vs}.
+Un conteneur n'embarque pas de \gls{os}, il s'appuie sur celui de l'hôte sur lequel il est déployé. Ce qui rend un conteneur beaucoup moins lourd qu'une machine virtuelle \ref{fig:vs}.
 
-Il faut également spécifier que Docker opère une isolation, des conteneurs, au niveau du système d'explotation. 
+Il faut également spécifier que Docker opère une isolation, des conteneurs, au niveau du système d'exploitation. 
 
-Un conteneurs DOcker est decrit à l'aide d'un simple fichier \emph{.Dockerfile}, il décrit la création du conteneur, en détails. On peut personnaliser cette description de manière très détaillée. 
+Un conteneur Docker est décrit à l'aide d'un simple fichier \emph{.Dockerfile}, il décrit la création du conteneur, en détail. On peut personnaliser cette description de manière très détaillée. 
 
-Il faut voir une application réalisé avec Docker comme une somme de micro-services. Nous verrons dans la section suivante des exemples basiques d'application DOcker. Le but étant de:
+Il faut voir une application réalisée avec Docker comme une somme de microservices. Nous verrons dans la section suivante des exemples basiques d'application Docker. Le but étant de:
 
 \begin{itemize}
-\item rendre l'application d'avantage élastique;
-\item Améliorer les performance;
-\item Le déploiement continue est facilité. On peu relancer les services independament les un des autres.
+\item rendre l'application davantage élastique;
+\item améliorer les performances;
+\item le déploiement continu est facilité. On peut relancer les services indépendamment les uns des autres.
 \end{itemize}
 
 
 \subsection{Docker-compose}
-Docker-compose permet de définir et d'executer des application multi-conteneurs. En effet, sans compose il fallait lancer les différent services de votre application soit manuellement soit en utilisant des scripts.
+Docker-compose permet de définir et d'exécuter des applications multi-conteneurs. En effet, sans compose il fallait lancer les différents services de votre application soit manuellement soit en utilisant des scripts.
 
 Compose utilise un fichier de composition, \emph{docker-compose.yml}, afin de configurer une application Docker. Ce qui permet de lancer une application à l'aide d'une seule commande. 
 
 Pour résumer, une application Docker, utilisant Compose, est la combinaison de trois étapes:
 
 \begin{enumerate}
-\item Définir les différent Dockerfile des vos micro-services composant l'application;
-\item Définir les services qui seront utilisé dans le compose, leurs relation et leurs configurations;
+\item Définir les différents Dockerfile des vos micro services composant l'application;
+\item Définir les services qui seront utilisés dans le composé, leurs relations et leurs configurations;
 \item Lancer l'application avec la simple commande, \emph{docker-compose up}.
 \end{enumerate}
 
 \section{Exemples}
 \subsection{simple pull, build et run}
-Les trois commandes les plus importantes de Docker sont \emph{pull}, \emph{build} et \emph{run}. En effet, ces commandes sont indispensable et doivent imperativement êtres comprise.
+Les trois commandes les plus importantes de Docker sont \emph{pull}, \emph{build} et \emph{run}. En effet, ces commandes sont indispensables et doivent impérativement être comprises.
 
-Premièrement, interessons nous à la commande \emph{pull}:
+Premièrement, intéressons-nous à la commande \emph{pull}:
 
 \begin{lstlisting}[frame=single]
 $ docker pull debian:jessie
@@ -129,9 +129,9 @@ Digest: sha256:abbe80c8c87b7e1f652fe5e99ff1799cdf9e0878c7009035afe1bccac129cad8
 Status: Downloaded newer image for debian:jessie
 \end{lstlisting}
 
-Avec cette commande l'engin Docker à téléchargé l'image de debian Jessie depuis le \emph{Docker Hub}. Vous pouvez trouver un grand nombre d'image sur \emph{Docker Hub} - \hyperref[Docker Hub]{https://hub.docker.com/}.
+Avec cette commande l'engin Docker à téléchargé l'image de debian Jessie depuis le \emph{Docker Hub}. Vous pouvez trouver un grand nombre d'images sur \emph{Docker Hub} - \hyperref[Docker Hub]{https://hub.docker.com/}.
 
-Il est possible de gèrer les images contenu sur une machine hôte. La commande suivante permet d'afficher la liste des images:
+Il est possible de gérer les images contenues sur une machine hôte. La commande suivante permet d'afficher la liste des images:
 
 \begin{lstlisting}[frame=single]
 $ docker images
@@ -140,7 +140,7 @@ REPOSITORY           TAG                 IMAGE ID            CREATED            
 debian               jessie              e5599115b6a6        2 weeks ago         123 MB
 \end{lstlisting}
 
-Il est egalement possible de supprimer une images, afin de liberer de l'espace disque:
+Il est également possible de supprimer une image, afin de libérer de l'espace disque:
 
 \begin{lstlisting}[frame=single]
 $ docker rmi e5599115b6a6
@@ -151,9 +151,9 @@ Deleted: sha256:e5599115b6a67e08278d176b05a3defb30e5564f5be6d73264ec560b484514a2
 Deleted: sha256:a2ae92ffcd29f7ededa0320f4a4fd709a723beae9a4e681696874932db7aee2c
 \end{lstlisting}
 
-Je tiens a signaler que l'on peu déjà se rendre compte d'un avantage de Docker par rapport a une machine virtuelle, l'image de Debian que l'on viens de télécharger ne fait que 123MB.
+Je tiens a signaler que l'on peut déjà se rendre compte d'un avantage de Docker par rapport a une machine virtuelle, l'image de Debian que l'on vient de télécharger ne fait que 123MB.
 
-A présent lançons notre premier conteneurs Docker:
+À présent lançons notre premier conteneur Docker:
 
 \begin{lstlisting}[frame=single]
 $ docker run -it debian:jessie /bin/bash
@@ -161,7 +161,7 @@ $ docker run -it debian:jessie /bin/bash
 root@47e35436f723:/# 
 \end{lstlisting}
 
-Il est maintenant possible d'executer nimporte quelle commande à l'interieur du conteneur:
+Il est maintenant possible d'exécuter n’importe quelle commande à l'intérieur du conteneur:
 
 \begin{lstlisting}[frame=single]
 $ date
@@ -177,9 +177,9 @@ $ docker run -itd debian:jessie
 5c09ebfa8bc99235ad482256dfb9fa1fa470a42314ed61654b6a653aff6fee6b
 \end{lstlisting}
 
-En ajoutant l'option "d" le conteneur est executé de manière \emph{détachée}.
+En ajoutant l'option "d" le conteneur est exécuté de manière \emph{détachée}.
 
-En utilisant la commande suivant il est possible de visualiser les conteneurs en cours d'execution:
+En utilisant la commande suivant, il est possible de visualiser les conteneurs en cours d'exécution:
 
 \begin{lstlisting}[frame=single]
 $ docker ps
@@ -188,7 +188,7 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
 5c09ebfa8bc9        debian:jessie       "/bin/bash"         About a minute ago   Up About a minute                       admiring_brattain
 \end{lstlisting}
 
-Il est possible d'executer nimporte quelle commande dans un conteneur en cours d'execution:
+Il est possible d'exécuter n’importe quelle commande dans un conteneur en cours d'exécution:
 
 \begin{lstlisting}[frame=single]
 $ docker exec -it admiring_brattain date
@@ -196,7 +196,7 @@ $ docker exec -it admiring_brattain date
 Sun Feb  5 11:06:21 UTC 2017
 \end{lstlisting}
 
-Ici le conteneur est identifié par son nom, si à l'execution aucun nom n'est définit, Docker en attribue un de manière aléatoire. Il est également possible d'identifier un conteneur en utilisant son \emph{CONTAINER ID}.
+Ici le conteneur est identifié par son nom, si à l'exécution aucun nom n'est défini, Docker en attribue un de manière aléatoire. Il est également possible d'identifier un conteneur en utilisant son \emph{CONTAINER ID}.
 
 En effet, il est possible et bien utile de définir un nom à vos conteneurs:
 
@@ -211,11 +211,11 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
 c4be3f837adc        debian:jessie       "/bin/bash"         3 seconds ago       Up 3 seconds                            inphinity
 \end{lstlisting}
 
-Finalement, abordons la commande \emph{build}. En effet, pour le moment nous n'avons fait qu'utiliser des images déjà construite. Un aspect très interessant de Docker est de pouvoir décrire en détails la construction d'une image qui sera ensuite utilisé afin de lancer notre conteneur.
+Finalement, abordons la commande \emph{build}. En effet, pour le moment nous n'avons fait qu'utiliser des images déjà construites. Un aspect très intéressant de Docker est de pouvoir décrire en détail la construction d'une image qui sera ensuite utilisée afin de lancer notre conteneur.
 
-Prennons comme exemple le cas ou vous souhaité lancer un conteneur qui possède Python 3 pré-installé dans la version que l'on souhaite.
+Prenons comme exemple le cas ou vous souhaité lancer un conteneur qui possède Python 3 préinstallé dans la version que l'on souhaite.
 
-Pour se faire il faut créer un fichier \emph{Dockerfile} dans un dossier vide. Retrouvé le fichier de cet exemple dans le dossier "sources" et en annexe.
+Pour se faire, il faut créer un fichier \emph{Dockerfile} dans un dossier vide. Vous pouvez retrouver le fichier de cet exemple dans le dossier "sources" et en annexe.
 
 \begin{enumerate}
 \item Il faut spécifier l'image de base:
@@ -223,20 +223,20 @@ Pour se faire il faut créer un fichier \emph{Dockerfile} dans un dossier vide. 
 FROM debian:jessie
 \end{lstlisting}
 
-\item On souhaite premièrement mettre à jour les packets:
+\item On souhaite premièrement mettre à jour les paquets:
 \begin{lstlisting}[frame=single]
 RUN apt-get update && \
     apt-get upgrade -y
 \end{lstlisting}
 
-\item Finalement on install le packet que l'on souhaite, python dans sa version 3:
+\item Finalement, on installe le paquet que l'on souhaite, python dans sa version 3:
 \begin{lstlisting}[frame=single]
 RUN apt-get install -y python3
 \end{lstlisting}
 
 \end{enumerate}
 
-A présent, on peut \emph{build} notre image Docker, lexecuter et voir que python 3 est bien présent:
+À présent, on peut \emph{build} notre image Docker, l'exécuter et voir que python 3 est bien présent:
 
 \begin{lstlisting}[frame=single]
 docker build -t exemple_1 .
@@ -255,13 +255,13 @@ Type "help", "copyright", "credits" or "license" for more information.
 \end{lstlisting}
 
 \subsection{Serveur Web: Docker compose}
-Afin de montrer l'utilisation de \emph{Docker Compose} nous allons réaliser un petit serveur web. Cela nous permettras également de voir comment plusieurs micro-services encapsulé chacuns dans un conteneur Docker, peuvent former une application.
+Afin de montrer l'utilisation de \emph{Docker Compose} nous allons réaliser un petit serveur web. Cela nous permettra également de voir comment plusieurs microservices encapsulés chacun dans un conteneur Docker, peuvent former une application.
 
-Toutes les sources de cet exemple sont disponible dans le dossier, \emph{$sources/exemple_2$}.
+Toutes les sources de cet exemple sont disponibles dans le dossier, \emph{$sources/exemple_2$}.
 
-Cet exemple, consiste en deux conteneurs Docker, construit a partir de deux \emph{Dockerfile}.
+Cet exemple consiste en deux conteneurs Docker, construit à partir de deux \emph{Dockerfile}.
 
-Premièrement, un conteneur avec mysql, qui gére la base de donnée:
+Premièrement, un conteneur avec mysql, qui gère la base de données:
 
 \begin{lstlisting}[frame=single]
 FROM mysql:5.7
@@ -269,7 +269,7 @@ FROM mysql:5.7
 COPY ./my.cnf /etc/mysql/conf.d/
 \end{lstlisting}
 
-Deuxièmement, un conteneur avec php et apache, afin d'executer les page web:
+Deuxièmement, un conteneur avec PHP et apache, afin d'exécuter les pages web:
 
 \begin{lstlisting}[frame=single]
 FROM php:7-apache
@@ -281,7 +281,7 @@ RUN apt-get update \
   && docker-php-ext-install pdo_mysql mysqli mbstring gd iconv mcrypt
 \end{lstlisting}
 
-De plus, les source se trouverrons dans se que l'on appel un volumes, une source de données pour nos conteneur. Dans cet exemple nous y mettons uniquement un fichier \emph{index.php} avec la commande \emph{phpinfo()}, afin de vérifier que notre application fonctionne bien.
+De plus, les sources se trouvent dans se que l'on appelle un volumes, une source de données pour nos conteneurs. Dans cet exemple nous y mettons uniquement un fichier \emph{index.php} avec la commande \emph{phpinfo()}, afin de vérifier que notre application fonctionne bien.
 
 Nous allons utiliser \emph{Docker Compose}, afin de lancer notre application complète:
 
@@ -309,7 +309,7 @@ volumes:
 
 \end{lstlisting}
 
-Executons, à présent, notre application web:
+Exécutons, à présent, notre application web:
 
 \begin{lstlisting}[frame=single]
 $ cd exemple_2/
@@ -328,7 +328,7 @@ cdb19eaa3cb7        exemple2_mysql      "docker-entrypoint.sh"   4 minutes ago  
 
 \end{lstlisting}
 
-Pour vérifier que tous fonctionne utilisez votre naviguateur favoris et accèdez à l'addresse \emph{localhost:8080} \ref{fig:phpinfo}.
+Pour vérifier que tous fonctionnent, utilisez votre navigateur favori et accédez à l'adresse \emph{localhost:8080} \ref{fig:phpinfo}.
 
 \begin{figure}[H] 
 \centering 
@@ -337,12 +337,23 @@ Pour vérifier que tous fonctionne utilisez votre naviguateur favoris et accède
 \label{fig:phpinfo} 
 \end{figure}
 
-\subsection{Biopython}
 \subsection{Parallélisation}
 
-\section{Conclusion}
-\subsection{Docker}
-\subsection{Alternatives}
+Il est possible de lancer plusieurs conteneurs avec la même image. Nous allons utiliser ceci dans la suite du développement afin de lancer plusieurs conteneurs pour l'analyse des séquences.
+
+\begin{lstlisting}[frame=single]
+$ docker run -itd debian:jessie
+
+kamyh@kamyh-linux-tower ~/projects/master/documents/sources/exemple_2 $ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+8901929d2bf0        debian:jessie       "/bin/bash"         2 seconds ago       Up 1 seconds                            determined_sinoussi
+877d2cddce6d        debian:jessie       "/bin/bash"         3 seconds ago       Up 2 seconds                            boring_nobel
+4ff340b9c797        debian:jessie       "/bin/bash"         4 seconds ago       Up 3 seconds                            loving_mccarthy
+e9a8bda7688f        debian:jessie       "/bin/bash"         4 seconds ago       Up 3 seconds                            focused_dijkstra
+2060301458d6        debian:jessie       "/bin/bash"         5 seconds ago       Up 5 seconds                            awesome_blackwell
+\end{lstlisting}
+
+Ici nous avons cinq conteneurs debian lancé simultanément. Ceci peut être très utile, par exemple, dans le cas d'une application web, afin de partager la charge des connexions utilisateurs entre plusieurs conteneurs.
 
 
 
