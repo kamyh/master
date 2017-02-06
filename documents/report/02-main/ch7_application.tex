@@ -441,8 +441,105 @@ number_of_bins = 1
 space_between_bins = 1
 \end{lstlisting}
 
+Etant donné l'importance des fichiers de configuration dans la productions de dataset interessants, nous allons passer en revu les différents éléments y etant définit.
+
+Premièrement, il faut savoir que l'on trouve deux type d'élément dans un fichier de configuration, des sections et de valeurs. Les section sont des mots clés entre crochets, eg. [INFORMATION], et en majuscules. Les valeurs sont en minuscules, et se rapport chacune à une section. En effet, toutes les valeurs àprès une section, font partie de cette section. Cela permet d'organiser le fichier de configuration au mieux.
+
+\textbf{Section - [INFORMATION]}
+
+Ces valeurs de configuration servent lors des phase de développement et tests.
+
+\begin{itemize}
+\item \emph{verbose}, permet de désactiver la pluspart de affichage console.
+\item \emph{$detailed\_logs$}, permet d'inscrire dans les logs des information détaillées sur l'execution de l'application.
+\item \emph{testing}, permet de limiter le nombre d'organisme traité par l'application, à des fin de développement ou de tests. 
+\end{itemize}
+
+\textbf{Section - [ENV]}
+
+Les configurations se trouvant sous cette section concerne des variable d'environnement de l'application.
+
+\begin{itemize}
+\item \emph{$path\_to\_core$}, afin de fonctionne, l'application, à besoins de connaitre l'emplacement du dossier contenant la description Docker de l'image du contrôleur principal.
+\item \emph{$temp\_file\_pseqs$}, permet de spécifier le fichiers temporaire qui sera utilisé afin de parser les sequences multi-fasta. 
+\item \emph{$reset\_db\_at\_start$}, permet de réinitialiser la base de donnée au lancement de l'application.
+\item \emph{process}, spécifie le nombre de coeurs qui sera alloué à la \emph{pool}. 
+\begin{itemize}
+\item fixé à "0", laisse la librairie automatiquement définir le nombre de coeur, normalement le nombre maximum disponnible.
+\item fixé à "-1", fixe le nombre de coeur au maximum disponnible moins 1. Cette méthode permet de laisser un coeur libre pour les processus de la mchine hôte.
+\item fixé à "x", laisse choisir le nombre de coeurs, mais attention en mettre davantage que le maximum ralentit l'execution de l'application.
+\end{itemize}
+\item \emph{$chunk\_size\_multiplier$}, définit la taille de \emph{chunk} pour le traitement des séquence lors de la phase 1.
+\item \emph{$phases\_to\_run$}, permet de définir quelles phases ont souhaite executer. Par exemple, si la valeur est égale à "1,2,3,4,5", toutes les phases seront executée. On peut choisir de n'executer que les deux derniere phase en inscrivant la valeur de se parametre à "4,5".
+\end{itemize}
+
+\textbf{Section - [$PHASE_1$]}
+
+Configurations se rapportant directement à l'execution de la phase 1 du traitement.
+
+\begin{itemize}
+\item \emph{$analyze\_phage$}, permet de définir si les phages doivent etres traités.
+\item \emph{$analyze\_bacteria$}, permet de définir si les bacteries doivent etres traités.
+\end{itemize}
+
+\textbf{Section - [$DOMS\_SELECTION$]}
+
+%TODO: add exemple
+
+\begin{itemize}
+\item \emph{$use\_e\_value\_selection$}, \emph{$min\_e\_value$}, \emph{$max\_e\_value$}, ces trois valeurs permet de filtré la selection des résultats de l'analyse HMMER en utilisant la \emph{e-value}.
+\item \emph{$use\_score\_selection$}, \emph{$min\_score$}, \emph{$max\_score$}, ces trois valeurs permet de filtré la selection des résultats de l'analyse HMMER en utilisant le \emph{score}.
+\item \emph{$use\_biais\_selection$}, \emph{$min\_biais$}, \emph{$max\_biais$}, ces trois valeurs permet de filtré la selection des résultats de l'analyse HMMER en utilisant la valeure de  \emph{biais}.
+\end{itemize}
+
+\textbf{Section - [$DATASET_GENERATION$]}
+
+\begin{itemize}
+\item \emph{$grades\_file\_pseqs$}, emplacements du dictionnaire des score pour la création du dataset.
+\item \emph{$ds\_dir$}, emplacement du dossier dans lequel placer le dataset créé. Le nom du dataset est définit en ajoutant au nom de la configuration la date et l'heure.
+\item \emph{normalisation}, spécifie si les valeurs du datasets doivent etre normalisé.
+\item \emph{$type\_bins$}, selectionne quell type de bins contient le dataset produit.
+\begin{itemize}
+\item fixé à "1", siginfie que l'on souhaite spécifier le nombre de \emph{bins} à produire.
+\item fixé à "2", signifie que l'on souhaite un vecteur de \emph{bins}.
+\end{itemize}
+\item \emph{$number\_of\_bins$}, permet de définir le nombre de \emph{bins}.
+\item \emph{$space\_between\_bins$}, permet de définir l'espacement entre les \emph{bins}.
+\end{itemize}
+
 \subsection{Loggs}
 %logs
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

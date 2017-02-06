@@ -278,7 +278,7 @@ class CountScoreInteraction():
             pid.append(fasta.id)
         return pid
 
-    # TODO: KEEP like that ? or file tmp ?
+    # TODO: KEEP like that ? or file tmp ? can replace fct "parse_sequences_prot"
     def parse_sequences_prot_from_string(self, sequence):
         pid = []
 
