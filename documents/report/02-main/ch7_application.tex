@@ -29,6 +29,7 @@ La mise en place d'une image \emph{Docker} avec un serveur mysql n'est, par exp�
 Premièrement, afin de pouvoir accéder au conteneur lancé à partir de cette image, il faut faire en sorte que mysql écoute les connexions en entrée.
 
 \lstset{language=bash}
+
 \begin{lstlisting}[frame=single]
 RUN sed -i -e"s/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/" /etc/mysql/my.cnf
 \end{lstlisting}
@@ -65,6 +66,8 @@ CMD ["/bin/bash", "/opt/startup.sh"]
 
 Regardons se que l'on trouve dans le fichier \emph{startup.sh}:
 
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 
 if [ ! -f /var/lib/mysql/ibdata1 ]; then
@@ -104,6 +107,9 @@ fi
 
 /usr/bin/mysqld_safe
 \end{lstlisting}
+\caption[Création bases de données]{Création bases de données}
+\label{fig:createDb} 
+\end{figure}
 
 Dans se script, on commence par donner les privilèges Mysql à l'utilisateur admin. Ensuite ont mets en place les différentes bases de données, \emph{$phage_bact, domine$}, dont l'application à besoins. On crée ces deux bases de données et leurs tables.
 
@@ -123,6 +129,8 @@ Comme pour l'image \emph{database} on installe les paquets nécessaires à utili
 
 On installe pip3, le gestionnaire de paquets pip pour python3:
 
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 RUN apt-get install -y python3-pip r-base
 \end{lstlisting}
@@ -145,7 +153,9 @@ Finalement, on installe Docker, car il nous faudra pouvoir communiquer avec l'en
 RUN apt-get install -y curl
 RUN curl -fsSL https://get.docker.com/ | sh
 \end{lstlisting}
-
+\caption[Core installations]{Core installations}
+\label{fig:coreInstall} 
+\end{figure}
 
 \section{Docker Compose}
 Maintenant que nous avons toutes les images nécessaires à notre environnement applicatif orienté bioinformatique, nous allons voir comment les combiner à l'aide de \emph{Docker Compose}.
@@ -167,6 +177,8 @@ Regardons comment cela est mis en place grâce à \emph{Docker Compose}.
 
 Premièrement, il nous faut un service qui lancera notre conteneur de base de données:
 
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 database:
     build: ../dockers/database
@@ -185,6 +197,9 @@ database:
     volumes:
       - /inphinity-data/mysql:/var/lib/mysql
 \end{lstlisting}
+\caption[Service base de données]{Service base de données}
+\label{fig:serviceDb} 
+\end{figure}
 
 On spécifie que l'on souhaite construire notre conteneur à partir de l'image se trouvant dans le dossier \emph{$/dockers/database$}. En effet, à l'exécution de la commande de lancement de notre \emph{compose}, docker compose construira l'image \emph{Database} et créera un conteneur à partir de cette image.
 
@@ -198,6 +213,8 @@ Finalement, on ajoute les volumes que l'on souhaite à notre conteneur. En effet
 
 Deuxièmement, il nous faut un service qui lancera le conteneur de notre contrôleur:
 
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 core:
     build: ../dockers/core
@@ -217,6 +234,9 @@ core:
       - database
     container_name: inphinity-core
 \end{lstlisting}
+\caption[Service contrôleur]{Service contrôleur}
+\label{fig:serviceCore} 
+\end{figure}
 
 On suit exactement la même logique que pour notre premier service. On spécifie que l'on souhaite construire notre conteneur à partir de l'image se trouvant dans le dossier \emph{$/dockers/core$}. En effet, à l'exécution de la commande de lancement de notre \emph{compose}, docker compose construira l'image \emph{Core} et créera un conteneur à partir de cette image.
 
@@ -269,15 +289,23 @@ C'est durant cette phase que l'utilisation à HMMER est faite, c'est dans cette 
 
 Ensuite, on divise le tableau des séquences à traité en \emph{chunk}, cela permet d'obtenir les résultats également par séries de 'n' réponse et de les incérer dans la base de données au fur et à mesure. Cela afin d'éviter de perdre du temps d'analyse en cas d'arrêté de l'application.
 
+\begin{figure}[H] 
+\centering 
 \lstset{language=python}
 \begin{lstlisting}[frame=single]
 chunk_size = pool_size * self.tools.configuration.get_chunk_size_multiplier()
         chunks = self.chunks(list(tab), chunk_size)
 \end{lstlisting} 
+\caption[Processus pool]{Processus pool}
+\label{fig:processPool} 
+\end{figure}
 
 Lorsque l'on insert les résultats dans la base de données ont insère également dans la table \emph{progress} qu'elle séquences ont été analysé. Cela nous permet d'arrêter et de relancer l'application quand ont veut sans pour autant devoir recommencer la phase d'analyse a zéro.
 
 On exécute le code suivant pour chacun des \emph{chunks}:
+
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 for chunk in chunks:
             print('%d sequences processed!' % total_processed)
@@ -296,6 +324,9 @@ for chunk in chunks:
 
                     self.tools.db.execute_insert_domains(id_prot, domaines_returned, id_cell, bool_bacteria, "--")
 \end{lstlisting} 
+\caption[Division en Chunks]{Division en Chunks}
+\label{fig:chunks} 
+\end{figure}
 
 On fait appelle de manière parallèle à la fonction \emph{$hmmerScan.analyze_domaines()$}. Grâce à la \emph{pool} de processus la fonction sera exécutée simultanément un certain nombre de fois.
 
@@ -317,6 +348,9 @@ results_filename = "/data-hmm/results/hits_test_" + str(uuid.uuid4()) + ".txt"
 
 Par la suite le code fait appel à la fonction \emph{Subprocess.Popen()} permettant de réaliser de commande UNIX directement depuis un code Python. Grâce à cela on peut lancer une commande qui créera un nouveau conteneur Docker qui effectuera une analyse de séquence, une fois l'analyse effectuée le conteneur s'arrête automatiquement.
 
+
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 p = subprocess.Popen([
                 "docker " +
@@ -338,6 +372,9 @@ p = subprocess.Popen([
             # This makes the wait possible
             p_status = p.wait()
 \end{lstlisting} 
+\caption[Popen Docker Hmmer]{Popen Docker Hmmer}
+\label{fig:popenHmmer} 
+\end{figure}
 
 Cette commande lance un conteneur docker avec l'image que l'on a préalablement créée pour encapsuler HMMER. On spécifie le fichier dans lequel se trouve la séquence au format \emph{FASTA}, ainsi que le fichier dans lequel on souhaite inscrire les résultats de l'analyse.
 
@@ -353,6 +390,8 @@ Nous aborderons la sélection des résultats dans la section \ref{ch:config}.
 
 Finalement on supprime les deux fichiers temporaires et  retourne les résultats.
 
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 p = subprocess.Popen([
 	"rm",
@@ -370,6 +409,9 @@ p = subprocess.Popen([
 
 return [values_tab[0], returned_domains, [start_time, end_time]]
 \end{lstlisting}
+\caption[Popen remove]{Popen}
+\label{fig:popen} 
+\end{figure}
 
 \subsection{Configuration}
 \label{ch:config}
@@ -380,6 +422,8 @@ Toutes les interactions utilisateurs que les scripts produisent lors de la thès
 
 La classe \emph{Main} de l'application (app.py) est faite pour lancer la fonction \emph{$Core.run()$} pour chaque fichier de configuration se trouvant dans le dossier \emph{$inphinity/v_0.5/configs$}. Il faut préciser que seuls les fichiers finissant par l'extension \emph{.ini} sont considérés comme des fichiers de configuration. Donc pour garder une configuration, tout en empêchant quelle soit utilisée, il suffit d'ajouter \emph{.old} à la fin, par exemple.
 
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 if __name__ == '__main__':
     os.chdir("inphinity/v_0.5/configs")
@@ -391,9 +435,14 @@ if __name__ == '__main__':
         c = Core(config_file)
         c.run()
 \end{lstlisting}
+\caption[Main]{Main}
+\label{fig:main} 
+\end{figure}
 
 Voici, un fichier de configuration standard:
 
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 [INFORMATION]
 verbose = 0
@@ -436,6 +485,9 @@ type_bins = 1
 number_of_bins = 1
 space_between_bins = 1
 \end{lstlisting}
+\caption[Fichier de configuration]{Fichier de configuration}
+\label{fig:configFile} 
+\end{figure}
 
 Étant donné l'importance des fichiers de configuration dans la production de dataset intéressants, nous allons passer en revue les différents éléments y étant définis.
 
@@ -516,6 +568,9 @@ Afin de facilité le développement de se travail et les futur développement et
 Chacun des niveaux de \emph{log} possède un mot clé qui est placé au début de la ligne du message dans le fichier compte-rendu.
 
 \lstset{language=bash}
+
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 DETAILS 2017-01-22 12:35:18| <<very detailed message!>>
 DETAILS 2017-01-22 12:35:34| <<very detailed message!>>
@@ -528,6 +583,9 @@ DEBUG 2017-01-22 12:37:21| <<debug message!>>
 DEBUG 2017-01-22 12:37:22| <<debug message!>>
 DEBUG 2017-01-22 12:37:23| <<debug message!>>
 \end{lstlisting}
+\caption[Logger]{Logger}
+\label{fig:logger} 
+\end{figure}
 
 Grâce au mot clé en début de ligne, il est très facile de consulter les \emph{logs} au niveau de l'on souhaite. La commande suivante permet d'obtenir les 1000 dernières lignes contenant le mot "NORMAL":
 

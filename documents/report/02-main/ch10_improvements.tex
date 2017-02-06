@@ -1,19 +1,18 @@
 \chapter{Améliorations}
 \label{ch:improve}
 
-Dans ce chapitre se trouve une liste non exaustive de piste d'amélioration pouvant encore améliorer le projet. 
+Dans ce chapitre se trouve une liste non exhaustive de pistes d'amélioration pouvant encore améliorer le projet. 
 
-\section{Parallèlisation}
+\section{Parallélisation}
 
-La transformation d'un code séquentiel en code linéaire est interessant dès le moment ou l'on à a appliquer le même traitement à un certain nombre de données de même type. Dans le cas de se travail, c'est la recherche des dommaines avec \emph{hmmscan} que l'on à pu rendre parallel.
+La transformation d'un code séquentiel en code linéaire est intéressante dès le moment ou l'on a a appliquer le même traitement à un certain nombre de données de même type. Dans le cas de se travail, c'est la recherche des domaines avec \emph{hmmscan} que l'on a pu rendre parallèle.
 
-Rapidement ont peu noter un certains nombre d'autres endroit présentant le potentielle d'être rendu parallel.
+Rapidement ont peu noté un certain nombre d'autres endroits présentant le potentiel d'être rendu parallèle.
 
-\begin{enumerate}
-\item Dans la phase 2 - \emph{Count Score Interaction} - il serait interessant de rendre parallel le traitement des interaction. Soit au niveau de la boucle sur les interactions (core.py, ligne 220). SOit au niveau du calcule des score PPI (core.py, ligne 242).
-\item Dans la phase 3 - \emph{Freq Qtd Scores} - il serait interessant de paralleliser le calcule du score d'interaction (core.py, ligne 410).
+\begin{enumerate} \item Dans la phase 2 - \emph{Count Score Interaction} - il serait intéressant de rendre parallèle le traitement des interactions. Soit au niveau de la boucle sur les interactions (core.py, ligne 220). Soit au niveau du calcul des scores PPI (core.py, ligne 242).
+\item Dans la phase 3 - \emph{Freq Qtd Scores} - il serait intéressant de paralléliser le calcule du score d'interaction (core.py, ligne 410).
 \end{enumerate}
 
 \section{Machines Amazone}
 
-Pour le moment, le déploiement et l'utilisation de l'application à été testé sur de machine hôtes avec un maximum de 8 coeurs disponible. Mais également, avec une machine Amazone \emph{EC2}, \url{https://aws.amazon.com/fr/ec2/instance-types}, \emph{t2.large}. Cela signifie que si l'on souhaite améliorer davantage la rapidité d'execution du code, on peu déployer l'application sur une machine Amazone avec un grand nombre de coeurs tel qu'une \emph{m4.16xlarge}.
+Pour le moment, le déploiement et l'utilisation de l'application a été testé sur de machine hôtes avec un maximum de 8 coeurs disponible. Mais également, avec une machine Amazone \emph{EC2}, \url{https://aws.amazon.com/fr/ec2/instance-types}, \emph{t2.large}. Cela signifie que si l'on souhaite améliorer davantage la rapidité d'exécution du code, on peut déployer l'application sur une machine Amazone avec un grand nombre de coeurs tel qu'une \emph{m4.16xlarge}.
