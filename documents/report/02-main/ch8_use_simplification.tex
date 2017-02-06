@@ -1,7 +1,74 @@
 \chapter{Simplification d'usage}
 \label{ch:simple}
 
-%TODO: pourquoi faire ceci ?
+Le projet étant relativement complexe, il est important de connaitre certaines astuces permettant de simplifier son utilisation.
 
 \section{Commandes et alias}
+
+La commande de la figure \ref{fig:cmdDockerExec}, permet de se connecter à un conteneur, par exemple, celui des bases de données.
+
+\begin{figure}[H] 
+\centering 
+\begin{lstlisting}[frame=single]
+$ docker exec -it <<CONTAINER NAME/ID>> /bin/bash
+$ docker exec -it inphinity-core /bin/bash
+$ docker exec -it inphinity-database /bin/bash
+\end{lstlisting} 
+\caption[Code - Commande docker exec]{Commande docker exec}
+\label{fig:cmdDockerExec} 
+\end{figure}
+
+Le première alias de la figure \ref{fig:aliases}, permet d'afficher des informations sur l'état du conteneurs de base de données.
+
+\begin{figure}[H] 
+\centering 
+\begin{lstlisting}[frame=single]
+alias inphinitydbstate="docker exec -it inphinity-database mysql -h inphinity-database -u admin -proot -e \"use phage_bact; SELECT (SELECT count(ProtDomId) as doms_found from phage_bact.PROTDOM) as doms_found, (SELECT count(id) as doms_done from phage_bact.progress) as doms_done, (SELECT count(Score_Inter_Id) from phage_bact.Score_interactions) as interactions_found;\""
+
+alias inphinitylogs="docker exec -it inphinity-core tail -100 /tmp/logs_inphinity.txt; echo ''"
+alias inphinitylogsnormal="docker exec -it inphinity-core tail -1000 /tmp/logs_inphinity.txt |grep NORMAL; echo ''"
+\end{lstlisting} 
+\caption[Code - Alias]{Alias}
+\label{fig:aliases} 
+\end{figure}
+
+Les deux autres alias de la figure \ref{fig:aliases}, permettent d'afficher certaines informations des \emph{logs}, directement depuis la machine hôte.
+
 \section{Scripts}
+
+Le dossier \emph{$developpement/scripts/$}, contient des scripts utiles à l'utilisation de ce projet.
+
+\begin{itemize}
+\item \emph{$install\_docker.sh$}, permet d'installer \emph{Docker} et \emph{Docker Compose} automatiquement sur n'importe quelle machine Linux.
+\item \emph{deploy.sh}, permet de déployer l'environnement de l'application, de récupérer les codes source, de lancer l'environnement et de se connecter au conteneur Docker du contrôleur.
+\item \emph{$docker\_ps\_lookup.sh$}, est simplement un script infinie, permettant de surveiller l'état de conteneurs \emph{Docker} en cours d'exécution.
+\item \emph{$infos\_lookup.sh$}, est simplement un script infinie, permettant de surveiller l'état de l'exécution de l'application.
+\end{itemize}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

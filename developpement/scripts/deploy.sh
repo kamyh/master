@@ -2,7 +2,7 @@
 
 git clone https://github.com/kamyh/master.git
 
-cd master/developpement/dockers/core/data-hmm/
+cd ./master/developpement/dockers/core/data-hmm/
 sh get_pfam_hmm.sh
 
 cd ../../database/data/

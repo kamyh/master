@@ -1,5 +1,102 @@
-\chapter{Déploiement}
+\chapter{Déploiement et execution}
 \label{ch:setup}
 
+Dans ce chapitre, nous allons aborder la manière dont l'environnement et l'application doivent être déployés.
+
 \section{Obtention des sources}
-\section{•}
+
+Le projet réalisé durant cette thèse a été développé en utilisant les gestionnaires de code source \emph{git} par l'intermédiaire de la plateforme \emph{Github.com}. Le projet est en accès public à l'adresse, \url{https://github.com/kamyh/master.git}.
+
+\begin{figure}[H] 
+\centering 
+\begin{lstlisting}[frame=single]
+$ git clone https://github.com/kamyh/master.git
+$ cd master/developpement/dockers/core/data-hmm/
+$ sh get_pfam_hmm.sh
+$ cd ../../database/data/
+$ wget https://www.dropbox.com/s/mzt9pxpfnvxl3wa/bacteriaVD.sql?dl=0
+$ mv bacteriaVD.sql?dl=0 bacteriaVD.sql
+\end{lstlisting} 
+\caption[Code - Obtention de sources]{Obtention des sources}
+\label{fig:getSources} 
+\end{figure}
+
+Le code \ref{fig:getSources} permet d'obtenir les sources, mais également la base de données \emph{Pfam} et la base de données des bactéries.
+
+\section{Edition de la configuration}
+
+Il faut tout d'abord créer au moins un fichier de configuration en copiant le fichier de configuration par défaut.
+
+\begin{figure}[H] 
+\centering 
+\begin{lstlisting}[frame=single]
+$ cd ../../../inphinity/v_0.5
+$ cp configs/config.ini.example config.ini
+$ sudo nano configs/config.ini
+\end{lstlisting} 
+\caption[Code - Edition de la configuration]{Edition de la configuration}
+\label{fig:renameConfig} 
+\end{figure}
+
+Il est impératif de modifier la valeur de \emph{$path\_to\_core$} afin qu’elle soit correcte par rapport à la machine hôte.
+
+\section{Execution de la composition Docker}
+
+Il est à présent possible d'executer l'environnement de notre application.
+
+\begin{figure}[H] 
+\centering 
+\begin{lstlisting}[frame=single]
+$ cd ../../compose/
+$ sudo sh run.sh
+$ docker ps
+\end{lstlisting} 
+\caption[Code - Execution composition]{Execution de la composition Docker}
+\label{fig:execCompose} 
+\end{figure}
+
+Une fois les commandes \ref{fig:execCompose} executées, \emph{docker ps} devrait retourner ceci:
+
+\begin{figure}[H] 
+\centering 
+\begin{lstlisting}[frame=single]
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                              NAMES
+6817333ab720        compose_core        "/bin/bash"              11 seconds ago      Up 7 seconds                                           inphinity-core
+b494735f1440        compose_database    "tini -- /bin/bash /o"   12 seconds ago      Up 10 seconds       3309/tcp, 0.0.0.0:3309->3306/tcp   inphinity-database
+\end{lstlisting} 
+\caption[Code - Execution composition vérification]{Execution de la composition Docker vérification}
+\label{fig:execComposeCheck} 
+\end{figure}
+
+L'application n'est executé automatiquement pour le moment, mais en cas de déploiement en prodution, cela est très facile à modifier.
+
+Pour le moment, il faut se connecter au conteneur du contrôleur et executer l'application:
+
+\begin{figure}[H] 
+\centering 
+\begin{lstlisting}[frame=single]
+$ docker exec -it inphinity-core /bin/bash
+$ python3 inphinity/v_0.5/app.py 
+\end{lstlisting} 
+\caption[Code - Execution Application]{Execution de l'application}
+\label{fig:execComposeCheck} 
+\end{figure}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

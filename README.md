@@ -77,9 +77,9 @@ $ mv bacteriaVD.sql?dl=0 bacteriaVD.sql
 You have to rename and edit the configuration file (config.example.ini)
 
 ```
-$ cd ../../../inphinity/v_0.3
-$ cp config.example.ini config_v0.3.ini
-$ sudo nano config_v0.3.ini
+$ cd ../../../inphinity/v_0.5
+$ cp configs/config.ini.example config.ini
+$ sudo nano configs/config.ini
 ```
 
 You have to set the variable 'path_to_core' to the correct path to the core directory (/developpement/dockers/core).
@@ -111,7 +111,7 @@ $ docker exec -it inphinity-core /bin/bash
 ##### Run
 
 ```
-$ python3 inphinity/v_0.3/test_popen_and_multiprocess_with_docker_more.py 
+$ python3 inphinity/v_0.5/app.py 
 ```
 
 
