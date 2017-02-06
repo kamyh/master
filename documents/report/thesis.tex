@@ -4,6 +4,7 @@
 
 % Configuration
 % -------------
+
 \input{00-settings/settings_base}    % template settings
 \input{00-settings/codestyles}       % code styles for minted
 \input{00-settings/settings_custom}  % your custom packages etc
@@ -17,25 +18,20 @@
 \frontmatter
 
 \input{01-head/titlepage} % don't modify, it follows the MSE mandatory format
-\input{01-head/dedication}
 \setcounter{page}{0} % start numbering here
-\input{01-head/acknowledgements}
+%\input{01-head/acknowledgements}
 \input{01-head/abstracts}
 
 % Table of contents
+\selectlanguage{french}
 \tableofcontents
 \cleardoublepage
 
 % List of figures
 \phantomsection
-\addcontentsline{toc}{chapter}{List of figures} % adds an entry to the table of contents
+\addcontentsline{toc}{chapter}{Liste des figures} % adds an entry to the table of contents
 \listoffigures
 \cleardoublepage
-
-% List of tables
-\phantomsection
-\addcontentsline{toc}{chapter}{List of tables} % adds an entry to the table of contents
-\listoftables
 
 % TODO: List of listings
 

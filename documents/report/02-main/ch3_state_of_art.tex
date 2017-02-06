@@ -63,7 +63,7 @@ Il est également un ensemble d'outils pour le traitement de grande source de do
 \section{Optimisations}
 Le code repris de la thèse \thLeite est un code séquentiel, sous forme de script nécessitant des inputs utilisateurs a chaque étape. De plus, ce code est ecrit en python dans sa version 2.
 
-Grâce au travail du Dr. Brett Cannon, \href{https://speakerdeck.com/pyconslides/python-3-dot-3-trust-me-its-better-than-python-2-dot-7-by-dr-brett-cannon}{See here}, on se rend compte que python 3.3 pourrait optimiser les performances de notre application. On peut lire  \href{https://mail.python.org/pipermail/python-dev/2012-October/121923.html}{ici} que même l'appel des fonctions est en moyenne 1.20 fois plus rapide. De plus, les \emph{threadded count} sont également plus rapide.
+Grâce au travail du Dr. Brett Cannon, \href{https://speakerdeck.com/pyconslides/python-3-dot-3-trust-me-its-better-than-python-2-dot-7-by-dr-brett-cannon}{voir ici}, on se rend compte que python 3.3 pourrait optimiser les performances de notre application. On peut lire  \href{https://mail.python.org/pipermail/python-dev/2012-October/121923.html}{ici} que même l'appel des fonctions est en moyenne 1.20 fois plus rapide. De plus, les \emph{threadded count} sont également plus rapide.
 
 Une autre possibilité est d'utiliser \emph{Cython}. Cython est un compilateur/langage de python permettant d'utiliser des appeles au langage C et de compiler un code python en exécutable C. Il faut savoir qu'un exécutable C est généralement plus rapide que l'exécution de l'interpréteur Python. 
 

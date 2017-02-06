@@ -38,6 +38,8 @@ Il est nécessaire d'êtres à l’aise avec l'\gls{os} Linux et l'utilisation d
 }
 
 \subsubsection{Installation Docker}
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 $ sudo apt-get update
 $ sudo apt-get install apt-transport-https ca-certificates
@@ -49,6 +51,9 @@ $ sudo apt-cache policy docker-engine
 $ sudo apt-get install -y docker-engine
 $ sudo systemctl status docker
 \end{lstlisting}
+\caption[Code - Installation Docker]{Installation Docker}
+\label{fig:installDocker} 
+\end{figure}
 
 Vous devriez maintenant voir une sortie console semblable a celle de la figure \ref{fig:dockerservices}:
 
@@ -61,24 +66,40 @@ Vous devriez maintenant voir une sortie console semblable a celle de la figure \
 
 Il faut à présent configurer Docker pour votre utilisateur hôte.
 
+\begin{figure}[H] 
+\centering
 \begin{lstlisting}[frame=single]
 $ sudo usermod -aG docker $(whoami)
 \end{lstlisting}
+\caption[Code - Configurer utlisateur Docker]{Configurer utlisateur Docker}
+\label{fig:configUserDocker} 
+\end{figure}
 
 À se point ci, il vous faut redémarrer votre machine.
 
 \subsubsection{Installation Docker-compose (1.9)}
 
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 $ curl -L "https://github.com/docker/compose/releases/download/1.9.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 $ sudo chmod +x /usr/local/bin/docker-compose
 $ docker-compose --version
 \end{lstlisting}
+\caption[Code - Installation Docker-compose]{Installation Docker-compose}
+\label{fig:installCompose} 
+\end{figure}
 
 Vous devriez à présent obtenir la sortie console suivante:
+
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 docker-compose version: 1.9.0
 \end{lstlisting}
+\caption[Code - Docker-compose version]{Docker-compose version}
+\label{fig:composeVersion} 
+\end{figure}
 
 \subsection{Téléchargements}
 
@@ -120,6 +141,8 @@ Les trois commandes les plus importantes de Docker sont \emph{pull}, \emph{build
 
 Premièrement, intéressons-nous à la commande \emph{pull}:
 
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 $ docker pull debian:jessie
 
@@ -128,20 +151,30 @@ jessie: Pulling from library/debian
 Digest: sha256:abbe80c8c87b7e1f652fe5e99ff1799cdf9e0878c7009035afe1bccac129cad8
 Status: Downloaded newer image for debian:jessie
 \end{lstlisting}
+\caption[Code - Docker pull]{Docker pull}
+\label{fig:dockerPull} 
+\end{figure}
 
 Avec cette commande l'engin Docker à téléchargé l'image de debian Jessie depuis le \emph{Docker Hub}. Vous pouvez trouver un grand nombre d'images sur \emph{Docker Hub} - \hyperref[Docker Hub]{https://hub.docker.com/}.
 
 Il est possible de gérer les images contenues sur une machine hôte. La commande suivante permet d'afficher la liste des images:
 
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 $ docker images
 
 REPOSITORY           TAG                 IMAGE ID            CREATED             SIZE
 debian               jessie              e5599115b6a6        2 weeks ago         123 MB
 \end{lstlisting}
+\caption[Code - Docker images]{Docker images}
+\label{fig:dockerImage} 
+\end{figure}
 
 Il est également possible de supprimer une image, afin de libérer de l'espace disque:
 
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 $ docker rmi e5599115b6a6
 
@@ -150,6 +183,9 @@ Untagged: debian@sha256:abbe80c8c87b7e1f652fe5e99ff1799cdf9e0878c7009035afe1bcca
 Deleted: sha256:e5599115b6a67e08278d176b05a3defb30e5564f5be6d73264ec560b484514a2
 Deleted: sha256:a2ae92ffcd29f7ededa0320f4a4fd709a723beae9a4e681696874932db7aee2c
 \end{lstlisting}
+\caption[Code - Docker rmi]{Docker rmi}
+\label{fig:dockerRmi} 
+\end{figure}
 
 Je tiens a signaler que l'on peut déjà se rendre compte d'un avantage de Docker par rapport a une machine virtuelle, l'image de Debian que l'on vient de télécharger ne fait que 123MB.
 
@@ -161,6 +197,7 @@ $ docker run -it debian:jessie /bin/bash
 root@47e35436f723:/# 
 \end{lstlisting}
 
+
 Il est maintenant possible d'exécuter n’importe quelle commande à l'intérieur du conteneur:
 
 \begin{lstlisting}[frame=single]
@@ -171,35 +208,52 @@ Sun Feb  5 11:01:11 UTC 2017
 
 \emph{Ctrl+d} permet de sortir du conteneur.
 
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 $ docker run -itd debian:jessie
 
 5c09ebfa8bc99235ad482256dfb9fa1fa470a42314ed61654b6a653aff6fee6b
 \end{lstlisting}
+\caption[Docker run linux]{Docker run linux}
+\label{fig:DockerRunLinux} 
+\end{figure}
 
 En ajoutant l'option "d" le conteneur est exécuté de manière \emph{détachée}.
 
 En utilisant la commande suivant, il est possible de visualiser les conteneurs en cours d'exécution:
 
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 $ docker ps
 
 CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS              PORTS               NAMES
 5c09ebfa8bc9        debian:jessie       "/bin/bash"         About a minute ago   Up About a minute                       admiring_brattain
 \end{lstlisting}
+\caption[Docker ps]{Docker ps}
+\label{fig:dockerPs} 
+\end{figure}
 
 Il est possible d'exécuter n’importe quelle commande dans un conteneur en cours d'exécution:
 
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 $ docker exec -it admiring_brattain date
 
 Sun Feb  5 11:06:21 UTC 2017
 \end{lstlisting}
+\caption[Docker exec]{Docker exec}
+\label{fig:dockerExec} 
+\end{figure}
 
 Ici le conteneur est identifié par son nom, si à l'exécution aucun nom n'est défini, Docker en attribue un de manière aléatoire. Il est également possible d'identifier un conteneur en utilisant son \emph{CONTAINER ID}.
 
 En effet, il est possible et bien utile de définir un nom à vos conteneurs:
 
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 $ docker run -itd --name inphinity debian:jessie
 
@@ -210,6 +264,9 @@ $ docker ps
 CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
 c4be3f837adc        debian:jessie       "/bin/bash"         3 seconds ago       Up 3 seconds                            inphinity
 \end{lstlisting}
+\caption[Docker run]{Docker run}
+\label{fig:dockerRun} 
+\end{figure}
 
 Finalement, abordons la commande \emph{build}. En effet, pour le moment nous n'avons fait qu'utiliser des images déjà construites. Un aspect très intéressant de Docker est de pouvoir décrire en détail la construction d'une image qui sera ensuite utilisée afin de lancer notre conteneur.
 
@@ -238,6 +295,8 @@ RUN apt-get install -y python3
 
 À présent, on peut \emph{build} notre image Docker, l'exécuter et voir que python 3 est bien présent:
 
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 docker build -t exemple_1 .
 
@@ -253,6 +312,9 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>> 
 
 \end{lstlisting}
+\caption[Docker build]{Docker build}
+\label{fig:dockerBuild} 
+\end{figure}
 
 \subsection{Serveur Web: Docker compose}
 Afin de montrer l'utilisation de \emph{Docker Compose} nous allons réaliser un petit serveur web. Cela nous permettra également de voir comment plusieurs microservices encapsulés chacun dans un conteneur Docker, peuvent former une application.
@@ -263,14 +325,21 @@ Cet exemple consiste en deux conteneurs Docker, construit à partir de deux \emp
 
 Premièrement, un conteneur avec mysql, qui gère la base de données:
 
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 FROM mysql:5.7
 
 COPY ./my.cnf /etc/mysql/conf.d/
 \end{lstlisting}
+\caption[mysql Docker]{Msyql Docker}
+\label{fig:mysqlDocker} 
+\end{figure}
 
 Deuxièmement, un conteneur avec PHP et apache, afin d'exécuter les pages web:
 
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 FROM php:7-apache
 
@@ -280,11 +349,16 @@ RUN apt-get update \
   && apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng12-dev libmcrypt-dev \
   && docker-php-ext-install pdo_mysql mysqli mbstring gd iconv mcrypt
 \end{lstlisting}
+\caption[php-apache Docker]{php-apache Docker}
+\label{fig:phpApacheDocker} 
+\end{figure}
 
 De plus, les sources se trouvent dans se que l'on appelle un volumes, une source de données pour nos conteneurs. Dans cet exemple nous y mettons uniquement un fichier \emph{index.php} avec la commande \emph{phpinfo()}, afin de vérifier que notre application fonctionne bien.
 
 Nous allons utiliser \emph{Docker Compose}, afin de lancer notre application complète:
 
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 $ nano docker-compose.yml
 
@@ -308,9 +382,14 @@ volumes:
   db:
 
 \end{lstlisting}
+\caption[Code - docker-compose configuration]{docker-compose configuration}
+\label{fig:composeConfig} 
+\end{figure}
 
 Exécutons, à présent, notre application web:
 
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 $ cd exemple_2/
 $ docker-compose up -d
@@ -327,6 +406,9 @@ e921dc5930ac        exemple2_php        "docker-php-entrypoin"   4 minutes ago  
 cdb19eaa3cb7        exemple2_mysql      "docker-entrypoint.sh"   4 minutes ago       Up 4 minutes        3306/tcp               exemple2_mysql_1
 
 \end{lstlisting}
+\caption[Docker-compose up]{Docker-compose up}
+\label{fig:composeUp} 
+\end{figure}
 
 Pour vérifier que tous fonctionnent, utilisez votre navigateur favori et accédez à l'adresse \emph{localhost:8080} \ref{fig:phpinfo}.
 
@@ -341,6 +423,8 @@ Pour vérifier que tous fonctionnent, utilisez votre navigateur favori et accéd
 
 Il est possible de lancer plusieurs conteneurs avec la même image. Nous allons utiliser ceci dans la suite du développement afin de lancer plusieurs conteneurs pour l'analyse des séquences.
 
+\begin{figure}[H] 
+\centering 
 \begin{lstlisting}[frame=single]
 $ docker run -itd debian:jessie
 
@@ -352,6 +436,9 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
 e9a8bda7688f        debian:jessie       "/bin/bash"         4 seconds ago       Up 3 seconds                            focused_dijkstra
 2060301458d6        debian:jessie       "/bin/bash"         5 seconds ago       Up 5 seconds                            awesome_blackwell
 \end{lstlisting}
+\caption[Docker Hmmer]{Docker Hmmer}
+\label{fig:dockerHmmer} 
+\end{figure}
 
 Ici nous avons cinq conteneurs debian lancé simultanément. Ceci peut être très utile, par exemple, dans le cas d'une application web, afin de partager la charge des connexions utilisateurs entre plusieurs conteneurs.
 

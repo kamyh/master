@@ -406,6 +406,7 @@ class FreqQtdScores():
     def scoring(self):
         sum_qtd = 0
         qtd_of_zeros = 0
+        # TODO: Parallel ?
         for interact in self.list_interact:
             sum_qtd = 0
             qtd_of_zeros = 0
@@ -454,7 +455,6 @@ class CreateGradesDict():
     def run(self):
         LOGGER.log_normal("Create Grades Dict")
         f = open(self.grades_file_pseqs, 'wb')  # Pickle file is newly created where foo1.py is
-        # TODO: test with python3
         pickle.dump([self.vec_id, self.vec_cla, self.vec_scor, self.vec_qtd], f)  # dump data to f
         f.close()
 
