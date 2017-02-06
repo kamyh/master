@@ -17,9 +17,10 @@ lcl|CP014196.1_prot_AUT26_00005_1 -          TniB                 PF05621.9    1
 # Program:         hmmsearch
 # Version:         3.1b2 (February 2015)
 # Pipeline mode:   SEARCH
-# Query file:      /data/Pfam-A.hmm
-# Target file:     /data/seq_diogo_03102016.fasta
-# Option settings: hmmsearch --tblout /data/hits.txt /data/Pfam-A.hmm /data/seq_diogo_03102016.fasta 
+# Query file:      /data-hmm/Pfam-A.hmm
+# Target file:     /data-hmm/fasta/seq_diogo_03102016.fasta
+# Option settings: hmmsearch --tblout /data-hmm/results/hits.txt /data-hmm/Pfam-A.hmm /data-hmm/fasta/seq_diogo_03102016.fasta 
 # Current dir:     /usr/local/bin
-# Date:            Mon Oct  3 09:25:13 2016
+# Date:            Mon Feb  6 10:56:36 2017
 # [ok]
+

@@ -484,7 +484,14 @@ Configurations se rapportant directement à l'execution de la phase 1 du traitem
 
 \textbf{Section - [$DOMS\_SELECTION$]}
 
-%TODO: add exemple
+Une analyse de séquence par \emph{hmmsearch} donne des résultats semblable à la figure \ref{fig:hmmseach}. On voit que chaque domaines trouvé possède une valeure de score, une e-value et un biais.
+
+\begin{figure}[H] 
+\centering 
+\includegraphics[width=1\columnwidth]{img/hmmsearchresult} 
+\caption[hmmseach]{Résultats de hmmerseach}
+\label{fig:hmmseach} 
+\end{figure}
 
 \begin{itemize}
 \item \emph{$use\_e\_value\_selection$}, \emph{$min\_e\_value$}, \emph{$max\_e\_value$}, ces trois valeurs permet de filtré la selection des résultats de l'analyse HMMER en utilisant la \emph{e-value}.
@@ -508,9 +515,29 @@ Configurations se rapportant directement à l'execution de la phase 1 du traitem
 \end{itemize}
 
 \subsection{Loggs}
-%logs
+Afin de facilité le développement de se travail et les futurs développement et modification de l'application, une classe permettant la génération d'un fichiers de \emph{log} (compte-rendu). COmme on le voit sur la figure \ref{fig:classdiagram}, il y a cinq niveau de \emph{log}. Cela permet d'organiser les information que l'on souhaite enregistrer.
 
+Chacun des niveau de \emph{log} possède un mot clé qui est placé au début de la ligne du message dans le fichier compte-rendu.
 
+\lstset{language=bash}
+\begin{lstlisting}[frame=single]
+DETAILS 2017-01-22 12:35:18| <<very detailed message!>>
+DETAILS 2017-01-22 12:35:34| <<very detailed message!>>
+DETAILS 2017-01-22 12:35:56| <<very detailed message!>>
+ERROR 2017-01-22 12:36:18| <<error message!>>
+DEBUG 2017-01-22 12:37:18| <<debug message!>>
+DEBUG 2017-01-22 12:37:19| <<debug message!>>
+DEBUG 2017-01-22 12:37:20| <<debug message!>>
+DEBUG 2017-01-22 12:37:21| <<debug message!>>
+DEBUG 2017-01-22 12:37:22| <<debug message!>>
+DEBUG 2017-01-22 12:37:23| <<debug message!>>
+\end{lstlisting}
+
+Grâce au mots clé en début de ligne, il est très facile de consulter les \emph{logs} au niveau de l'on souhaite. La commande suivante, permet d'obtenir les 1000 dernière lignes contenant le mots "NORMAL":
+
+\begin{lstlisting}[frame=single]
+$ tail -1000 /tmp/logs_inphinity.txt |grep NORMAL
+\end{lstlisting}
 
 
 
