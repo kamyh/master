@@ -3,13 +3,13 @@
 
 Nous allons principalement nous servir de deux fonctionnalités afin de rendre une partie, critique, du code parallèle. En effet, la recherche de domaine protéinique, à l'aide de \emph{HMMER Scan} est une opération très longue.
 
-Nous allons rendre parallèle les appeles à un conteneur Docker encapsulant une version locale de \emph{HMMER} et la lecture des résultats.
+Nous allons rendre parallèle les appels à un conteneur Docker encapsulant une version locale de \emph{HMMER} et la lecture des résultats.
 
-Pour plus d'information sur la transformation du code, que se soit l'ajout de la philosophie objet ou que se soit au niveau des optimisations veuillez consulter le chapitre \cf{ch:app}
+Pour plus d'informations sur la transformation du code, que ce soit l'ajout de la philosophie objet ou au niveau des optimisations, veuillez consulter le \cf{ch:app}
 
 \section{Code de base}
 
-Dans se sous chapitre il est question de comment paralléliser un code en python 3, lorsque l'on a un traitement à appliquer sur un ensemble de données de même type.
+Dans ce sous-chapitre il est question de comment paralléliser un code en python 3, lorsque l'on a un traitement à appliquer sur un ensemble de données de même type.
 
 Le code suivant montre comment utiliser la librairie \emph{multiprocessing} et les \emph{pool}.
 
@@ -25,9 +25,9 @@ if __name__ == '__main__':
     print(p.map(f, [1, 2, 3]))
 \end{lstlisting} 
 
-Se qui se passe dans se code c'est que l'on \emph{map} une fonction sur un tableau de données. Ce code va donc appliquer la fonction carrée sur chaque élément du tableau et renvoyer les résultats dans un tableau.
+Ce qui se passe dans ce code c'est que l'on \emph{map} une fonction sur un tableau de données. Ce code va donc appliquer la fonction carrée sur chaque élément du tableau et renvoyer les résultats dans un tableau.
 
-Il est également possible de passer à la fonction \emph{Pool.map()} des paramètres plus complexe:
+Il est également possible de passer à la fonction \emph{Pool.map()} des paramètres plus complexes:
 
 \lstset{language=python}
 \begin{lstlisting}[frame=single]
@@ -41,7 +41,7 @@ if __name__ == '__main__':
     print(p.starmap(f, [[1,2],[3,4],[5,6]]))
 \end{lstlisting} 
 
-La ligne suivante, permets de définir le nombre de coeurs \gls{cpu} que l'on souhaite utiliser: 
+La ligne suivante, permet de définir le nombre de coeurs \gls{cpu} que l'on souhaite utiliser: 
 
 \begin{lstlisting}[frame=single]
 p = Pool(processes=5)
@@ -51,7 +51,7 @@ Attention la fonction \emph{starmap} n'est disponible que depuis python 3.3.
 
 Retrouver ces codes dans le dossier \emph{$sources/exemple_3$}. Dans ce chapitre nous n'aborderons que les éléments nécessaires à la compréhension et à l'utilisation du code produit dans cette thèse. Pour plus d'informations sur la librairie multiprocessing cf. https://docs.python.org/2/library/multiprocessing.html.
 
-Dans un des scripts du code de la thèse \thLeite , des séquences protéiniques sont traitées en faisant appel à l'\gls{api} de HMMER. Dans le chapitre \cf{ch:app} nous verrons comment cet appel a été remplacé par un conteneur Docker.
+Dans un des scripts du code de la thèse \thLeite , des séquences protéiniques sont traitées en faisant appel à l'\gls{api} de HMMER. Dans le \cf{ch:app} nous verrons comment cet appel a été remplacé par un conteneur Docker.
 
 
 

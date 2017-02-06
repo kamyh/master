@@ -2,15 +2,15 @@
 \label{ch:docker}
 
 \section{Introduction}
-Dans ce chapitre nous allons parler du fonctionnement de \emph{Docker} et \emph{Docker Compose}. Ce chapitre est réalisé sous le ton d'un cours d'introduction à Docker, afin de pouvoir transmettre les connaissances de base a l'utilisation et à la modification du travail réalisé lors de cette thèse. Cela passera entre autres par certains exemples et codes qui seront fournis en annexe notamment.
+Dans ce chapitre nous allons parler du fonctionnement de \emph{Docker} et \emph{Docker Compose}. Ce chapitre est réalisé sous le ton d'un cours d'introduction à Docker, afin de pouvoir transmettre les connaissances de base à l'utilisation et à la modification du travail réalisé lors de cette thèse. Cela passera entre autres par certains exemples et codes qui seront fournis en annexe notamment.
 
 Docker permet l'exécution de code dans un conteneur indépendant de vote système hôte. 
 
 \subsection{Utilisations}
 \subsection{Compatibilité inter-OS}
-Docker permet d'éviter les problèmes liés aux différences entre les environnements d'exécution. En effet, lorsque l'on exécute un code avec Docker ont contrôlé exactement l'état et le type d'environnement d'exécution. Cela rend donc possible l'exécution d'un code sous différent \gls{os} hôte (OSX, Linux, Windows).
+Docker permet d'éviter les problèmes liés aux différences entre les environnements d'exécution. En effet, lorsque l'on exécute un code avec Docker on contrôle exactement l'état et le type d'environnement d'exécution. Cela rend donc possible l'exécution d'un code sous différents \gls{os} hôte (OSX, Linux, Windows).
 
-Mais pourquoi ne pas utiliser une simple machine virtuelle ? Une première différence entre une machine virtuelle et Docker est le fait que Docker n'encapsule pas tout un \gls{os}, ceci permet une exécution beaucoup plus rapide, et c'est bien se que l'on cherche dans ce travail.
+Mais pourquoi ne pas utiliser une simple machine virtuelle ? Une première différence entre une machine virtuelle et Docker est le fait que Docker n'encapsule pas tout un \gls{os}, ceci permet une exécution beaucoup plus rapide, et c'est bien ce que l'on cherche dans ce travail.
 
 \begin{figure}[H] 
 \centering 
@@ -20,13 +20,13 @@ Mais pourquoi ne pas utiliser une simple machine virtuelle ? Une première diff�
 \end{figure}
 
 \subsection{Miracle or illusion}
-Je tiens ici à faire une mise en garde vis-à-vis de l'utilisation de Docker. Dans sont utilisation Docker est, à mon sens, une solution assez miraculeuse, notamment par le fait que l'on peu partage une application sans se poser de question sur l'hôte cible. Mais attention Docker n'est pas aussi miraculeux que cela dans le développement d'une solution applicative. En effet, il peut parfois êtres compliquer d'arriver du premier coup à réaliser se que l'on souhaite.
+Je tiens ici à faire une mise en garde vis-à-vis de l'utilisation de Docker. Dans son utilisation Docker est, à mon sens, une solution assez miraculeuse, notamment par le fait que l'on peut partager une application sans se poser de questions sur l'hôte cible. Mais attention Docker n'est pas aussi miraculeux que cela dans le développement d'une solution applicative. En effet, il peut parfois être compliqué d'arriver du premier coup à réaliser ce que l'on souhaite.
 
 Docker n'est donc pas une solution miracle, mais présente beaucoup d'avantages en termes d'exécution standardisée, de partage de code et de déploiement.
 
 \section{Pré-requis}
 \subsection{Connaissance}
-Il est nécessaire d'êtres à l’aise avec l'\gls{os} Linux et l'utilisation de commande UNIX. En effet, la plupart du temps les conteneurs utiliseront un système Linux. Pour plus d'information cf. ci-après.
+Il est nécessaire d'être à l’aise avec l'\gls{os} Linux et l'utilisation de commande UNIX. En effet, la plupart du temps les conteneurs utiliseront un système Linux. Pour plus d'informations cf. ci-après.
 
 
 \subsection{Installations}
@@ -75,7 +75,7 @@ $ sudo usermod -aG docker $(whoami)
 \label{fig:configUserDocker} 
 \end{figure}
 
-À se point ci, il vous faut redémarrer votre machine.
+À ce point-ci, il vous faut redémarrer votre machine.
 
 \subsubsection{Installation Docker-compose (1.9)}
 
@@ -155,7 +155,7 @@ Status: Downloaded newer image for debian:jessie
 \label{fig:dockerPull} 
 \end{figure}
 
-Avec cette commande l'engin Docker à téléchargé l'image de debian Jessie depuis le \emph{Docker Hub}. Vous pouvez trouver un grand nombre d'images sur \emph{Docker Hub} - \hyperref[Docker Hub]{https://hub.docker.com/}.
+Avec cette commande l'engin Docker a téléchargé l'image de debian Jessie depuis le \emph{Docker Hub}. Vous pouvez trouver un grand nombre d'images sur \emph{Docker Hub} - \hyperref[Docker Hub]{https://hub.docker.com/}.
 
 Il est possible de gérer les images contenues sur une machine hôte. La commande suivante permet d'afficher la liste des images:
 
@@ -221,7 +221,7 @@ $ docker run -itd debian:jessie
 
 En ajoutant l'option "d" le conteneur est exécuté de manière \emph{détachée}.
 
-En utilisant la commande suivant, il est possible de visualiser les conteneurs en cours d'exécution:
+En utilisant la commande suivante, il est possible de visualiser les conteneurs en cours d'exécution:
 
 \begin{figure}[H] 
 \centering 
@@ -270,7 +270,7 @@ c4be3f837adc        debian:jessie       "/bin/bash"         3 seconds ago       
 
 Finalement, abordons la commande \emph{build}. En effet, pour le moment nous n'avons fait qu'utiliser des images déjà construites. Un aspect très intéressant de Docker est de pouvoir décrire en détail la construction d'une image qui sera ensuite utilisée afin de lancer notre conteneur.
 
-Prenons comme exemple le cas ou vous souhaité lancer un conteneur qui possède Python 3 préinstallé dans la version que l'on souhaite.
+Prenons comme exemple le cas ou vous souhaitez lancer un conteneur qui possède Python 3 préinstallé dans la version que l'on souhaite.
 
 Pour se faire, il faut créer un fichier \emph{Dockerfile} dans un dossier vide. Vous pouvez retrouver le fichier de cet exemple dans le dossier "sources" et en annexe.
 
@@ -321,7 +321,7 @@ Afin de montrer l'utilisation de \emph{Docker Compose} nous allons réaliser un 
 
 Toutes les sources de cet exemple sont disponibles dans le dossier, \emph{$sources/exemple_2$}.
 
-Cet exemple consiste en deux conteneurs Docker, construit à partir de deux \emph{Dockerfile}.
+Cet exemple consiste en deux conteneurs Docker, construits à partir de deux \emph{Dockerfile}.
 
 Premièrement, un conteneur avec mysql, qui gère la base de données:
 
@@ -353,7 +353,7 @@ RUN apt-get update \
 \label{fig:phpApacheDocker} 
 \end{figure}
 
-De plus, les sources se trouvent dans se que l'on appelle un volumes, une source de données pour nos conteneurs. Dans cet exemple nous y mettons uniquement un fichier \emph{index.php} avec la commande \emph{phpinfo()}, afin de vérifier que notre application fonctionne bien.
+De plus, les sources se trouvent dans ce que l'on appelle un volume, une source de données pour nos conteneurs. Dans cet exemple nous y mettons uniquement un fichier \emph{index.php} avec la commande \emph{phpinfo()}, afin de vérifier que notre application fonctionne bien.
 
 Nous allons utiliser \emph{Docker Compose}, afin de lancer notre application complète:
 
@@ -410,7 +410,7 @@ cdb19eaa3cb7        exemple2_mysql      "docker-entrypoint.sh"   4 minutes ago  
 \label{fig:composeUp} 
 \end{figure}
 
-Pour vérifier que tous fonctionnent, utilisez votre navigateur favori et accédez à l'adresse \emph{localhost:8080} \ref{fig:phpinfo}.
+Pour vérifier que tout fonctionne, utilisez votre navigateur favori et accédez à l'adresse \emph{localhost:8080} \ref{fig:phpinfo}.
 
 \begin{figure}[H] 
 \centering 
@@ -440,7 +440,7 @@ e9a8bda7688f        debian:jessie       "/bin/bash"         4 seconds ago       
 \label{fig:dockerHmmer} 
 \end{figure}
 
-Ici nous avons cinq conteneurs debian lancé simultanément. Ceci peut être très utile, par exemple, dans le cas d'une application web, afin de partager la charge des connexions utilisateurs entre plusieurs conteneurs.
+Ici nous avons cinq conteneurs debian lancés simultanément. Ceci peut être très utile, par exemple, dans le cas d'une application web, afin de partager la charge des connexions utilisateurs entre plusieurs conteneurs.
 
 
 

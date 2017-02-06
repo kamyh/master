@@ -1,9 +1,9 @@
 \chapter{Environnement et application}
 \label{ch:app}
 
-Nous allons aborder, dans ce chapitre, le nouvel environnement créé a l'aide de Docker et le nouveau code produit à partir de celui de la thèse \thLeite.
+Nous allons aborder, dans ce chapitre, le nouvel environnement créé à l'aide de Docker et le nouveau code produit à partir de celui de la thèse \thLeite.
 
-L'environnement est réalisé à l'aide de \emph{Docker Compose}, il est composer de trois images différentes. Le code, orienté objet sera exécuté dans ce nouvel environnement.
+L'environnement est réalisé à l'aide de \emph{Docker Compose}, il est composé de trois images différentes. Le code, orienté objet sera exécuté dans ce nouvel environnement.
 
 \section{Images Docker}
 Tous les fichiers nécessaires à la construction des images de notre environnement se trouvent dans le dossier \emph{$developpement/dockers$}.
@@ -11,20 +11,20 @@ Tous les fichiers nécessaires à la construction des images de notre environnem
 \subsection{Hmmer}
 La première image est celle visant à remplacer l'utilisation de l'\gls{api} en ligne de HMMER. Il s’agit d'encapsuler l'application HMMER afin de pouvoir l'utiliser pour traiter les séquences protéiniques.
 
-Les fichiers nécessaires se trouvent dans le dossier \emph{$developpement/dockers/hmmer$}. Il s’agit d'un image basées sur \emph{centos}, qui est une image de base Docker très légère.
+Les fichiers nécessaires se trouvent dans le dossier \emph{$developpement/dockers/hmmer$}. Il s’agit d'une image basée sur \emph{centos}, qui est une image de base Docker très légère.
 
-Tout d'abord, le \emph{Dockerfile} de cette image, installe le compilateur C++ \emph{gcc}. Puis, il récupère les sources de l'application HMMER et les compile.
+Tout d'abord, le \emph{Dockerfile} de cette image installe le compilateur C++ \emph{gcc}. Puis, il récupère les sources de l'application HMMER et les compile.
 
-Pour davantage de détail, veuillez consulter directement le fichier \emph{Dockerfile} de l'image.
+Pour davantage de détails, veuillez consulter directement le fichier \emph{Dockerfile} de l'image.
 
 \subsection{Database}
 L'application nécessite plusieurs bases de données Mysql. L'image \emph{database}, dont les sources se trouvent dans le dossier \emph{$developpement/dockers/database$}, remplit cette fonctionnalité.
 
 Pour des raisons de simplicité, cette image est construite à partir de Debian Jessie, la différence entre Centos et Debian est négligeable du fait que nous ne lancerons qu'un seul conteneur de cette image.
 
-Due à la fois à la phase de débug et pour de futurs débugs, l'image est construite avec un certain nombre de paquets afin de faciliter la vie du développeur.
+Dû à la fois à la phase de débug et pour de futurs débugs, l'image est construite avec un certain nombre de paquets afin de faciliter la vie du développeur.
 
-La mise en place d'une image \emph{Docker} avec un serveur mysql n'est, par expérience, jamais une chose facile à réaliser. C'est pour cela que nous allons entrer un peu plus dans les détails les différentes commandes qui composent le fichier \emph{Dockerfile} de cette image. Il n'est pas forcément nécessaire de lire ce sous-chapitre pour comprendre les aboutissants de cette thèse, mais il est nécessaire que les informations qui suivent y figurent.
+La mise en place d'une image \emph{Docker} avec un serveur mysql n'est, par expérience, jamais une chose facile à réaliser. C'est pour cela que nous allons entrer un peu plus dans les détails des différentes commandes qui composent le fichier \emph{Dockerfile} de cette image. Il n'est pas forcément nécessaire de lire ce sous-chapitre pour comprendre les aboutissants de cette thèse, mais il est nécessaire que les informations qui suivent y figurent.
 
 Premièrement, afin de pouvoir accéder au conteneur lancé à partir de cette image, il faut faire en sorte que mysql écoute les connexions en entrée.
 
@@ -56,7 +56,7 @@ RUN sed -ire 's/max_allowed_packet.*=.*/max_allowed_packet = 200M/g' /etc/mysql/
 RUN sed -ire 's/key_buffer_size.*=.*/key_buffer_size = 128M/g' /etc/mysql/my.cnf
 \end{lstlisting}
 
-On ajoute le fichier \emph{startup.sh} et ont fixe qu'au lancement du conteneur il soit exécuté.
+On ajoute le fichier \emph{startup.sh} et on fixe qu'au lancement du conteneur il soit exécuté.
 
 \begin{lstlisting}[frame=single]
 ADD ./startup.sh /opt/startup.sh
@@ -64,7 +64,7 @@ ADD ./startup.sh /opt/startup.sh
 CMD ["/bin/bash", "/opt/startup.sh"]
 \end{lstlisting}
 
-Regardons se que l'on trouve dans le fichier \emph{startup.sh}:
+Regardons ce que l'on trouve dans le fichier \emph{startup.sh}:
 
 \begin{figure}[H] 
 \centering 
@@ -111,19 +111,19 @@ fi
 \label{fig:createDb} 
 \end{figure}
 
-Dans se script, on commence par donner les privilèges Mysql à l'utilisateur admin. Ensuite ont mets en place les différentes bases de données, \emph{$phage_bact, domine$}, dont l'application à besoins. On crée ces deux bases de données et leurs tables.
+Dans ce script, on commence par donner les privilèges Mysql à l'utilisateur admin. Ensuite on met en place les différentes bases de données, \emph{$phage_bact, domine$}, dont l'application a besoin. On crée ces deux bases de données et leurs tables.
 
-Dans l'éventualité ou l'on souhaiterait ajouter une nouvelle base de données, c'est ici qu'il faudra ajouter la commande Mysql de création.
+Dans l'éventualité où l'on souhaiterait ajouter une nouvelle base de données, c'est ici qu'il faudra ajouter la commande Mysql de création.
 
-De plus si l'on souhaite ajouter des tables ou données à une de nos bases de données, c'est également dans se fichier qu'il faudra le faire.
+De plus si l'on souhaite ajouter des tables ou données à une de nos bases de données, c'est également dans ce fichier qu'il faudra le faire.
 
 Comme vous pouvez le voir, tous les fichiers \emph{.sql} nécessaires sont placés dans le dossier \emph{$developpement/dockers/database/data$}.
 
 
 \subsection{Core}
-Due à la fois à la phase de débug et pour de futurs débugs, l'image est construite avec un certain nombre de paquets afin de faciliter la vie du développeur.
+Dû à la fois à la phase de débug et pour de futurs débugs, l'image est construite avec un certain nombre de paquets afin de faciliter la vie du développeur.
 
-C'est véritablement cette image qui contient tous se qui est nécessaire à l'exécution de l'aspect bio-informatique de l'application. C'est également elle qui contrôle l'application, étant donné que c’est dans se conteneur que le code de l'application est exécuté.
+C'est véritablement cette image qui contient tout ce qui est nécessaire à l'exécution de l'aspect bio-informatique de l'application. C'est également elle qui contrôle l'application, étant donné que c’est dans ce conteneur que le code de l'application est exécuté.
 
 Comme pour l'image \emph{database} on installe les paquets nécessaires à utiliser Mysql, \emph{mysql-server, mysql-client, libmysqlclient-dev} et python.
 
@@ -169,7 +169,7 @@ La figure \ref{fig:architecture} montre l'architecture qui est mise en place à 
 \label{fig:architecture} 
 \end{figure}
 
-La figure \ref{fig:architecture} montre qu'un conteneur construit à partir de l'image \emph{Core} contrôlera l'exécution du code applicatif et la création de conteneurs basés sur l'image \emph{hmmer}. De plus, tous se qui a trait aux données stockées en SQL sera géré par le conteneur \emph{Database}.
+La figure \ref{fig:architecture} montre qu'un conteneur construit à partir de l'image \emph{Core} contrôlera l'exécution du code applicatif et la création de conteneurs basés sur l'image \emph{hmmer}. De plus, tout ce qui a trait aux données stockées en SQL sera géré par le conteneur \emph{Database}.
 
 De cette manière, le conteneur \emph{Core} peut créer des conteneurs \emph{hmmer} pour exécuter les recherches de domaines protéiniques.
 
@@ -203,11 +203,11 @@ database:
 
 On spécifie que l'on souhaite construire notre conteneur à partir de l'image se trouvant dans le dossier \emph{$/dockers/database$}. En effet, à l'exécution de la commande de lancement de notre \emph{compose}, docker compose construira l'image \emph{Database} et créera un conteneur à partir de cette image.
 
-On fixe les paramètres de configuration de Mysql, tel que le mot de passe root, l'utilisateur, sont mot de passe et le nom de la base de données par défaut.
+On fixe les paramètres de configuration de Mysql, tels que le mot de passe root, l'utilisateur, son mot de passe et le nom de la base de données par défaut.
 
 On route les ports utiles au conteneur, ainsi que le réseau virtuel qui sera utilisé.
 
-On fixe manuellement le nom du conteneur qui sera créé afin de facilement pouvoir y accéder en cas de besoins (debug, tests, etc.).
+On fixe manuellement le nom du conteneur qui sera créé afin de facilement pouvoir y accéder en cas de besoin (debug, tests, etc.).
 
 Finalement, on ajoute les volumes que l'on souhaite à notre conteneur. En effet, avec cette dernière commande, on attache le dossier hôte \emph{$/inphinity-data/mysql$} au dossier \emph{$/var/lib/mysql$} du conteneur. De cette manière lorsque l'on arrête et relance notre application notre base de données ne sera pas détruite. Si l'on souhaite supprimer la base de données et en recréer une vierge, il suffit de supprimer le contenu du dossier \emph{$/inphinity-data/mysql$}.
 
@@ -242,7 +242,7 @@ On suit exactement la même logique que pour notre premier service. On spécifie
 
 On attribue le réseau virtuel qui sera utilisé, le même que pour le service de la base de données.
 
-On fixe manuellement le nom du conteneur qui sera créé, afin de facilement pouvoir y accéder en cas de besoins (debug, tests, etc.).
+On fixe manuellement le nom du conteneur qui sera créé, afin de facilement pouvoir y accéder en cas de besoin (debug, tests, etc.).
 
 On ajoute les volumes nécessaires:
 
@@ -256,19 +256,19 @@ On lie, grâce à la commande \emph{links}, le contrôleur à la base de donnée
 
 La commande \emph{$depends_on$} permet de garantir que le conteneur "core" sera créé uniquement après la création du conteneur "database".
 
-Le troisième service se trouvant le le fichier compose n'est pas nécessaire, car on lancera les conteneurs hmmer directement depuis le code python de notre application. 
+Le troisième service se trouvant dans le fichier compose n'est pas nécessaire, car on lancera les conteneurs hmmer directement depuis le code python de notre application. 
 
 Finalement, on définit un réseau dans lequel on place les conteneurs de l'application.
 
 \section{<<Inphinity Environment>>}
 
-Comme déjà précisée précédemment, une première optimisation du code est passée par le fait de traduire les codes existant du python2 vers le python3.3 .
+Comme déjà précisé précédemment, une première optimisation du code est passée par le fait de traduire les codes existants du python2 vers le python3.3 .
 
 Au niveau du code, la logique suivie a été de diviser le code en \emph{phases} successives. Chacune de ces phases est chargée d'un traitement spécifique de remplir un objectif.
 
-Attention, ce chapitre n'aborde pas la logique du code réalisé dans la thèse \thLeite , il n'est question ici que de la plus-value ajoutée lors de se travail de master.
+Attention, ce chapitre n'aborde pas la logique du code réalisé dans la thèse \thLeite , il n'est question ici que de la plus-value ajoutée lors de ce travail de master.
 
-Les fonctions utilisées dans les scripts de la thèse \thLeite reste très proches de celle de se travail!
+Les fonctions utilisées dans les scripts de la thèse \thLeite restent très proches de celle de ce travail!
 
 \subsection{Diagramme de classes}
 \begin{figure}[H] 
@@ -281,13 +281,13 @@ Les fonctions utilisées dans les scripts de la thèse \thLeite reste très proc
 \subsubsection{Core}
 La classe \emph{Core} est la classe principale de l'application. C'est elle qui est chargée d'instancier les classes nécessaires au bon déroulement du code et de lancer les phases du processus.
 
-Comme ont le voit sur la figure \ref{fig:classdiagram}, la classe \emph{Core} possède une instance des cinq classes, représentant chacune une phase du processus. Elle possède également une instance de la classe \emph{Tools}, qui donne accès a l'objet de la classe \emph{Config}, gérant le \emph{parsing} de la configuration en cours. De plus, la classe \emph{Tools} possède un accès à l'objet \emph{DBUtilities}, qui gère l'ensemble des accès aux bases de données.
+Comme on le voit sur la figure \ref{fig:classdiagram}, la classe \emph{Core} possède une instance des cinq classes, représentant chacune une phase du processus. Elle possède également une instance de la classe \emph{Tools}, qui donne accès à l'objet de la classe \emph{Config}, gérant le \emph{parsing} de la configuration en cours. De plus, la classe \emph{Tools} possède un accès à l'objet \emph{DBUtilities}, qui gère l'ensemble des accès aux bases de données.
 
 \subsubsection{Phase 1 - DetectDomaines}
 
 C'est durant cette phase que l'utilisation à HMMER est faite, c'est dans cette phase que la parallélisation de cette utilisation est réalisée. Plus précisément regardons la fonction \emph{$seek_domaines_multiprocess()$}, on y initialise une \emph{Multiprocessing.Pool} avec un certain nombre de coeurs à disposition. Ce nombre de coeurs est défini dans les fichiers de configuration, cf. \ref{ch:config}.
 
-Ensuite, on divise le tableau des séquences à traité en \emph{chunk}, cela permet d'obtenir les résultats également par séries de 'n' réponse et de les incérer dans la base de données au fur et à mesure. Cela afin d'éviter de perdre du temps d'analyse en cas d'arrêté de l'application.
+Ensuite, on divise le tableau des séquences à traiter en \emph{chunk}, cela permet d'obtenir les résultats également par séries de 'n' réponse et de les incérer dans la base de données au fur et à mesure. Cela afin d'éviter de perdre du temps d'analyse en cas d'arrêté de l'application.
 
 \begin{figure}[H] 
 \centering 
@@ -300,7 +300,7 @@ chunk_size = pool_size * self.tools.configuration.get_chunk_size_multiplier()
 \label{fig:processPool} 
 \end{figure}
 
-Lorsque l'on insert les résultats dans la base de données ont insère également dans la table \emph{progress} qu'elle séquences ont été analysé. Cela nous permet d'arrêter et de relancer l'application quand ont veut sans pour autant devoir recommencer la phase d'analyse a zéro.
+Lorsque l'on insère les résultats dans la base de données on insère également dans la table \emph{progress} quelles séquences ont été analysées. Cela nous permet d'arrêter et de relancer l'application quand on veut sans pour autant devoir recommencer la phase d'analyse a zéro.
 
 On exécute le code suivant pour chacun des \emph{chunks}:
 
@@ -328,11 +328,11 @@ for chunk in chunks:
 \label{fig:chunks} 
 \end{figure}
 
-On fait appelle de manière parallèle à la fonction \emph{$hmmerScan.analyze_domaines()$}. Grâce à la \emph{pool} de processus la fonction sera exécutée simultanément un certain nombre de fois.
+On fait appel de manière parallèle à la fonction \emph{$hmmerScan.analyze_domaines()$}. Grâce à la \emph{pool} de processus la fonction sera exécutée simultanément un certain nombre de fois.
 
-Allons voir plus en détail se qui se passe dans cette fonction. Pour voir le code de la fonction en détail, veuillez vous rendre directement dans les sources du code (\emph{$developpement/inphinity/v_0.5/hmmerScan.py$}).
+Allons voir plus en détails ce qui se passe dans cette fonction. Pour voir le code de la fonction en détails, veuillez vous rendre directement dans les sources du code (\emph{$developpement/inphinity/v_0.5/hmmerScan.py$}).
 
-La séquence envoyée à la fonction est \emph{parsé} dans un fichier temporaire:
+La séquence envoyée à la fonction est \emph{parsée} dans un fichier temporaire:
 
 \begin{lstlisting}[frame=single]
 fasta = '>' + values_tab[0] + '\n' + values_tab[1] + '\n'
@@ -420,7 +420,7 @@ Toutes les interactions utilisateurs que les scripts produisent lors de la thès
 
 \subsubsection{Lancement des configurations}
 
-La classe \emph{Main} de l'application (app.py) est faite pour lancer la fonction \emph{$Core.run()$} pour chaque fichier de configuration se trouvant dans le dossier \emph{$inphinity/v_0.5/configs$}. Il faut préciser que seuls les fichiers finissant par l'extension \emph{.ini} sont considérés comme des fichiers de configuration. Donc pour garder une configuration, tout en empêchant quelle soit utilisée, il suffit d'ajouter \emph{.old} à la fin, par exemple.
+La classe \emph{Main} de l'application (app.py) est faite pour lancer la fonction \emph{$Core.run()$} pour chaque fichier de configuration se trouvant dans le dossier \emph{$inphinity/v_0.5/configs$}. Il faut préciser que seuls les fichiers finissant par l'extension \emph{.ini} sont considérés comme des fichiers de configuration. Donc pour garder une configuration, tout en empêchant qu'elle soit utilisée, il suffit d'ajouter \emph{.old} à la fin, par exemple.
 
 \begin{figure}[H] 
 \centering 
@@ -439,7 +439,7 @@ if __name__ == '__main__':
 \label{fig:main} 
 \end{figure}
 
-Voici, un fichier de configuration standard:
+Voici un fichier de configuration standard:
 
 \begin{figure}[H] 
 \centering 
@@ -491,7 +491,7 @@ space_between_bins = 1
 
 Étant donné l'importance des fichiers de configuration dans la production de dataset intéressants, nous allons passer en revue les différents éléments y étant définis.
 
-Premièrement, il faut savoir que l'on trouve deux types d'éléments dans un fichier de configuration, des sections et de valeurs. Les sections sont des mots clés entre crochets, eg. [INFORMATION], et en majuscules. Les valeurs sont en minuscules, et se rapporte chacune à une section. En effet, toutes les valeurs après une section font partie de cette section. Cela permet d'organiser le fichier de configuration au mieux.
+Premièrement, il faut savoir que l'on trouve deux types d'éléments dans un fichier de configuration, des sections et de valeurs. Les sections sont des mots clés entre crochets, eg. [INFORMATION], et en majuscules. Les valeurs sont en minuscules, et se rapportent chacune à une section. En effet, toutes les valeurs après une section font partie de cette section. Cela permet d'organiser le fichier de configuration au mieux.
 
 \textbf{Section - [INFORMATION]}
 
@@ -508,17 +508,17 @@ Ces valeurs de configuration servent lors des phases de développement et tests.
 Les configurations se trouvant sous cette section concernent des variables d'environnement de l'application.
 
 \begin{itemize}
-\item \emph{$path\_to\_core$}, afin de fonctionne, l'application, à besoins de connaitre l'emplacement du dossier contenant la description Docker de l'image du contrôleur principal.
+\item \emph{$path\_to\_core$}, afin de fonctionner, l'application a besoin de connaitre l'emplacement du dossier contenant la description Docker de l'image du contrôleur principal.
 \item \emph{$temp\_file\_pseqs$}, permet de spécifier le fichier temporaire qui sera utilisé afin de parser les séquences multi-fasta. 
 \item \emph{$reset\_db\_at\_start$}, permet de réinitialiser la base de données au lancement de l'application.
 \item \emph{process}, spécifie le nombre de coeurs qui sera alloué à la \emph{pool}. 
 \begin{itemize}
 \item fixé à "0", laisse la librairie automatiquement définir le nombre de coeurs, normalement le nombre maximum disponible.
 \item fixé à "-1", fixe le nombre de coeurs au maximum disponible moins 1. Cette méthode permet de laisser un coeur libre pour les processus de la machine hôte.
-\item fixé à "x", laisse choisir le nombre de coeurs, mais attention en mettre davantage que le maximum ralentit l'exécution de l'application.
+\item fixé à "x", laisse choisir le nombre de coeurs, mais attention, en mettre davantage que le maximum ralentit l'exécution de l'application.
 \end{itemize}
 \item \emph{$chunk\_size\_multiplier$}, définit la taille de \emph{chunk} pour le traitement des séquences lors de la phase 1.
-\item \emph{$phases\_to\_run$}, permet de définir quelles phases ont souhaite exécuter. Par exemple, si la valeur est égale à "1,2,3,4,5", toutes les phases seront exécutées. On peut choisir de n'exécuter que les deux dernières phases en inscrivant la valeur de se paramètre à "4,5".
+\item \emph{$phases\_to\_run$}, permet de définir quelles phases on souhaite exécuter. Par exemple, si la valeur est égale à "1,2,3,4,5", toutes les phases seront exécutées. On peut choisir de n'exécuter que les deux dernières phases en inscrivant la valeur de ce paramètre à "4,5".
 \end{itemize}
 
 \textbf{Section - [$PHASE_1$]}
@@ -526,8 +526,8 @@ Les configurations se trouvant sous cette section concernent des variables d'env
 Configurations se rapportant directement à l'exécution de la phase 1 du traitement.
 
 \begin{itemize}
-\item \emph{$analyze\_phage$}, permet de définir si les phages doivent êtres traités.
-\item \emph{$analyze\_bacteria$}, permet de définir si les bactéries doivent êtres traités.
+\item \emph{$analyze\_phage$}, permet de définir si les phages doivent être traités.
+\item \emph{$analyze\_bacteria$}, permet de définir si les bactéries doivent être traitése.
 \end{itemize}
 
 \textbf{Section - [$DOMS\_SELECTION$]}
@@ -542,9 +542,9 @@ Une analyse de séquence par \emph{hmmsearch} donne des résultats semblables à
 \end{figure}
 
 \begin{itemize}
-\item \emph{$use\_e\_value\_selection$}, \emph{$min\_e\_value$}, \emph{$max\_e\_value$}, ces trois valeurs permet de filtré la sélection des résultats de l'analyse HMMER en utilisant la \emph{e-value}.
-\item \emph{$use\_score\_selection$}, \emph{$min\_score$}, \emph{$max\_score$}, ces trois valeurs permet de filtré la sélection des résultats de l'analyse HMMER en utilisant le \emph{score}.
-\item \emph{$use\_biais\_selection$}, \emph{$min\_biais$}, \emph{$max\_biais$}, ces trois valeurs permet de filtré la sélection des résultats de l'analyse HMMER en utilisant la valeur de  \emph{biais}.
+\item \emph{$use\_e\_value\_selection$}, \emph{$min\_e\_value$}, \emph{$max\_e\_value$}, ces trois valeurs permettent de filtrer la sélection des résultats de l'analyse HMMER en utilisant la \emph{e-value}.
+\item \emph{$use\_score\_selection$}, \emph{$min\_score$}, \emph{$max\_score$}, ces trois valeurs permettemt de filtrer la sélection des résultats de l'analyse HMMER en utilisant le \emph{score}.
+\item \emph{$use\_biais\_selection$}, \emph{$min\_biais$}, \emph{$max\_biais$}, ces trois valeurs permettent de filtrer la sélection des résultats de l'analyse HMMER en utilisant la valeur de  \emph{biais}.
 \end{itemize}
 
 \textbf{Section - [$DATASET_GENERATION$]}
@@ -552,7 +552,7 @@ Une analyse de séquence par \emph{hmmsearch} donne des résultats semblables à
 \begin{itemize}
 \item \emph{$grades\_file\_pseqs$}, emplacements du dictionnaire des scores pour la création du dataset.
 \item \emph{$ds\_dir$}, emplacement du dossier dans lequel placer le dataset créé. Le nom du dataset est défini en ajoutant au nom de la configuration la date et l'heure.
-\item \emph{normalisation}, spécifie si les valeurs du datasets doivent être normalisé.
+\item \emph{normalisation}, spécifie si les valeurs du dataset doivent être normalisées.
 \item \emph{$type\_bins$}, sélectionne quel type de \emph{bins} contient le dataset produit.
 \begin{itemize}
 \item fixé à "1", signifie que l'on souhaite spécifier le nombre de \emph{bins} à produire.
@@ -563,7 +563,7 @@ Une analyse de séquence par \emph{hmmsearch} donne des résultats semblables à
 \end{itemize}
 
 \subsection{Loggs}
-Afin de facilité le développement de se travail et les futur développement et modification de l'application, une classe permettant la génération d'un fichier de \emph{log} (compte-rendu). Comme on le voit sur la figure \ref{fig:classdiagram}, il y a cinq niveaux de \emph{log}. Cela permet d'organiser les informations que l'on souhaite enregistrer.
+Afin de faciliter le développement de ce travail et les futurs développements et modifications de l'application, une classe permettant la génération d'un fichier de \emph{log} (compte-rendu) a été réalisée. Comme on le voit sur la figure \ref{fig:classdiagram}, il y a cinq niveaux de \emph{log}. Cela permet d'organiser les informations que l'on souhaite enregistrer.
 
 Chacun des niveaux de \emph{log} possède un mot clé qui est placé au début de la ligne du message dans le fichier compte-rendu.
 
