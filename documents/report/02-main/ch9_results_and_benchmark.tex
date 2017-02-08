@@ -1,0 +1,35 @@
+\chapter{Résultats}
+\label{ch:result}
+
+Nous avons vue se qui a été produit durant les chapitres précédents, dans se chapitre figure certaine informations quant aux aboutissants du projet.
+
+\section{Performances}
+Les informations suivantes proviennent des tests d'exécutions réalisés sur une machine hôte possédant huit coeurs. Les exécutions les plus optimales ont été réalisées en utilisant les huit coeurs disponibles. 
+
+La phase la plus critique en termes de performances est la phase de détection des domaines. En effet, dans les données fournies pour ce projet, il y a prêts de 2000 organismes à traiter.
+
+La phase de détection des domaines exécutée avec la version du code gérant de multiples processus (coeurs), traite huit séquences toutes les deux minutes environ.
+
+Il est donc évident que cette phase doit être traitée de manière intelligente. En effet, il faut éviter de devoirs relancer cette phase à partir d'une base de données vide. De plus il faudrait penser à générer les résultats de cette phase sur une machine hôte puissante, puis de les migrer sur une machine moins puissante pour l'utilisation du reste de l'application.
+
+\section{Configuration}
+La mise en place du système de configuration fonctionne de manière optimale. Il est donc possible de lancer un premier fichier de configuration qui permet d'exécuter l'ensemble de phases. Puis d'ajouter plusieurs fichiers de configuration générant uniquement des dataset avec des paramètres différents.
+
+\section{Docker}
+La mise en place de l'environnement Docker permet effectivement une unification du processus de création et de lancement de l'application. L'utilisation de Docker-compose permet d'ajouter un service supplémentaire à tout moment. On peut imaginer ajouter un conteneur avec un serveur web pour la consultation du statut de l'application et des résultats, voir même la récupération de dataset.
+
+\cite{EinsteinPR1935}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
