@@ -1,4 +1,5 @@
-# Master Thesis
+# Master Thesis -- Dockerisation d'environement pour Les projets de bioinformatique
+
 ## Architecture
 
 ![Architecture](./documents/img/Inphinity_system_design.png)
