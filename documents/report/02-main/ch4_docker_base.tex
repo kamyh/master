@@ -2,7 +2,7 @@
 \label{ch:docker}
 
 \section{Introduction}
-Dans ce chapitre nous allons parler du fonctionnement de \emph{Docker} et \emph{Docker Compose}. Ce chapitre est réalisé sous le ton d'un cours d'introduction à Docker, afin de pouvoir transmettre les connaissances de base à l'utilisation et à la modification du travail réalisé lors de cette thèse. Cela passera entre autres par certains exemples et codes qui seront fournis en annexe notamment.
+Dans ce chapitre nous allons parler du fonctionnement de \emph{Docker} et \emph{Docker Compose}. Ce chapitre est réalisé sous le ton d'un cours d'introduction à Docker \cite{1}, afin de pouvoir transmettre les connaissances de base à l'utilisation et à la modification du travail réalisé lors de cette thèse. Cela passera entre autres par certains exemples et codes qui seront fournis en annexe notamment.
 
 Docker permet l'exécution de code dans un conteneur indépendant de vote système hôte. 
 
@@ -24,6 +24,7 @@ Je tiens ici à faire une mise en garde vis-à-vis de l'utilisation de Docker. D
 
 Docker n'est donc pas une solution miracle, mais présente beaucoup d'avantages en termes d'exécution standardisée, de partage de code et de déploiement.
 
+\newpage
 \section{Pré-requis}
 \subsection{Connaissance}
 Il est nécessaire d'être à l’aise avec l'\gls{os} Linux et l'utilisation de commande UNIX. En effet, la plupart du temps les conteneurs utiliseront un système Linux. Pour plus d'informations cf. ci-après.
@@ -71,7 +72,7 @@ Il faut à présent configurer Docker pour votre utilisateur hôte.
 \begin{lstlisting}[frame=single]
 $ sudo usermod -aG docker $(whoami)
 \end{lstlisting}
-\caption[Code - Configurer utlisateur Docker]{Configurer utlisateur Docker}
+\caption[Code - Configurer utlisateur Docker]{Configurer utilisateur Docker}
 \label{fig:configUserDocker} 
 \end{figure}
 
@@ -155,7 +156,7 @@ Status: Downloaded newer image for debian:jessie
 \label{fig:dockerPull} 
 \end{figure}
 
-Avec cette commande l'engin Docker a téléchargé l'image de debian Jessie depuis le \emph{Docker Hub}. Vous pouvez trouver un grand nombre d'images sur \emph{Docker Hub} - \hyperref[Docker Hub]{https://hub.docker.com/}.
+Avec cette commande l'engin Docker a téléchargé l'image de debian Jessie depuis le \emph{Docker Hub} \cite{3}. Vous pouvez trouver un grand nombre d'images sur \emph{Docker Hub} - \hyperref[Docker Hub]{https://hub.docker.com/}.
 
 Il est possible de gérer les images contenues sur une machine hôte. La commande suivante permet d'afficher la liste des images:
 
@@ -293,6 +294,7 @@ RUN apt-get install -y python3
 
 \end{enumerate}
 
+\newpage
 À présent, on peut \emph{build} notre image Docker, l'exécuter et voir que python 3 est bien présent:
 
 \begin{figure}[H] 
@@ -386,6 +388,7 @@ volumes:
 \label{fig:composeConfig} 
 \end{figure}
 
+\newpage
 Exécutons, à présent, notre application web:
 
 \begin{figure}[H] 
@@ -414,7 +417,7 @@ Pour vérifier que tout fonctionne, utilisez votre navigateur favori et accédez
 
 \begin{figure}[H] 
 \centering 
-\includegraphics[width=1\columnwidth]{img/phpinfo} 
+\includegraphics[width=0.8\columnwidth]{img/phpinfo} 
 \caption[phpinfo]{phpinfo()}
 \label{fig:phpinfo} 
 \end{figure}

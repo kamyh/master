@@ -26,6 +26,7 @@ Dû à la fois à la phase de débug et pour de futurs débugs, l'image est cons
 
 La mise en place d'une image \emph{Docker} avec un serveur mysql n'est, par expérience, jamais une chose facile à réaliser. C'est pour cela que nous allons entrer un peu plus dans les détails des différentes commandes qui composent le fichier \emph{Dockerfile} de cette image. Il n'est pas forcément nécessaire de lire ce sous-chapitre pour comprendre les aboutissants de cette thèse, mais il est nécessaire que les informations qui suivent y figurent.
 
+\newpage
 Premièrement, afin de pouvoir accéder au conteneur lancé à partir de cette image, il faut faire en sorte que mysql écoute les connexions en entrée.
 
 \lstset{language=bash}
@@ -64,6 +65,7 @@ ADD ./startup.sh /opt/startup.sh
 CMD ["/bin/bash", "/opt/startup.sh"]
 \end{lstlisting}
 
+\newpage
 Regardons ce que l'on trouve dans le fichier \emph{startup.sh}:
 
 \begin{figure}[H] 
@@ -117,7 +119,7 @@ Dans l'éventualité où l'on souhaiterait ajouter une nouvelle base de données
 
 De plus si l'on souhaite ajouter des tables ou données à une de nos bases de données, c'est également dans ce fichier qu'il faudra le faire.
 
-Comme vous pouvez le voir, tous les fichiers \emph{.sql} nécessaires sont placés dans le dossier \emph{$developpement/dockers/database/data$}.
+Comme vous pouvez le voir, tous les fichiers \emph{.sql} nécessaires sont placés dans le dossier \\ \emph{$developpement/dockers/database/data$}.
 
 
 \subsection{Core}
@@ -157,6 +159,7 @@ RUN curl -fsSL https://get.docker.com/ | sh
 \label{fig:coreInstall} 
 \end{figure}
 
+\newpage
 \section{Docker Compose}
 Maintenant que nous avons toutes les images nécessaires à notre environnement applicatif orienté bioinformatique, nous allons voir comment les combiner à l'aide de \emph{Docker Compose}.
 
@@ -175,6 +178,7 @@ De cette manière, le conteneur \emph{Core} peut créer des conteneurs \emph{hmm
 
 Regardons comment cela est mis en place grâce à \emph{Docker Compose}. 
 
+\newpage
 Premièrement, il nous faut un service qui lancera notre conteneur de base de données:
 
 \begin{figure}[H] 
@@ -211,6 +215,7 @@ On fixe manuellement le nom du conteneur qui sera créé afin de facilement pouv
 
 Finalement, on ajoute les volumes que l'on souhaite à notre conteneur. En effet, avec cette dernière commande, on attache le dossier hôte \emph{$/inphinity-data/mysql$} au dossier \emph{$/var/lib/mysql$} du conteneur. De cette manière lorsque l'on arrête et relance notre application notre base de données ne sera pas détruite. Si l'on souhaite supprimer la base de données et en recréer une vierge, il suffit de supprimer le contenu du dossier \emph{$/inphinity-data/mysql$}.
 
+\newpage
 Deuxièmement, il nous faut un service qui lancera le conteneur de notre contrôleur:
 
 \begin{figure}[H] 
@@ -270,6 +275,7 @@ Attention, ce chapitre n'aborde pas la logique du code réalisé dans la thèse 
 
 Les fonctions utilisées dans les scripts de la thèse \thLeite restent très proches de celle de ce travail!
 
+\newpage
 \subsection{Diagramme de classes}
 \begin{figure}[H] 
 \centering 
@@ -330,7 +336,7 @@ for chunk in chunks:
 
 On fait appel de manière parallèle à la fonction \emph{$hmmerScan.analyze_domaines()$}. Grâce à la \emph{pool} de processus la fonction sera exécutée simultanément un certain nombre de fois.
 
-Allons voir plus en détails ce qui se passe dans cette fonction. Pour voir le code de la fonction en détails, veuillez vous rendre directement dans les sources du code (\emph{$developpement/inphinity/v_0.5/hmmerScan.py$}).
+Allons voir plus en détails ce qui se passe dans cette fonction. Pour voir le code de la fonction en détails, veuillez vous rendre directement dans les sources du code (\emph{$developpement/inphinity/v\_0.5/hmmerScan.py$}).
 
 La séquence envoyée à la fonction est \emph{parsée} dans un fichier temporaire:
 
@@ -388,6 +394,7 @@ results = self.io.read_results(results_filename, self.configuration.get_detailed
 
 Nous aborderons la sélection des résultats dans la section \ref{ch:config}.
 
+\newpage
 Finalement on supprime les deux fichiers temporaires et  retourne les résultats.
 
 \begin{figure}[H] 
@@ -439,6 +446,7 @@ if __name__ == '__main__':
 \label{fig:main} 
 \end{figure}
 
+\newpage
 Voici un fichier de configuration standard:
 
 \begin{figure}[H] 
@@ -532,6 +540,7 @@ Configurations se rapportant directement à l'exécution de la phase 1 du traite
 
 \textbf{Section - [$DOMS\_SELECTION$]}
 
+\newpage
 Une analyse de séquence par \emph{hmmsearch} donne des résultats semblables à la figure \ref{fig:hmmseach}. On voit que chaque domaine trouvé possède une valeur de score, une e-value et un biais.
 
 \begin{figure}[H] 
@@ -562,6 +571,7 @@ Une analyse de séquence par \emph{hmmsearch} donne des résultats semblables à
 \item \emph{$space\_between\_bins$}, permet de définir l'espacement entre les \emph{bins}.
 \end{itemize}
 
+\newpage
 \subsection{Loggs}
 Afin de faciliter le développement de ce travail et les futurs développements et modifications de l'application, une classe permettant la génération d'un fichier de \emph{log} (compte-rendu) a été réalisée. Comme on le voit sur la figure \ref{fig:classdiagram}, il y a cinq niveaux de \emph{log}. Cela permet d'organiser les informations que l'on souhaite enregistrer.
 

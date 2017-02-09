@@ -9,7 +9,7 @@ Avant toutes choses, il a fallu se mettre au niveau et comprendre la thèse \thL
 \section{Automatisation}
 En terme d'automatisation, une pratique bien courante chez les développeurs s'agit d'utiliser des scripts bash afin de pouvoir exécuter un certain nombre de commandes et de codes successivement. Bien que cette méthode présente l'avantage d'être simple, il suffit d'une console UNIX et d'un éditeur de texte, elle présente un défaut majeur. En effet, le développeur du script contrôle quelle commande et code sont exécutés et peut également définir des paramètres pour ceux-ci, mais il ne peut pas contrôler l'environnement d'exécution.
 
-Une façon de faire, en plein essor depuis quelque temps, est l'utilisation de la plateforme Docker. Il s'agit d'un logiciel de containerisation. C'est-à-dire la création de briques d'applications, qui mises ensemble permettent de réaliser une application globale. De plus, le développement d'une telle solution permet un partage facilité grâce à un déploiement facilité et autonome. Pour davantage d'explications sur le sujet je vous renvoie au  \cf{ch:docker}.
+Une façon de faire, en plein essor depuis quelque temps, est l'utilisation de la plateforme Docker \cite{1}. Il s'agit d'un logiciel de containerisation. C'est-à-dire la création de briques d'applications, qui mises ensemble permettent de réaliser une application globale. De plus, le développement d'une telle solution permet un partage facilité grâce à un déploiement facilité et autonome. Pour davantage d'explications sur le sujet je vous renvoie au  \cf{ch:docker}.
 
 Vous l'aurez bien compris, le choix qui a été fait est celui de l'utilisation de Docker.
 
@@ -21,11 +21,11 @@ Les fichiers de configurations dont il est question ici sont spécifiques à la 
 
 Nous citerons ici uniquement la solution retenue, car les autres solutions trouvées sont soit trop incompatibles soit presque identiques à la solution retenue.
 
-Nous utilisons le module python \emph{Configparser}, qui permet de lire et parser des fichiers à l'extension .ini de manière simple. De plus, la structure d'un fichier .ini est très simple et ne laisse donc que très peu de place aux erreurs de format.
+Nous utilisons le module python \emph{Configparser} \cite{13}, qui permet de lire et parser des fichiers à l'extension .ini de manière simple. De plus, la structure d'un fichier .ini est très simple et ne laisse donc que très peu de place aux erreurs de format.
  
  
 \section{Hmmer}
-Dans la thèse \thLeite les séquences protéiniques sont recherchées dans la base de données de profile-HMM à l'aide d'une \gls{api} en ligne. Cette \gls{api} est disponible depuis le site \emph{https://www.ebi.ac.uk/Tools/hmmer/}. 
+Dans la thèse \thLeite les séquences protéiniques sont recherchées dans la base de données de profile-HMM à l'aide d'une \gls{api} en ligne. Cette \gls{api} est disponible depuis le site \emph{https://www.ebi.ac.uk/Tools/hmmer/} \cite{19}. 
 
 Comme dit précédemment, un des objectifs de ce travail est de se passer de l'utilisation de cette \gls{api} car son accès n'est pas toujours disponible ou stable.
 
@@ -40,6 +40,7 @@ Plusieurs solutions sont possibles, encore une fois les solutions les plus compl
 
 La partie principale que l'on souhaite paralléliser est l'utilisation de la fonction de scanne de HMMMER, étant donné qu'un très grand nombre de séquences protéiniques doivent être analysées.
 
+\newpage
 \subsection{Simple}
 \subsubsection{Docker}
 Docker, mis à part de rendre le déploiement et l'exécution d'application automatisée, permet également de lancer plusieurs conteneurs simultanément, \cf{ch:docker}. Un conteneur englobe un système de fichier complet possédant tout ce qui est nécessaire à remplir sa fonction. 
@@ -53,10 +54,10 @@ Notre but est de réaliser et d'optimiser un code \gls{cpu} dépendant, c'est-à
 
 \subsection{Avancée}
 \subsubsection{Docker Swarm}
-Une autre méthode utilisant une librairie avancée de Docker, consiste à utiliser Docker Swarm. Docker Swarm apporte à Docker une gestion native du \emph{clustering}, afin de transformer un groupe de \emph{Docker engines} en un unique et virtuel \emph{Docker engine}. Grâce à cela, il est possible d'exécuter une application sur une architecture partagée sur plusieurs systèmes physiquement indépendants. 
+Une autre méthode utilisant une librairie avancée de Docker, consiste à utiliser Docker Swarm \cite{9}. Docker Swarm apporte à Docker une gestion native du \emph{clustering}, afin de transformer un groupe de \emph{Docker engines} en un unique et virtuel \emph{Docker engine}. Grâce à cela, il est possible d'exécuter une application sur une architecture partagée sur plusieurs systèmes physiquement indépendants. 
 
 \subsubsection{Spark}
-Spark est un framework \emph{open source} de calcul distribué. Il permet d'effectuer des analyses complexes sur un grand nombre de données.
+Spark \cite{6},\cite{7} est un framework \emph{open source} de calcul distribué. Il permet d'effectuer des analyses complexes sur un grand nombre de données.
 
 Il est également un ensemble d'outils pour le traitement de grandes sources de données, notamment grâce à des fonctions \emph{MapReduce}.
 	
@@ -65,7 +66,7 @@ Le code repris de la thèse \thLeite est un code séquentiel, sous forme de scri
 
 Grâce au travail du Dr. Brett Cannon, \href{https://speakerdeck.com/pyconslides/python-3-dot-3-trust-me-its-better-than-python-2-dot-7-by-dr-brett-cannon}{voir ici}, on se rend compte que python 3.3 pourrait optimiser les performances de notre application. On peut lire  \href{https://mail.python.org/pipermail/python-dev/2012-October/121923.html}{ici} que même l'appel des fonctions est en moyenne 1.20 fois plus rapide. De plus, les \emph{threadded count} sont également plus rapides.
 
-Une autre possibilité est d'utiliser \emph{Cython}. Cython est un compilateur/langage de python permettant d'utiliser des appeles au langage C et de compiler un code python en exécutable C. Il faut savoir qu'un exécutable C est généralement plus rapide que l'exécution de l'interpréteur Python. 
+Une autre possibilité est d'utiliser \emph{Cython} \cite{11}. Cython est un compilateur/langage de python permettant d'utiliser des appeles au langage C et de compiler un code python en exécutable C. Il faut savoir qu'un exécutable C est généralement plus rapide que l'exécution de l'interpréteur Python. 
 
 On trouve le tableau suivant dans la documentation de Cython, qui permet de nous rendre compte des différences.
 
