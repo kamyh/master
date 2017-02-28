@@ -6,6 +6,7 @@ cd ./master/developpement/dockers/core/data-hmm/
 sh get_pfam_hmm.sh
 
 cd ../../database/data/
+#others .sql files are directly on the git repository
 wget https://www.dropbox.com/s/mzt9pxpfnvxl3wa/bacteriaVD.sql?dl=0
 mv bacteriaVD.sql?dl=0 bacteriaVD.sql
 
