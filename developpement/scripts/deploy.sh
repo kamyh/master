@@ -14,7 +14,7 @@ cd ../../../inphinity/configs/v_0.3
 cp config.example.ini config_v0.3.ini
 sudo nano config_v0.3.ini
 
-cd ../../compose/
+cd ../../../compose/
 sudo sh run.sh
 docker ps
 
