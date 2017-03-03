@@ -1,9 +1,9 @@
 ## Execution
 
-'''
+```
 $ docker exec -it inphinity-core /bin/bash
 $ python3 inphinity/v_0.5/app.py
-'''
+```
 
 ### Know issues
 
@@ -13,9 +13,9 @@ This append if your linux system is not a Debian Jessie. This is due to server/c
 
 To fix it run the following command in the "inphinity-cire" container:
 
-'''
+```
 export DOCKER_API_VERSION=1.22
-'''
+```
 
 ## Usefull commands
 
