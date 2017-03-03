@@ -14,7 +14,7 @@ This append if your linux system is not a Debian Jessie. This is due to server/c
 To fix it run the following command in the "inphinity-cire" container:
 
 ```
-export DOCKER_API_VERSION=1.22
+$ export DOCKER_API_VERSION=1.22
 ```
 
 ## Usefull commands
