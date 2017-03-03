@@ -7,7 +7,7 @@ $ python3 inphinity/v_0.5/app.py
 
 ### Know issues
 
-#### Error response from daemon: client is newer than server (client API version: 1.24, server API version: 1.22)
+#### 1. Error response from daemon: client is newer than server (client API version: 1.24, server API version: 1.22)
 
 This append if your linux system is not a Debian Jessie. This is due to server/client dockers API missmatch.
 
