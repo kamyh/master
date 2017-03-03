@@ -1,11 +1,23 @@
-## Process
+## Execution
 
-1. core code
-    - supervision by host ???
-    - supervision by a container ???
-2. start docker hmmer --> run hmmscan
-3. 
+'''
+$ docker exec -it inphinity-core /bin/bash
+$ python3 inphinity/v_0.5/app.py
+'''
 
+### Know issues
+
+#### Error response from daemon: client is newer than server (client API version: 1.24, server API version: 1.22)
+
+This append if your linux system is not a Debian Jessie. This is due to server/client dockers API missmatch.
+
+To fix it run the following command in the "inphinity-cire" container:
+
+'''
+export DOCKER_API_VERSION=1.22
+'''
+
+## Usefull commands
 
 docker exec -it inphinity-database mysql -h phage_bact -u admin -proot -e "SELECT count(ProtDomId) as doms_found from phage_bact.PROTDOM;"
 
