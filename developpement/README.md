@@ -11,7 +11,7 @@ $ python3 inphinity/v_0.5/app.py
 
 This append if your linux system is not a Debian Jessie. This is due to server/client dockers API missmatch.
 
-To fix it run the following command in the "inphinity-cire" container:
+To fix it run the following command in the "inphinity-core" container:
 
 ```
 $ export DOCKER_API_VERSION=1.22
