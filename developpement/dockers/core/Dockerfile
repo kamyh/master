@@ -55,4 +55,6 @@ RUN chmod 0777 /tmp/inphinity
 RUN apt-get install -y curl
 RUN curl -fsSL https://get.docker.com/ | sh
 
+export DOCKER_API_VERSION=1.22
+
 WORKDIR /
